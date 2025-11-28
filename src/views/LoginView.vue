@@ -47,31 +47,28 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
+import config from '@/config';
 
 const router = useRouter();
 
 const handleKakaoLogin = () => {
-  // TODO: Implement Kakao login logic
-  console.log('Kakao login clicked');
-  // router.push('/nickname');
+  // OAuth2 카카오 로그인 - 백엔드로 리다이렉트
+  window.location.href = `${config.api.baseURL}/oauth2/authorization/kakao`;
 };
 
 const handleNaverLogin = () => {
-  // TODO: Implement Naver login logic
-  console.log('Naver login clicked');
-  // router.push('/nickname');
+  // OAuth2 네이버 로그인 - 백엔드로 리다이렉트
+  window.location.href = `${config.api.baseURL}/oauth2/authorization/naver`;
 };
 
 const handleGoogleLogin = () => {
-  // TODO: Implement Google login logic
-  console.log('Google login clicked');
-  // router.push('/nickname');
+  // OAuth2 구글 로그인 - 백엔드로 리다이렉트
+  window.location.href = `${config.api.baseURL}/oauth2/authorization/google`;
 };
 
 const handleBrowseWithoutLogin = () => {
-  // TODO: Implement browse without login logic
-  console.log('Browse without login clicked');
-  // router.push('/');
+  // 로그인 없이 홈으로 이동
+  router.push('/');
 };
 </script>
 

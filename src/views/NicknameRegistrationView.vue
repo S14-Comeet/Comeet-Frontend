@@ -53,27 +53,28 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { checkNickname } from '@/api/auth';
+import { DEFAULTS } from '@/constants';
 
 const router = useRouter();
 
 const nickname = ref('');
-const validationState = ref('idle'); // 'idle', 'success', 'error', 'duplicate'
+const validationState = ref('idle'); // 'idle', 'success', 'error', 'duplicate', 'checking'
 const helperMessage = ref('');
-
-// TODO: 실제 환경에서는 API로 중복 체크를 해야 합니다
-const duplicateNicknames = ['test', '테스트', 'admin', '관리자'];
+let debounceTimer = null;
 
 const isValid = computed(() => {
   return nickname.value.trim().length > 0 && validationState.value === 'success';
 });
 
-const validateNickname = () => {
+const validateNickname = async () => {
   const trimmedNickname = nickname.value.trim();
 
   // 입력이 없으면 초기 상태로
   if (nickname.value.length === 0) {
     validationState.value = 'idle';
     helperMessage.value = '';
+    clearTimeout(debounceTimer);
     return;
   }
 
@@ -81,6 +82,7 @@ const validateNickname = () => {
   if (trimmedNickname.length === 0) {
     validationState.value = 'error';
     helperMessage.value = '공백만 입력할 수 없습니다';
+    clearTimeout(debounceTimer);
     return;
   }
 
@@ -89,20 +91,33 @@ const validateNickname = () => {
   if (specialCharPattern.test(nickname.value)) {
     validationState.value = 'error';
     helperMessage.value = '특수문자는 사용할 수 없습니다';
+    clearTimeout(debounceTimer);
     return;
   }
 
-  // TODO: 실제로는 API 호출로 중복 체크를 해야 합니다
-  // 중복 닉네임 검사 (임시 로직)
-  if (duplicateNicknames.includes(trimmedNickname)) {
-    validationState.value = 'duplicate';
-    helperMessage.value = '중복된 닉네임입니다.';
-    return;
-  }
+  // 디바운싱을 적용하여 API 호출 최적화
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(async () => {
+    try {
+      validationState.value = 'checking';
+      helperMessage.value = '확인 중...';
 
-  // 모든 검증 통과
-  validationState.value = 'success';
-  helperMessage.value = '사용할 수 있는 닉네임이에요';
+      // API 호출로 중복 체크
+      const isDuplicate = await checkNickname(trimmedNickname);
+
+      if (isDuplicate) {
+        validationState.value = 'duplicate';
+        helperMessage.value = '중복된 닉네임입니다.';
+      } else {
+        validationState.value = 'success';
+        helperMessage.value = '사용할 수 있는 닉네임이에요';
+      }
+    } catch (error) {
+      console.error('닉네임 중복 확인 실패:', error);
+      validationState.value = 'error';
+      helperMessage.value = '중복 확인에 실패했습니다. 다시 시도해 주세요.';
+    }
+  }, DEFAULTS.DEBOUNCE_DELAY);
 };
 
 const handleBack = () => {

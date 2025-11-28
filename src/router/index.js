@@ -19,6 +19,7 @@ const routes = [
     name: 'nickname',
     component: NicknameRegistrationView
   }
+
 ];
 
 const router = createRouter({
