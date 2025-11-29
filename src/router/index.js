@@ -19,11 +19,6 @@ const routes = [
         component: () => import('@/views/MapView.vue'),
     },
     {
-        path: '/saved',
-        name: 'saved',
-        component: () => import('@/views/SavedPlacesView.vue'),
-    },
-    {
         path: '/profile',
         name: 'profile',
         component: () => import('@/views/ProfileView.vue'),
