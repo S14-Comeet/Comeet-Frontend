@@ -9,14 +9,24 @@ const routes = [
         redirect: '/map', // 🗺️ 메인 페이지를 지도로 변경
     },
     {
+        path: '/home',
+        name: 'home',
+        component: HomeView
+    },
+    {
         path: '/map',
         name: 'map',
         component: () => import('@/views/MapView.vue'),
     },
     {
-        path: '/',
-        name: 'home',
-        component: HomeView
+        path: '/saved',
+        name: 'saved',
+        component: () => import('@/views/SavedPlacesView.vue'),
+    },
+    {
+        path: '/profile',
+        name: 'profile',
+        component: () => import('@/views/ProfileView.vue'),
     },
     {
         path: '/login',
@@ -27,6 +37,11 @@ const routes = [
         path: '/nickname',
         name: 'nickname',
         component: NicknameRegistrationView
+    },
+    {
+        path: '/survey',
+        name: 'survey',
+        component: () => import('@/views/SurveyView.vue'),
     }
 
 ];

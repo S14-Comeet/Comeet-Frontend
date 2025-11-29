@@ -1,13 +1,7 @@
 <template>
-  <div class="relative w-full h-screen">
+  <div class="relative w-full h-full">
     <!-- 지도 컨테이너 -->
     <div ref="mapContainer" class="w-full h-full"></div>
-
-    <!-- 🗺️ 지도 컨트롤 (우측 상단) -->
-    <MapControls
-        @request-location="handleRequestLocation"
-        class="absolute top-4 right-4 z-10"
-    />
 
     <!-- 로딩 오버레이 -->
     <div
@@ -16,7 +10,7 @@
     >
       <div class="bg-white rounded-lg p-6 shadow-lg">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-        <p class="mt-4 text-text-secondary">지도 로딩 중...</p>
+        <p class="mt-4 text-textSecondary">지도 로딩 중...</p>
       </div>
     </div>
 
@@ -43,7 +37,6 @@ import {ref, onMounted} from 'vue'
 import {useNaverMap} from '@/composables/useNaverMap'
 import {useGeolocation} from '@/composables/useGeolocation'
 import {useToast} from 'vue-toastification'
-import MapControls from '@/components/map/MapControls.vue'
 import PlaceInfoCard from "@/components/map/PlaceInfoCard.vue";
 import PlaceDetailModal from "@/components/map/PlaceDetailModal.vue";
 
@@ -56,14 +49,6 @@ const {location, requestLocation} = useGeolocation()
 const {map, initMap, addMarker, clearMarkers} = useNaverMap()
 const selectedPlace = ref(null)
 const detailPlace = ref(null)
-
-
-const handleRequestLocation = async () => {
-  await requestLocation()
-  if (location.value) {
-    map.value.setCenter(new naver.maps.LatLng(location.value.lat, location.value.lng))
-  }
-}
 
 // 🗺️ Mock 카페 데이터
 const mockCafes = [

@@ -12,7 +12,7 @@
         <!-- 닫기 버튼 -->
         <button
             @click="$emit('close')"
-            class="absolute top-4 right-4 text-text-secondary hover:text-text-primary"
+            class="absolute top-4 right-4 text-textSecondary hover:text-textPrimary"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -20,28 +20,28 @@
         </button>
 
         <!-- 카페 정보 -->
-        <h2 class="text-2xl font-bold text-text-primary mb-4">
+        <h2 class="text-2xl font-bold text-textPrimary mb-4">
           {{ place.name }}
         </h2>
 
         <div class="space-y-3">
           <div>
-            <p class="text-sm text-text-secondary">주소</p>
-            <p class="text-base text-text-primary">
+            <p class="text-sm text-textSecondary">주소</p>
+            <p class="text-base text-textPrimary">
               {{ place.address || '주소 정보 없음' }}
             </p>
           </div>
 
           <div>
-            <p class="text-sm text-text-secondary">카테고리</p>
+            <p class="text-sm text-textSecondary">카테고리</p>
             <span class="inline-block px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm">
                 카페
               </span>
           </div>
 
           <div v-if="place.description">
-            <p class="text-sm text-text-secondary">설명</p>
-            <p class="text-base text-text-primary">
+            <p class="text-sm text-textSecondary">설명</p>
+            <p class="text-base text-textPrimary">
               {{ place.description }}
             </p>
           </div>

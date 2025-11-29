@@ -28,8 +28,8 @@ export default {
         },
         background: '#f6f8fb',
         surface: '#ffffff',
-        'text-primary': '#1a1a1a',
-        'text-secondary': '#8b95a1',
+        textPrimary: '#1a1a1a',
+        textSecondary: '#8b95a1',
         border: '#e0e0e0',
       },
       fontFamily: {

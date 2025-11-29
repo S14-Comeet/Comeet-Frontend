@@ -4,6 +4,15 @@
 /* Tailwind CSS */
 @import "tailwindcss";
 
+/* Tailwind CSS v4 Theme 정의 */
+@theme {
+  --color-textPrimary: #1a1a1a;
+  --color-textSecondary: #8b95a1;
+  --color-background: #f6f8fb;
+  --color-surface: #ffffff;
+  --color-border: #e0e0e0;
+}
+
 /* 기본 스타일 */
 * {
   box-sizing: border-box;
@@ -11,8 +20,8 @@
 
 body {
   font-family: Pretendard, system-ui, sans-serif;
-  color: #1a1a1a;
-  background-color: #f6f8fb;
+  color: var(--color-textPrimary);
+  background-color: var(--color-background);
   margin: 0;
   min-height: 100vh;
 }

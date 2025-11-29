@@ -15,10 +15,10 @@
           </span>
 
         <div class="flex-1">
-          <h3 class="text-lg font-bold text-text-primary">
+          <h3 class="text-lg font-bold text-textPrimary">
             {{ place.name }}
           </h3>
-          <p class="text-sm text-text-secondary mt-1">
+          <p class="text-sm text-textSecondary mt-1">
             {{ place.address || '주소 정보 없음' }}
           </p>
         </div>
@@ -34,7 +34,7 @@
         </button>
         <button
             @click="$emit('close')"
-            class="px-4 py-2 border border-border rounded-lg text-text-secondary"
+            class="px-4 py-2 border border-border rounded-lg text-textSecondary"
         >
           닫기
         </button>
