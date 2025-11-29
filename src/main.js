@@ -35,4 +35,3 @@ app.use(Toast, {
 })
 
 app.mount('#app')
-
