@@ -43,12 +43,11 @@ const isFullScreenPage = computed(() => {
 <style scoped>
 .app-shell {
   position: relative;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   background-color: #ffffff;
   width: 100%;
-  overflow: hidden;
 }
 
 /* 데스크톱: 중앙 정렬 + 최대 너비 + 그림자 */
@@ -66,6 +65,7 @@ const isFullScreenPage = computed(() => {
   max-width: 960px;
   width: 100%;
   margin: 0 auto;
+  overflow-y: auto;
 }
 
 .app-main.no-header {
@@ -78,6 +78,13 @@ const isFullScreenPage = computed(() => {
   padding: 0;
   max-width: 100%;
   margin: 0;
+  overflow: hidden;
+}
+
+/* 지도 페이지용 app-shell 수정 */
+.app-shell:has(.app-main.full-screen) {
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* 네비게이션 바가 있을 때 하단 패딩 추가 (64px = h-16) */

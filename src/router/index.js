@@ -27,6 +27,11 @@ const routes = [
         path: '/nickname',
         name: 'nickname',
         component: NicknameRegistrationView
+    },
+    {
+        path: '/test-components',
+        name: 'test-components',
+        component: () => import('@/views/ComponentTestView.vue')
     }
 
 ];
