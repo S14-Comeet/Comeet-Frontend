@@ -47,7 +47,6 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 // SVG 아이콘 임포트
