@@ -1,7 +1,7 @@
 /**
  * 인증 관련 API 호출 함수
  */
-import api from './axios';
+import api from '@/api/axios';
 import { API_ENDPOINTS } from '@/constants';
 
 /**
