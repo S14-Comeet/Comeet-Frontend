@@ -2,8 +2,13 @@
   <div
     :class="[
       'box-border flex gap-2.5 h-10 items-center justify-center py-2.5 rounded-full transition-all',
-      chipClasses
+      chipClasses,
+      clickable && 'cursor-pointer hover:opacity-80 active:scale-95'
     ]"
+    :role="clickable ? 'button' : undefined"
+    :tabindex="clickable ? 0 : undefined"
+    @click="handleClick"
+    @keydown="handleKeyDown"
   >
     <!-- Default variant -->
     <p
@@ -34,8 +39,18 @@
       >
         {{ label }}
       </p>
-      <ChevronDownIcon v-if="dropdown" class="w-4 h-4 text-primary-700" />
-      <SortIcon v-if="sort" class="w-4 h-4 text-primary-700" />
+      <BaseIcon
+        v-if="dropdown"
+        name="chevron-down"
+        :size="16"
+        color="var(--color-primary-700)"
+      />
+      <BaseIcon
+        v-if="sort"
+        name="sort"
+        :size="16"
+        color="var(--color-primary-700)"
+      />
     </div>
 
     <!-- Primary Selected variant -->
@@ -50,23 +65,7 @@
 
 <script setup>
 import { computed } from 'vue'
-
-// Icons (placeholder - will be implemented in BaseIcon)
-const ChevronDownIcon = {
-  template: `
-    <svg viewBox="0 0 16 16" fill="none" class="w-4 h-4">
-      <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  `
-}
-
-const SortIcon = {
-  template: `
-    <svg viewBox="0 0 16 16" fill="none" class="w-4 h-4">
-      <path d="M4 8L8 4L12 8M4 12L8 8L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  `
-}
+import BaseIcon from './BaseIcon.vue'
 
 const props = defineProps({
   /**
@@ -108,8 +107,32 @@ const props = defineProps({
   selected: {
     type: Boolean,
     default: false
+  },
+  /**
+   * Make chip clickable (adds hover, cursor, and keyboard support)
+   */
+  clickable: {
+    type: Boolean,
+    default: false
   }
 })
+
+const emit = defineEmits(['click'])
+
+const handleClick = () => {
+  if (props.clickable) {
+    emit('click')
+  }
+}
+
+const handleKeyDown = (event) => {
+  if (!props.clickable) return
+
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault()
+    emit('click')
+  }
+}
 
 const chipClasses = computed(() => {
   const base = {

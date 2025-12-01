@@ -244,6 +244,45 @@
       />
     </template>
 
+    <!-- Sort (Up/Down Arrows) -->
+    <template v-else-if="name === 'sort'">
+      <path
+        d="M8 15L12 19L16 15"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M8 9L12 5L16 9"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </template>
+
+    <!-- Spinner (Loading) -->
+    <template v-else-if="name === 'spinner'">
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+        :stroke="color"
+        stroke-width="2"
+        stroke-linecap="round"
+        fill="none"
+        opacity="0.25"
+      />
+      <path
+        d="M12 2C6.47715 2 2 6.47715 2 12"
+        :stroke="color"
+        stroke-width="2"
+        stroke-linecap="round"
+        fill="none"
+      />
+    </template>
+
     <!-- Fallback: Unknown icon -->
     <template v-else>
       <circle cx="12" cy="12" r="2" :fill="color" />

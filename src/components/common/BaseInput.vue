@@ -24,6 +24,8 @@
         :placeholder="placeholder"
         :disabled="disabled"
         :type="inputType"
+        :aria-invalid="status === 'error' ? 'true' : undefined"
+        :aria-describedby="helperText ? 'helper-text' : undefined"
         :class="[
           'flex-1 bg-transparent outline-none text-base leading-normal',
           inputClasses
@@ -43,15 +45,18 @@
     </div>
 
     <!-- Helper Text -->
-    <p
+    <output
       v-if="helperText"
+      id="helper-text"
       :class="[
         'mt-2 text-sm',
         helperTextClasses
       ]"
+      :role="status === 'error' ? 'alert' : undefined"
+      :aria-live="status === 'error' ? 'polite' : undefined"
     >
       {{ helperText }}
-    </p>
+    </output>
   </div>
 </template>
 
@@ -174,9 +179,9 @@ const inputClasses = computed(() => {
 })
 
 const iconColor = computed(() => {
-  if (props.disabled) return '#757575'
-  if (isFocused.value || props.modelValue) return '#171717'
-  return '#9e9e9e'
+  if (props.disabled) return 'var(--color-textDisabled)'
+  if (isFocused.value || props.modelValue) return 'var(--color-neutral-900)'
+  return 'var(--color-textSecondary)'
 })
 
 const helperTextClasses = computed(() => {

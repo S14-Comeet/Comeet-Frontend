@@ -1,21 +1,29 @@
 <template>
   <button
     :type="buttonType"
-    :disabled="disabled"
+    :disabled="disabled || loading"
     :class="[
       'inline-flex items-center justify-center gap-2.5 font-bold text-center rounded-xl transition-all',
       sizeClasses,
       variantClasses,
-      disabled && 'cursor-not-allowed'
+      (disabled || loading) && 'cursor-not-allowed'
     ]"
     @click="handleClick"
   >
+    <BaseIcon
+      v-if="loading"
+      name="spinner"
+      :size="size === 'large' ? 20 : size === 'medium' ? 18 : 16"
+      class="animate-spin"
+      color="currentColor"
+    />
     <slot>{{ label }}</slot>
   </button>
 </template>
 
 <script setup>
 import { computed } from 'vue'
+import BaseIcon from './BaseIcon.vue'
 
 const props = defineProps({
   /**
@@ -56,6 +64,13 @@ const props = defineProps({
     default: false
   },
   /**
+   * Loading state - shows spinner and disables button
+   */
+  loading: {
+    type: Boolean,
+    default: false
+  },
+  /**
    * Button type attribute
    */
   buttonType: {
@@ -77,7 +92,7 @@ const sizeClasses = computed(() => {
 })
 
 const variantClasses = computed(() => {
-  if (props.disabled) {
+  if (props.disabled || props.loading) {
     return 'bg-border text-textDisabled'
   }
 
@@ -92,7 +107,7 @@ const variantClasses = computed(() => {
 })
 
 const handleClick = (event) => {
-  if (!props.disabled) {
+  if (!props.disabled && !props.loading) {
     emit('click', event)
   }
 }

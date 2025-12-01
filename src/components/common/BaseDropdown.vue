@@ -1,74 +1,86 @@
 <template>
   <div
-    ref="dropdownRef"
-    :class="[
+      ref="dropdownRef"
+      :class="[
       'relative w-full',
       isOpen && 'h-auto'
     ]"
   >
     <!-- Dropdown Button -->
-    <div
-      :class="[
-        'flex items-center justify-between pl-5 pr-3 py-2 rounded-xl transition-all cursor-pointer',
+    <button
+        type="button"
+        :class="[
+        'flex items-center justify-between pl-5 pr-3 py-2 rounded-xl transition-all w-full',
         dropdownClasses
       ]"
-      @click="toggleDropdown"
-      :disabled="disabled"
+        @click="toggleDropdown"
+        @keydown="handleKeyDown"
+        :aria-expanded="isOpen"
+        :aria-controls="listboxId"
+        :aria-haspopup="listbox"
+        :disabled="disabled"
     >
       <!-- Label -->
-      <p
-        :class="[
+      <span
+          :class="[
           'text-base leading-normal',
           labelClasses
         ]"
       >
         {{ displayValue }}
-      </p>
+      </span>
 
       <!-- Chevron Icon -->
-      <div class="overflow-hidden shrink-0 w-10 h-10 flex items-center justify-center">
+      <span class="overflow-hidden shrink-0 w-10 h-10 flex items-center justify-center" aria-hidden="true">
         <svg
-          :class="[
+            :class="[
             'w-6 h-6 transition-transform',
             isOpen && 'rotate-180'
           ]"
-          viewBox="0 0 24 24"
-          fill="none"
+            viewBox="0 0 24 24"
+            fill="none"
         >
           <path
-            d="M6 9L12 15L18 9"
-            :stroke="chevronColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+              d="M6 9L12 15L18 9"
+              :stroke="chevronColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
           />
         </svg>
-      </div>
-    </div>
+      </span>
+    </button>
+
 
     <!-- Dropdown List -->
     <transition name="dropdown">
-      <div
-        v-if="isOpen"
-        class="absolute left-0 right-0 top-full mt-2 bg-white border border-border rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto"
+      <ul
+          v-if="isOpen"
+          :id="listboxId"
+          class="absolute left-0 right-0 top-full mt-2 bg-white border border-border rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto px-5 py-4 flex flex-col gap-2 list-none m-0"
       >
-        <div class="px-5 py-4 flex flex-col gap-8">
-          <p
-            v-for="option in options"
+        <li
+            v-for="(option, index) in options"
             :key="option.value"
-            class="text-base text-neutral-900 cursor-pointer hover:text-primary transition-colors"
+            :class="[
+              'text-base cursor-pointer transition-all px-2 py-1 rounded',
+              index === highlightedIndex
+                ? 'bg-primary-50 text-primary-700 font-medium'
+                : 'text-neutral-900 hover:text-primary'
+            ]"
+            :aria-selected="option.value === modelValue"
             @click="selectOption(option)"
-          >
-            {{ option.label }}
-          </p>
-        </div>
-      </div>
+            @mouseenter="highlightedIndex = index"
+        >
+          {{ option.label }}
+        </li>
+      </ul>
     </transition>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import {ref, computed, onMounted, onUnmounted} from 'vue'
 
 const props = defineProps({
   /**
@@ -116,6 +128,8 @@ const emit = defineEmits(['update:modelValue', 'change'])
 
 const dropdownRef = ref(null)
 const isOpen = ref(false)
+const highlightedIndex = ref(-1)
+const listboxId = `dropdown-listbox-${Math.random().toString(36).substr(2, 9)}`
 
 const displayValue = computed(() => {
   if (!props.modelValue) return props.placeholder
@@ -125,20 +139,20 @@ const displayValue = computed(() => {
 
 const dropdownClasses = computed(() => {
   if (props.disabled) {
-    return 'bg-surface-light border-0 cursor-not-allowed'
+    return 'bg-surface-light border-0'
   }
 
   if (isOpen.value) {
-    return 'bg-white border border-neutral-900'
+    return 'bg-white border border-neutral-900 cursor-pointer'
   }
 
   if (props.modelValue) {
-    return 'bg-white border border-border'
+    return 'bg-white border border-border cursor-pointer'
   }
 
   return props.variant === 'border'
-    ? 'bg-white border border-border'
-    : 'bg-surface-light border-0'
+      ? 'bg-white border border-border cursor-pointer'
+      : 'bg-surface-light border-0 cursor-pointer'
 })
 
 const labelClasses = computed(() => {
@@ -154,20 +168,90 @@ const labelClasses = computed(() => {
 })
 
 const chevronColor = computed(() => {
-  if (props.disabled) return '#757575'
-  if (isOpen.value || props.modelValue) return '#171717'
-  return '#9e9e9e'
+  if (props.disabled) return 'var(--color-textDisabled)'
+  if (isOpen.value || props.modelValue) return 'var(--color-neutral-900)'
+  return 'var(--color-textSecondary)'
 })
 
 const toggleDropdown = () => {
   if (props.disabled) return
   isOpen.value = !isOpen.value
+  if (isOpen.value) {
+    highlightedIndex.value = props.options.findIndex(opt => opt.value === props.modelValue)
+  }
 }
 
 const selectOption = (option) => {
   emit('update:modelValue', option.value)
   emit('change', option.value)
   isOpen.value = false
+  highlightedIndex.value = -1
+}
+
+const handleEnterOrSpace = (event) => {
+  event.preventDefault()
+  if (isOpen.value && highlightedIndex.value >= 0) {
+    selectOption(props.options[highlightedIndex.value])
+  } else {
+    toggleDropdown()
+  }
+}
+
+const handleEscape = (event) => {
+  if (isOpen.value) {
+    event.preventDefault()
+    isOpen.value = false
+    highlightedIndex.value = -1
+  }
+}
+
+const handleArrowDown = (event) => {
+  event.preventDefault()
+  if (isOpen.value) {
+    highlightedIndex.value = Math.min(highlightedIndex.value + 1, props.options.length - 1)
+  } else {
+    toggleDropdown()
+  }
+}
+
+const handleArrowUp = (event) => {
+  event.preventDefault()
+  if (isOpen.value) {
+    highlightedIndex.value = Math.max(highlightedIndex.value - 1, 0)
+  }
+}
+
+const handleHome = (event) => {
+  if (isOpen.value) {
+    event.preventDefault()
+    highlightedIndex.value = 0
+  }
+}
+
+const handleEnd = (event) => {
+  if (isOpen.value) {
+    event.preventDefault()
+    highlightedIndex.value = props.options.length - 1
+  }
+}
+
+const handleKeyDown = (event) => {
+  if (props.disabled) return
+
+  const keyHandlers = {
+    'Enter': handleEnterOrSpace,
+    ' ': handleEnterOrSpace,
+    'Escape': handleEscape,
+    'ArrowDown': handleArrowDown,
+    'ArrowUp': handleArrowUp,
+    'Home': handleHome,
+    'End': handleEnd
+  }
+
+  const handler = keyHandlers[event.key]
+  if (handler) {
+    handler(event)
+  }
 }
 
 // Close dropdown when clicking outside
@@ -186,16 +270,3 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
-/* Dropdown transition */
-.dropdown-enter-active,
-.dropdown-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.dropdown-enter-from,
-.dropdown-leave-to {
-  opacity: 0;
-  transform: translateY(-8px);
-}
-</style>
