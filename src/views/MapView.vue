@@ -14,7 +14,7 @@
       </div>
     </div>
 
-    <PlaceInfoCard
+    <MapPlaceInfo
         v-if="selectedPlace"
         :place="selectedPlace"
         @close="selectedPlace = null"
@@ -22,7 +22,7 @@
         class="absolute bottom-0 left-0 right-0 z-30"
     />
 
-    <PlaceDetailModal
+    <MapPlaceDetail
         v-if="detailPlace"
         :place="detailPlace"
         @close="detailPlace = null"
@@ -37,8 +37,8 @@ import {ref, onMounted} from 'vue'
 import {useNaverMap} from '@/composables/useNaverMap'
 import {useGeolocation} from '@/composables/useGeolocation'
 import {useToast} from 'vue-toastification'
-import PlaceInfoCard from "@/components/map/PlaceInfoCard.vue";
-import PlaceDetailModal from "@/components/map/PlaceDetailModal.vue";
+import MapPlaceInfo from "@/components/map/MapPlaceInfo.vue";
+import MapPlaceDetail from "@/components/map/MapPlaceDetail.vue";
 
 
 

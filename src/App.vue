@@ -7,7 +7,7 @@
       <main class="app-main" :class="{ 'no-header': !showHeader, 'with-nav': showNavigation, 'full-screen': isFullScreenPage }">
         <RouterView />
       </main>
-      <NavigationBar v-if="showNavigation" />
+      <BaseNavigationBar v-if="showNavigation" />
     </div>
   </div>
 </template>
@@ -16,7 +16,7 @@
 import { computed } from 'vue';
 import { RouterView, useRoute } from 'vue-router';
 import BaseHeader from './components/BaseHeader.vue';
-import NavigationBar from './components/common/NavigationBar.vue';
+import BaseNavigationBar from './components/BaseNavigationBar.vue';
 
 const route = useRoute();
 
