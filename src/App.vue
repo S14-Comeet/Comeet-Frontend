@@ -15,8 +15,8 @@
 <script setup>
 import { computed } from 'vue';
 import { RouterView, useRoute } from 'vue-router';
-import BaseHeader from './components/BaseHeader.vue';
-import BaseNavigationBar from './components/BaseNavigationBar.vue';
+import BaseHeader from './components/common/BaseHeader.vue';
+import BaseNavigationBar from './components/common/BaseNavigationBar.vue';
 
 const route = useRoute();
 

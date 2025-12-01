@@ -185,6 +185,65 @@
       <circle cx="12" cy="19" r="1.5" :fill="color" />
     </template>
 
+    <!-- Event (Calendar) -->
+    <template v-else-if="name === 'event'">
+      <rect
+        x="3"
+        y="4"
+        width="18"
+        height="18"
+        rx="2"
+        ry="2"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M16 2V6M8 2V6M3 10H21"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </template>
+
+    <!-- Notice (Bell) -->
+    <template v-else-if="name === 'notice'">
+      <path
+        d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </template>
+
+    <!-- User Line -->
+    <template v-else-if="name === 'user-line'">
+      <path
+        d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </template>
+
     <!-- Fallback: Unknown icon -->
     <template v-else>
       <circle cx="12" cy="12" r="2" :fill="color" />
