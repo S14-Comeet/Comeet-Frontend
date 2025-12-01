@@ -21,17 +21,17 @@ import NavigationBar from './components/common/NavigationBar.vue';
 const route = useRoute();
 
 // 헤더를 숨길 페이지 목록
-const pagesWithoutHeader = ['login', 'nickname'];
+const pagesWithoutHeader = new Set(['login', 'nickname', 'map']);
 
 // 네비게이션 바를 숨길 페이지 목록 (로그인, 닉네임, 설문)
-const pagesWithoutNavigation = ['login', 'nickname', 'survey'];
+const pagesWithoutNavigation = new Set(['login', 'nickname', 'survey']);
 
 const showHeader = computed(() => {
-  return !pagesWithoutHeader.includes(route.name);
+  return !pagesWithoutHeader.has(route.name);
 });
 
 const showNavigation = computed(() => {
-  return !pagesWithoutNavigation.includes(route.name);
+  return !pagesWithoutNavigation.has(route.name);
 });
 
 // 전체 화면을 사용하는 페이지 목록 (지도 등)

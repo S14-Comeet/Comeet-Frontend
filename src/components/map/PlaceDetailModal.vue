@@ -1,18 +1,21 @@
 <template>
   <transition name="fade">
-    <div
+    <dialog
         v-if="place"
         class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+        role="alertdialog"
+        aria-modal="true"
         @click="$emit('close')"
     >
       <div
-          class="bg-white rounded-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto p-6"
+          class="relative bg-white rounded-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto p-6"
           @click.stop
       >
         <!-- 닫기 버튼 -->
         <button
             @click="$emit('close')"
             class="absolute top-4 right-4 text-textSecondary hover:text-textPrimary"
+            aria-label="장소 상세 닫기"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -47,7 +50,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </dialog>
   </transition>
 </template>
 
