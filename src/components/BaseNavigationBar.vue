@@ -1,7 +1,7 @@
 <template>
-  <nav class="absolute bottom-0 left-0 right-0 bg-white z-[9999]">
+  <nav class="absolute bottom-0 left-0 right-0 bg-white shadow-nav z-[9999]">
     <div class="max-w-screen-sm mx-auto px-4 pb-safe">
-      <div class="flex items-center justify-around h-16">
+      <div class="flex items-center justify-around h-16 border-t border-border">
         <!-- 홈 -->
         <router-link
           to="/"
@@ -93,34 +93,58 @@ const getIcon = (type) => {
   justify-content: center;
   gap: 0.25rem;
   color: var(--color-textSecondary);
-  transition: color 200ms;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
   min-width: 60px;
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+  position: relative;
 }
 
 /* 네비게이션 아이콘 */
 .nav-icon {
   width: 1.5rem;
   height: 1.5rem;
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* 네비게이션 라벨 */
 .nav-label {
   font-size: 0.75rem;
   font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 /* 활성 상태 */
 .nav-item-active {
   color: var(--color-primary);
+  background-color: rgba(132, 97, 72, 0.08); /* Primary 600 8% opacity */
+}
+
+.nav-item-active .nav-icon {
+  transform: scale(1.1);
+}
+
+.nav-item-active .nav-label {
+  font-weight: 600;
 }
 
 /* 호버 상태 (데스크톱) */
 @media (hover: hover) {
   .nav-item:hover {
-    color: var(--color-primary);
+    color: var(--color-primary-hover);
+    background-color: rgba(164, 121, 91, 0.06); /* Primary 500 6% opacity */
   }
+
+  .nav-item:hover .nav-icon {
+    transform: scale(1.05);
+  }
+}
+
+/* 상단 그림자 (네비게이션바) */
+nav {
+  box-shadow: 0 -2px 8px rgba(99, 73, 54, 0.08); /* Primary 700 8% opacity */
+  backdrop-filter: blur(8px);
+  background-color: rgba(255, 255, 255, 0.95);
 }
 
 /* iOS Safe Area 대응 */

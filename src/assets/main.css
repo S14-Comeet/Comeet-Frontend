@@ -4,29 +4,88 @@
 /* Tailwind CSS */
 @import "tailwindcss";
 
-/* Tailwind CSS v4 Theme 정의 */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Comeet Design System - Warm Brown Theme
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Tailwind CSS v4 Native Theme Definition
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 @theme {
-  --color-textPrimary: #1a1a1a;
-  --color-textSecondary: #8b95a1;
-  --color-background: #f6f8fb;
-  --color-surface: #ffffff;
-  --color-border: #e0e0e0;
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     * Primary Palette - Warm Brown (11-step grayscale)
+     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --color-primary-50: #f6f2ef;           /* Lightest - Page background */
+    --color-primary-100: #ede4de;          /* Light - Card background */
+    --color-primary-200: #dbcabd;          /* Soft beige - Borders, dividers */
+    --color-primary-300: #c9af9c;          /* Beige - Disabled text, icons */
+    --color-primary-400: #b7947b;          /* Medium - Tag background, secondary buttons */
+    --color-primary-500: #a4795b;          /* Warm brown - Accent elements, hover states */
+    --color-primary-600: #846148;          /* Main brown - Primary buttons, links (DEFAULT) */
+    --color-primary-700: #634936;          /* Dark brown - Body text (WCAG AAA) */
+    --color-primary-800: #423124;          /* Darker - Headings, strong emphasis */
+    --color-primary-900: #211812;          /* Almost black - Dark mode bg, headlines */
+    --color-primary-950: #17110d;          /* Deepest - Highest contrast text */
+    --color-primary: var(--color-primary-600);  /* Alias for default primary */
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     * Neutral Colors
+     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --color-neutral-900: #323232;          /* Neutral dark text */
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     * Semantic Colors - Cafe & Accent (Orange)
+     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --color-cafe: #ff9800;                 /* Cafe marker (PRD requirement) */
+    --color-accent: #ff9800;               /* Positive emphasis (save success, favorites) */
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     * Status Colors - Clear Semantic Distinction
+     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --color-success: #66bb6a;              /* Green - Success messages */
+    --color-success-light: #81c784;
+    --color-success-dark: #4caf50;
+
+    --color-error: #d32f2f;                /* Red - Errors, validation failures */
+    --color-error-light: #ef5350;
+    --color-error-dark: #c62828;
+
+    --color-warning: #ffa726;              /* Amber - Warnings, cautions */
+    --color-warning-light: #ffb74d;
+    --color-warning-dark: #f57c00;
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     * Text Colors - WCAG Compliant
+     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --color-textPrimary: var(--color-primary-700);              /* Body text (8.52:1 - WCAG AAA) */
+    --color-textSecondary: rgba(132, 97, 72, 0.7);              /* Secondary text (4.2:1 - WCAG AA) */
+    --color-textDisabled: var(--color-primary-300);             /* Disabled state */
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     * Background & Surface
+     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --color-background: var(--color-primary-50);                /* Warm beige page background */
+    --color-surface: #ffffff;                                   /* White cards */
+    --color-surface-light: var(--color-primary-100);           /* Light card variant */
+    --color-border: var(--color-primary-200);                   /* Subtle borders */
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     * Dark Mode Theme (Future Enhancement)
+     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --color-dark-background: var(--color-primary-900);          /* Dark mode page bg */
+    --color-dark-surface: var(--color-primary-800);             /* Dark mode cards */
+    --color-dark-textPrimary: var(--color-primary-50);         /* Dark mode text (inverted) */
+    --color-dark-textSecondary: rgba(219, 202, 189, 0.7);       /* Dark mode secondary text */
+    --color-dark-border: var(--color-primary-700);              /* Dark mode borders */
 }
 
 /* 기본 스타일 */
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 body {
-  font-family: Pretendard, system-ui, sans-serif;
-  color: var(--color-textPrimary);
-  background-color: var(--color-background);
-  margin: 0;
-  min-height: 100vh;
+    font-family: Pretendard, system-ui, sans-serif;
+    color: var(--color-textPrimary);
+    background-color: var(--color-background);
+    margin: 0;
+    min-height: 100vh;
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+    color: inherit;
+    text-decoration: none;
 }

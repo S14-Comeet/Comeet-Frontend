@@ -6,11 +6,11 @@
         @click.stop
     >
       <!-- 드래그 핸들 -->
-      <div class="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-4"></div>
+      <div class="w-12 h-1 bg-primary-200 rounded-full mx-auto mb-4"></div>
 
       <!-- 카페 정보 -->
       <div class="flex items-start gap-3">
-          <span class="px-2 py-1 rounded-md text-xs font-medium bg-orange-100 text-orange-800">
+          <span class="px-2 py-1 rounded-md text-xs font-medium bg-accent/10 text-accent">
             카페
           </span>
 
@@ -28,13 +28,13 @@
       <div class="flex gap-2 mt-4">
         <button
             @click="$emit('detail')"
-            class="flex-1 px-4 py-2 bg-primary text-white rounded-lg font-medium"
+            class="flex-1 px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-500 transition-colors"
         >
           상세보기
         </button>
         <button
             @click="$emit('close')"
-            class="px-4 py-2 border border-border rounded-lg text-textSecondary"
+            class="px-4 py-2 border border-border rounded-lg text-textSecondary hover:bg-primary-50 transition-colors"
         >
           닫기
         </button>
