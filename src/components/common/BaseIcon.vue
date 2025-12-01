@@ -327,4 +327,14 @@ svg {
   display: inline-block;
   vertical-align: middle;
 }
+
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+svg:has(> [d="M12 2C6.47715 2 2 6.47715 2 12"]) {
+  animation: spin 1s linear infinite;
+}
 </style>

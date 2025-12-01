@@ -131,7 +131,7 @@ const getIcon = (type) => {
 /* 호버 상태 (데스크톱) */
 @media (hover: hover) {
   .nav-item:hover {
-    color: var(--color-primary-hover);
+        color: var(--color-primary);
     background-color: rgba(164, 121, 91, 0.06); /* Primary 500 6% opacity */
   }
 

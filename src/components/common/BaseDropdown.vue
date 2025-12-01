@@ -17,7 +17,7 @@
         @keydown="handleKeyDown"
         :aria-expanded="isOpen"
         :aria-controls="listboxId"
-        :aria-haspopup="listbox"
+        aria-haspopup="listbox"
         :disabled="disabled"
     >
       <!-- Label -->
@@ -88,7 +88,7 @@ const props = defineProps({
    */
   modelValue: {
     type: [String, Number],
-    default: ''
+    default: null
   },
   /**
    * Dropdown options
