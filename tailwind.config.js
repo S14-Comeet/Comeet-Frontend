@@ -1,4 +1,16 @@
 /** @type {import('tailwindcss').Config} */
+/**
+ * Comeet Frontend - Tailwind Configuration
+ *
+ * ⚠️ COLOR SYSTEM LOCATION:
+ * All color definitions are in src/assets/main.css using @theme directive.
+ * This follows Tailwind v4 best practices for CSS-native theming.
+ *
+ * This config file handles:
+ * - Content paths (what files to scan)
+ * - Non-color extensions (spacing, shadows, etc.)
+ * - Plugins
+ */
 export default {
     content: [
         "./index.html",
@@ -7,50 +19,50 @@ export default {
     theme: {
         extend: {
             colors: {
-                // Comeet 브랜드 컬러
                 primary: {
-                    DEFAULT: '#667eea',
-                    50: '#f5f7ff',
-                    100: '#ebefff',
-                    200: '#d6dfff',
-                    300: '#b3c2ff',
-                    400: '#8da0ff',
-                    500: '#667eea',  // Main
-                    600: '#5568d3',
-                    700: '#4552ba',
-                    800: '#3a4599',
-                    900: '#2f3777',
+                    400: '#b7947b',  // Medium - Tag background, secondary buttons
+                    950: '#17110d',  // Deepest - Highest contrast text
                 },
-                error: {
-                    DEFAULT: '#ff9800',
-                    light: '#ffb74d',
-                    dark: '#f57c00',
-                },
-                background: '#f6f8fb',
-                surface: '#ffffff',
-                textPrimary: '#1a1a1a',
-                textSecondary: '#8b95a1',
-                border: '#e0e0e0',
             },
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            // Typography
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             fontFamily: {
                 sans: ['Pretendard', 'system-ui', 'sans-serif'],
             },
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            // Spacing (custom values beyond default scale)
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             spacing: {
-                '18': '4.5rem',
-                '88': '22rem',
+                '18': '4.5rem',   // 72px - Custom gap size
+                '88': '22rem',    // 352px - Large container width
             },
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            // Border Radius
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             borderRadius: {
-                'DEFAULT': '8px',
-                'lg': '16px',
+                'DEFAULT': '8px',   // Standard rounded corners
+                'lg': '16px',       // Large rounded (cards, modals)
             },
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            // Box Shadows - Comeet Design System
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             boxShadow: {
-                'sm': '0 2px 4px rgba(0, 0, 0, 0.08)',
-                'DEFAULT': '0 4px 12px rgba(0, 0, 0, 0.08)',
-                'lg': '0 8px 24px rgba(0, 0, 0, 0.12)',
-                'button-hover': '0 4px 12px rgba(0, 0, 0, 0.15)',
+                'sm': '0 2px 4px rgba(0, 0, 0, 0.08)',          // Subtle elevation
+                'DEFAULT': '0 4px 12px rgba(0, 0, 0, 0.08)',    // Standard cards
+                'lg': '0 8px 24px rgba(0, 0, 0, 0.12)',         // Modals, overlays
+                'button-hover': '0 4px 12px rgba(0, 0, 0, 0.15)', // Interactive feedback
             },
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            // Transitions
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             transitionDuration: {
-                'DEFAULT': '200ms',
+                'DEFAULT': '200ms',  // Standard UI transitions
             },
         },
     },

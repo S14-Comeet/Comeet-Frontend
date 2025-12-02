@@ -14,7 +14,7 @@
         <!-- 닫기 버튼 -->
         <button
             @click="$emit('close')"
-            class="absolute top-4 right-4 text-textSecondary hover:text-textPrimary"
+            class="absolute top-4 right-4 text-textSecondary hover:text-primary hover:bg-primary-50 rounded-full p-1 transition-all"
             aria-label="장소 상세 닫기"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -37,7 +37,7 @@
 
           <div>
             <p class="text-sm text-textSecondary">카테고리</p>
-            <span class="inline-block px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm">
+            <span class="inline-block px-3 py-1 bg-accent/10 text-accent rounded-full text-sm font-medium">
                 카페
               </span>
           </div>
