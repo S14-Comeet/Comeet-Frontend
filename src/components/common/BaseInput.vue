@@ -3,7 +3,7 @@
     <!-- Input Container -->
     <div
       :class="[
-        'flex items-center gap-3 rounded-xl transition-all',
+        'flex items-center gap-3 rounded-xl',
         containerClasses
       ]"
     >
@@ -36,11 +36,11 @@
       <button
         v-if="clearable && modelValue && !disabled"
         @click="handleClear"
-        class="shrink-0 w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors"
+        class="shrink-0 w-5 h-5 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors"
         type="button"
         aria-label="Clear input"
       >
-        <BaseIcon name="x" :size="24" color="currentColor" />
+        <BaseIcon name="x" :size="12" color="currentColor" />
       </button>
     </div>
 
@@ -103,8 +103,8 @@ const props = defineProps({
   },
   /**
    * Variant style
-   * - default: Gray background
-   * - border: White background with border
+   * - default: Light gray background, no border (minimalist)
+   * - border: White background with border (outlined)
    */
   variant: {
     type: String,
@@ -139,10 +139,10 @@ const inputType = computed(() => {
 })
 
 const containerClasses = computed(() => {
-  const base = 'h-14 px-5 py-4'
+  const base = 'h-14 pl-5 pr-2.5 py-4 transition-colors transition-shadow duration-200'
 
   if (props.disabled) {
-    return `${base} bg-surface-light cursor-not-allowed`
+    return `${base} bg-surface-light cursor-not-allowed border-0`
   }
 
   // Status colors (success/error)
@@ -153,17 +153,18 @@ const containerClasses = computed(() => {
     return `${base} bg-white border-2 border-error`
   }
 
-  // Focus state
+  // Focus state - with focus ring for accessibility
   if (isFocused.value) {
-    return `${base} bg-white border-2 border-neutral-900`
+    return `${base} bg-white border-2 border-neutral-900 ring-2 ring-primary-200 ring-opacity-50`
   }
 
-  // Default variants
+  // Border variant: White background with visible border
   if (props.variant === 'border') {
-    return `${base} bg-white border border-border`
+    return `${base} bg-white border border-border hover:border-neutral-400`
   }
 
-  return `${base} bg-white border border-border`
+  // Default variant: Light gray background, no border (minimalist)
+  return `${base} bg-surface-light border-0 hover:bg-neutral-100`
 })
 
 const inputClasses = computed(() => {
@@ -201,11 +202,11 @@ const handleClear = () => {
 </script>
 
 <style scoped>
-/* Input autofill styling */
+/* Input autofill styling - matches variant backgrounds */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px white inset;
+  -webkit-box-shadow: 0 0 0 1000px var(--color-surface-light) inset;
   -webkit-text-fill-color: var(--color-neutral-900);
 }
 

@@ -10,11 +10,13 @@
     <button
         type="button"
         :class="[
-        'flex items-center justify-between pl-5 pr-3 py-2 rounded-xl transition-all w-full',
+        'flex items-center justify-between pl-5 pr-3 py-2 rounded-xl w-full',
         dropdownClasses
       ]"
         @click="toggleDropdown"
         @keydown="handleKeyDown"
+        @focus="isFocused = true"
+        @blur="isFocused = false"
         :aria-expanded="isOpen"
         :aria-controls="listboxId"
         aria-haspopup="listbox"
@@ -63,7 +65,7 @@
             v-for="(option, index) in options"
             :key="option.value"
             :class="[
-              'text-base cursor-pointer transition-all px-2 py-1 rounded',
+              'text-base cursor-pointer transition-colors duration-200 px-2 py-1 rounded',
               index === highlightedIndex
                 ? 'bg-primary-50 text-primary-700 font-medium'
                 : 'text-neutral-900 hover:text-primary'
@@ -114,8 +116,8 @@ const props = defineProps({
   },
   /**
    * Variant style
-   * - default: Gray background
-   * - border: White background with border
+   * - default: Light gray background, no border (minimalist)
+   * - border: White background with border (outlined)
    */
   variant: {
     type: String,
@@ -128,6 +130,7 @@ const emit = defineEmits(['update:modelValue', 'change'])
 
 const dropdownRef = ref(null)
 const isOpen = ref(false)
+const isFocused = ref(false)
 const highlightedIndex = ref(-1)
 const listboxId = `dropdown-listbox-${Math.random().toString(36).substr(2, 9)}`
 
@@ -138,21 +141,33 @@ const displayValue = computed(() => {
 })
 
 const dropdownClasses = computed(() => {
+  const base = 'transition-colors transition-shadow duration-200'
+
   if (props.disabled) {
-    return 'bg-surface-light border-0'
+    return `${base} bg-surface-light border-0 cursor-not-allowed`
   }
 
+  // Open state (highest priority)
   if (isOpen.value) {
-    return 'bg-white border border-neutral-900 cursor-pointer'
+    return `${base} bg-white border-2 border-neutral-900 cursor-pointer ring-2 ring-primary-200 ring-opacity-50`
   }
 
+  // Focus state (keyboard navigation)
+  if (isFocused.value) {
+    return `${base} bg-white border-2 border-neutral-900 cursor-pointer ring-2 ring-primary-200 ring-opacity-50`
+  }
+
+  // Has value selected
   if (props.modelValue) {
-    return 'bg-white border border-border cursor-pointer'
+    return props.variant === 'border'
+      ? `${base} bg-white border border-border cursor-pointer hover:border-neutral-400`
+      : `${base} bg-surface-light border-0 cursor-pointer hover:bg-neutral-100`
   }
 
+  // Default empty state
   return props.variant === 'border'
-      ? 'bg-white border border-border cursor-pointer'
-      : 'bg-surface-light border-0 cursor-pointer'
+      ? `${base} bg-white border border-border cursor-pointer hover:border-neutral-400`
+      : `${base} bg-surface-light border-0 cursor-pointer hover:bg-neutral-100`
 })
 
 const labelClasses = computed(() => {

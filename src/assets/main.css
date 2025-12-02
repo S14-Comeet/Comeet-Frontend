@@ -9,6 +9,12 @@
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  * Tailwind CSS v4 Native Theme Definition
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* Workaround for Tailwind v4 @theme issue with 400 and 950 shades */
+:root {
+    --color-primary-400: #b7947b;
+    --color-primary-950: #17110d;
+}
+
 @theme {
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
      * Primary Palette - Warm Brown (11-step grayscale)

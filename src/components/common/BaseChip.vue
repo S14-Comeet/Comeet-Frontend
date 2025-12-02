@@ -1,7 +1,7 @@
 <template>
   <div
     :class="[
-      'box-border flex gap-2.5 h-10 items-center justify-center py-2.5 rounded-full transition-all',
+      'box-border flex gap-2.5 h-10 items-center justify-center py-2.5 rounded-full transition-opacity transition-transform duration-200',
       chipClasses,
       clickable && 'cursor-pointer hover:opacity-80 active:scale-95'
     ]"

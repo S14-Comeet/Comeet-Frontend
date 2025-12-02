@@ -204,7 +204,7 @@
             <BaseInput
               v-model="inputValue2"
               placeholder="Search..."
-              icon="search"
+              type="search"
             />
           </div>
 
@@ -214,15 +214,6 @@
               v-model="inputValue3"
               placeholder="Type to see clear button"
               clearable
-            />
-          </div>
-
-          <div>
-            <h3 class="text-sm font-medium text-textSecondary mb-2">Focused State (focus on input to see)</h3>
-            <BaseInput
-              v-model="inputValue4"
-              placeholder="Click to focus"
-              helperText="This input shows a border when focused"
             />
           </div>
 

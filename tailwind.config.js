@@ -18,6 +18,13 @@ export default {
     ],
     theme: {
         extend: {
+            colors: {
+                primary: {
+                    400: '#b7947b',  // Medium - Tag background, secondary buttons
+                    950: '#17110d',  // Deepest - Highest contrast text
+                },
+            },
+
             // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             // Typography
             // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
