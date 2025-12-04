@@ -1,7 +1,9 @@
-
 import axios from 'axios';
 import config from '@/config';
 import { getAccessToken, setAccessToken, removeAccessToken } from '@/utils/storage';
+import { createLogger } from '@/utils/logger';
+
+const logger = createLogger('API');
 
 const api = axios.create({
   baseURL: config.api.baseURL,
@@ -22,16 +24,13 @@ api.interceptors.request.use(
       requestConfig.headers.Authorization = `Bearer ${accessToken}`;
     }
 
-    // 디버그 모드일 때 요청 로깅
-    if (import.meta.env.VITE_ENABLE_DEBUG === 'true') {
-      console.log('[API 요청]', requestConfig.method?.toUpperCase(), requestConfig.url);
-      if (accessToken) {
-        console.log('[인증] 액세스 토큰 포함:', accessToken.substring(0, 20) + '...');
-      }
-    }
+    // 요청 로깅 (DEBUG 레벨)
+    logger.debug(`${requestConfig.method?.toUpperCase()} ${requestConfig.url}`);
+
     return requestConfig;
   },
   (error) => {
+    logger.error('요청 인터셉터 에러', error);
     return Promise.reject(error);
   }
 );
@@ -83,13 +82,11 @@ const handleTokenReissue = async (originalRequest) => {
     originalRequest.headers.Authorization = `Bearer ${token}`;
     processQueue(null, token);
 
-    if (import.meta.env.VITE_ENABLE_DEBUG === 'true') {
-      console.log('[인증] 토큰 재발급 성공');
-    }
+    logger.info('토큰 재발급 성공');
 
     return api.request(originalRequest);
   } catch (reissueError) {
-    console.warn('[인증] 토큰 재발급 실패:', reissueError.message);
+    logger.warn('토큰 재발급 실패', reissueError.message);
     processQueue(reissueError, null);
     removeAccessToken();
 
@@ -112,10 +109,7 @@ api.interceptors.response.use(
     if (newAccessToken) {
       const token = newAccessToken.replace('Bearer ', '');
       setAccessToken(token);
-
-      if (import.meta.env.VITE_ENABLE_DEBUG === 'true') {
-        console.log('[인증] 액세스 토큰이 응답 헤더에서 갱신되었습니다.');
-      }
+      logger.debug('토큰 갱신됨 (응답 헤더)');
     }
     return response;
   },
@@ -123,6 +117,11 @@ api.interceptors.response.use(
     const originalRequest = error.config;
     const isUnauthorized = error.response?.status === 401;
     const isRetryable = !originalRequest._retry;
+
+    // API 에러 로깅 (INFO 레벨)
+    if (error.response) {
+      logger.info(`응답 에러: ${error.response.status} ${originalRequest?.url}`);
+    }
 
     if (!isUnauthorized || !isRetryable) {
       throw error;
