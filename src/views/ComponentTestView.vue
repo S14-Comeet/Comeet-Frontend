@@ -98,59 +98,132 @@
 
       <!-- BaseIcon Component -->
       <section class="mb-12 bg-white p-6 rounded-lg shadow">
-        <h2 class="text-2xl font-bold text-textPrimary mb-4">BaseIcon Component</h2>
+        <h2 class="text-2xl font-bold text-textPrimary mb-4">BaseIcon Component - 모든 아이콘</h2>
 
-        <div class="space-y-4">
+        <div class="space-y-6">
           <div>
-            <h3 class="text-sm font-medium text-textSecondary mb-2">Navigation Icons</h3>
-            <div class="flex gap-4 flex-wrap items-center">
-              <div class="flex flex-col items-center gap-1">
-                <BaseIcon name="home-line" :size="24" />
-                <span class="text-xs text-textSecondary">home-line</span>
+            <h3 class="text-sm font-medium text-textSecondary mb-3">Navigation Icons</h3>
+            <div class="grid grid-cols-4 md:grid-cols-6 gap-4">
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="home-line" :size="32" />
+                <span class="text-xs text-textSecondary text-center">home-line</span>
               </div>
-              <div class="flex flex-col items-center gap-1">
-                <BaseIcon name="home-fill" :size="24" />
-                <span class="text-xs text-textSecondary">home-fill</span>
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="home-fill" :size="32" />
+                <span class="text-xs text-textSecondary text-center">home-fill</span>
               </div>
-              <div class="flex flex-col items-center gap-1">
-                <BaseIcon name="map-line" :size="24" />
-                <span class="text-xs text-textSecondary">map-line</span>
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="map-line" :size="32" />
+                <span class="text-xs text-textSecondary text-center">map-line</span>
               </div>
-              <div class="flex flex-col items-center gap-1">
-                <BaseIcon name="bookmark-line" :size="24" />
-                <span class="text-xs text-textSecondary">bookmark-line</span>
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="bookmark-line" :size="32" />
+                <span class="text-xs text-textSecondary text-center">bookmark-line</span>
+              </div>
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="bookmark-fill" :size="32" />
+                <span class="text-xs text-textSecondary text-center">bookmark-fill</span>
               </div>
             </div>
           </div>
 
           <div>
-            <h3 class="text-sm font-medium text-textSecondary mb-2">Chevron Icons</h3>
-            <div class="flex gap-4 flex-wrap items-center">
-              <BaseIcon name="chevron-up" :size="24" />
-              <BaseIcon name="chevron-down" :size="24" />
-              <BaseIcon name="chevron-left" :size="24" />
-              <BaseIcon name="chevron-right" :size="24" />
+            <h3 class="text-sm font-medium text-textSecondary mb-3">Chevron Icons</h3>
+            <div class="grid grid-cols-4 md:grid-cols-6 gap-4">
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="chevron-up" :size="32" />
+                <span class="text-xs text-textSecondary text-center">chevron-up</span>
+              </div>
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="chevron-down" :size="32" />
+                <span class="text-xs text-textSecondary text-center">chevron-down</span>
+              </div>
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="chevron-left" :size="32" />
+                <span class="text-xs text-textSecondary text-center">chevron-left</span>
+              </div>
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="chevron-right" :size="32" />
+                <span class="text-xs text-textSecondary text-center">chevron-right</span>
+              </div>
             </div>
           </div>
 
           <div>
-            <h3 class="text-sm font-medium text-textSecondary mb-2">Action Icons</h3>
-            <div class="flex gap-4 flex-wrap items-center">
-              <BaseIcon name="search" :size="24" />
-              <BaseIcon name="plus" :size="24" />
-              <BaseIcon name="check" :size="24" />
-              <BaseIcon name="x" :size="24" />
-              <BaseIcon name="filter" :size="24" />
+            <h3 class="text-sm font-medium text-textSecondary mb-3">Action Icons</h3>
+            <div class="grid grid-cols-4 md:grid-cols-6 gap-4">
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="search" :size="32" />
+                <span class="text-xs text-textSecondary text-center">search</span>
+              </div>
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="plus" :size="32" />
+                <span class="text-xs text-textSecondary text-center">plus</span>
+              </div>
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="check" :size="32" />
+                <span class="text-xs text-textSecondary text-center">check</span>
+              </div>
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="x" :size="32" />
+                <span class="text-xs text-textSecondary text-center">x</span>
+              </div>
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="filter" :size="32" />
+                <span class="text-xs text-textSecondary text-center">filter</span>
+              </div>
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="sort" :size="32" />
+                <span class="text-xs text-textSecondary text-center">sort</span>
+              </div>
             </div>
           </div>
 
           <div>
-            <h3 class="text-sm font-medium text-textSecondary mb-2">Icons with Primary Color</h3>
-            <div class="flex gap-4 flex-wrap items-center text-primary">
-              <BaseIcon name="home-fill" :size="32" color="var(--color-primary)" />
-              <BaseIcon name="map-line" :size="32" color="var(--color-primary)" />
-              <BaseIcon name="bookmark-fill" :size="32" color="var(--color-primary)" />
-              <BaseIcon name="check" :size="32" color="var(--color-primary)" />
+            <h3 class="text-sm font-medium text-textSecondary mb-3">UI Icons</h3>
+            <div class="grid grid-cols-4 md:grid-cols-6 gap-4">
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="more" :size="32" />
+                <span class="text-xs text-textSecondary text-center">more</span>
+              </div>
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="event" :size="32" />
+                <span class="text-xs text-textSecondary text-center">event</span>
+              </div>
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="notice" :size="32" />
+                <span class="text-xs text-textSecondary text-center">notice</span>
+              </div>
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="user-line" :size="32" />
+                <span class="text-xs text-textSecondary text-center">user-line</span>
+              </div>
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="spinner" :size="32" />
+                <span class="text-xs text-textSecondary text-center">spinner</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-medium text-textSecondary mb-3">Primary Color Examples</h3>
+            <div class="grid grid-cols-4 md:grid-cols-6 gap-4">
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="home-fill" :size="32" color="var(--color-primary)" />
+                <span class="text-xs text-primary text-center">home-fill</span>
+              </div>
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="bookmark-fill" :size="32" color="var(--color-primary)" />
+                <span class="text-xs text-primary text-center">bookmark-fill</span>
+              </div>
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="notice" :size="32" color="var(--color-primary)" />
+                <span class="text-xs text-primary text-center">notice</span>
+              </div>
+              <div class="flex flex-col items-center gap-2 p-3 rounded hover:bg-primary-50 transition">
+                <BaseIcon name="user-line" :size="32" color="var(--color-primary)" />
+                <span class="text-xs text-primary text-center">user-line</span>
+              </div>
             </div>
           </div>
         </div>
@@ -160,28 +233,54 @@
       <section class="mb-12 bg-white p-6 rounded-lg shadow">
         <h2 class="text-2xl font-bold text-textPrimary mb-4">BaseHeader Component</h2>
 
-        <div class="space-y-4">
+        <div class="space-y-6">
+          <!-- 로그인 상태 헤더 -->
           <div>
-            <h3 class="text-sm font-medium text-textSecondary mb-2">Header with Notification Badge</h3>
+            <h3 class="text-sm font-medium text-textSecondary mb-2">로그인 상태 (알림 있음)</h3>
             <BaseHeader
-              :hasNotifications="hasNotifications"
-              @event-click="handleEventClick"
+              :hasNotifications="true"
+              :forceAuthState="true"
               @notice-click="handleNoticeClick"
-              @user-click="handleUserClick"
+              @login="handleLogin"
             />
           </div>
 
-          <div class="flex items-center gap-4">
-            <button
-              @click="hasNotifications = !hasNotifications"
-              class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-700"
-            >
-              Toggle Notification Badge ({{ hasNotifications ? 'On' : 'Off' }})
-            </button>
+          <div>
+            <h3 class="text-sm font-medium text-textSecondary mb-2">로그인 상태 (알림 없음)</h3>
+            <BaseHeader
+              :hasNotifications="false"
+              :forceAuthState="true"
+              @notice-click="handleNoticeClick"
+              @login="handleLogin"
+            />
+          </div>
+
+          <!-- 비로그인 상태 헤더 -->
+          <div>
+            <h3 class="text-sm font-medium text-textSecondary mb-2">비로그인 상태 (로그인 버튼 표시)</h3>
+            <BaseHeader
+              :hasNotifications="false"
+              :forceAuthState="false"
+              @notice-click="handleNoticeClick"
+              @login="handleLogin"
+            />
+          </div>
+
+          <!-- 뒤로가기 버튼 포함 헤더 -->
+          <div>
+            <h3 class="text-sm font-medium text-textSecondary mb-2">로그인 상태 + 뒤로가기 버튼 (알림 페이지용)</h3>
+            <BaseHeader
+              :hasNotifications="true"
+              :showBackButton="true"
+              :forceAuthState="true"
+              @notice-click="handleNoticeClick"
+              @login="handleLogin"
+            />
           </div>
 
           <div class="text-sm text-textSecondary">
-            <p>Click the header buttons to see console logs. The notification badge can be toggled.</p>
+            <p>헤더 버튼을 클릭하면 콘솔에 로그가 출력됩니다.</p>
+            <p class="mt-1">forceAuthState prop을 사용하여 테스트 목적으로 인증 상태를 시뮬레이션합니다.</p>
           </div>
         </div>
       </section>
@@ -372,19 +471,12 @@ const inputValue5 = ref('Disabled input')
 const inputValue6 = ref('Success input')
 const inputValue7 = ref('Error input')
 
-// Header notification state
-const hasNotifications = ref(true)
-
-const handleEventClick = () => {
-  console.log('Event button clicked')
-}
-
+// Header event handlers
 const handleNoticeClick = () => {
   console.log('Notice button clicked')
-  hasNotifications.value = !hasNotifications.value
 }
 
-const handleUserClick = () => {
-  console.log('User button clicked')
+const handleLogin = () => {
+  console.log('Login button clicked')
 }
 </script>

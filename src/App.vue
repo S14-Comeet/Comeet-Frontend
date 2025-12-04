@@ -3,7 +3,13 @@
   <div class="min-h-screen bg-gray-100">
     <!-- Inner wrapper: 모바일 뷰 컨테이너 -->
     <div class="app-shell">
-      <BaseHeader v-if="showHeader" />
+      <BaseHeader
+        v-if="showHeader"
+        :has-notifications="hasUnreadNotifications"
+        :show-back-button="showBackButton"
+        @notice-click="handleNoticeClick"
+        @login="handleLogin"
+      />
       <main class="app-main" :class="{ 'no-header': !showHeader, 'with-nav': showNavigation, 'full-screen': isFullScreenPage }">
         <RouterView />
       </main>
@@ -14,11 +20,14 @@
 
 <script setup>
 import { computed } from 'vue';
-import { RouterView, useRoute } from 'vue-router';
+import { RouterView, useRoute, useRouter } from 'vue-router';
 import BaseHeader from '@/components/common/BaseHeader.vue';
 import BaseNavigationBar from '@/components/common/BaseNavigationBar.vue';
+import { useNotificationStore } from '@/store/notification';
 
 const route = useRoute();
+const router = useRouter();
+const notificationStore = useNotificationStore();
 
 // 헤더를 숨길 페이지 목록
 const pagesWithoutHeader = new Set(['login', 'nickname', 'map']);
@@ -38,6 +47,24 @@ const showNavigation = computed(() => {
 const isFullScreenPage = computed(() => {
   return route.name === 'map';
 });
+
+// 뒤로가기 버튼을 표시할 페이지 목록
+const showBackButton = computed(() => {
+  return route.name === 'notifications';
+});
+
+// 읽지 않은 알림이 있는지
+const hasUnreadNotifications = computed(() => notificationStore.hasUnread);
+
+// 알림 아이콘 클릭 핸들러
+const handleNoticeClick = () => {
+  router.push('/notifications');
+};
+
+// 로그인 버튼 클릭 핸들러
+const handleLogin = () => {
+  router.push('/login');
+};
 </script>
 
 <style scoped>

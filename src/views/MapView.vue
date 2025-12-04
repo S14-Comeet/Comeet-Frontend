@@ -14,6 +14,21 @@
       </div>
     </div>
 
+    <!-- Floating 알림 아이콘 (우측 상단) - 로그인 상태일 때만 표시 -->
+    <button
+      v-if="isAuthenticated"
+      @click="handleNotificationClick"
+      class="floating-notification-button"
+      aria-label="알림"
+    >
+      <BaseIcon name="notice" :size="24" color="var(--color-neutral-900)" />
+      <!-- 읽지 않은 알림 배지 -->
+      <span
+        v-if="hasUnreadNotifications"
+        class="notification-badge"
+      ></span>
+    </button>
+
     <MapPlaceInfo
         v-if="selectedPlace"
         :place="selectedPlace"
@@ -33,22 +48,38 @@
 </template>
 
 <script setup>
-import {ref, onMounted} from 'vue'
-import {useNaverMap} from '@/composables/useNaverMap'
-import {useGeolocation} from '@/composables/useGeolocation'
-import {useToast} from 'vue-toastification'
-import MapPlaceInfo from "@/components/map/MapPlaceInfo.vue";
-import MapPlaceDetail from "@/components/map/MapPlaceDetail.vue";
+import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useNaverMap } from '@/composables/useNaverMap'
+import { useGeolocation } from '@/composables/useGeolocation'
+import { useToast } from 'vue-toastification'
+import { useNotificationStore } from '@/store/notification'
+import { useAuthStore } from '@/store/auth'
+import MapPlaceInfo from "@/components/map/MapPlaceInfo.vue"
+import MapPlaceDetail from "@/components/map/MapPlaceDetail.vue"
+import BaseIcon from '@/components/common/BaseIcon.vue'
 
-
-
+const router = useRouter()
 const toast = useToast()
+const notificationStore = useNotificationStore()
+const authStore = useAuthStore()
 const mapContainer = ref(null)
 const isLoading = ref(true)
 const {location, requestLocation} = useGeolocation()
 const {map, initMap, addMarker, clearMarkers} = useNaverMap()
 const selectedPlace = ref(null)
 const detailPlace = ref(null)
+
+// 인증 상태
+const isAuthenticated = computed(() => authStore.isAuthenticated)
+
+// 읽지 않은 알림이 있는지
+const hasUnreadNotifications = computed(() => notificationStore.hasUnread)
+
+// 알림 아이콘 클릭 핸들러
+const handleNotificationClick = () => {
+  router.push('/notifications')
+}
 
 // 🗺️ Mock 카페 데이터
 const mockCafes = [
@@ -129,3 +160,54 @@ onMounted(async () => {
 
 
 </script>
+
+<style scoped>
+/* Floating 알림 버튼 - BaseHeader와 동일한 위치 및 크기 */
+.floating-notification-button {
+  position: absolute;
+  top: 0.5rem; /* 헤더 높이(56px) 기준 중앙 정렬 */
+  right: 1.25rem; /* 헤더 px-5와 동일 */
+  z-index: 100;
+  width: 2.5rem; /* 40px - BaseHeader 아이콘과 동일 */
+  height: 2.5rem; /* 40px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border-radius: 50%;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.floating-notification-button:hover {
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.floating-notification-button:active {
+  transform: scale(0.95);
+  background-color: var(--color-primary-50);
+}
+
+/* 알림 배지 */
+.notification-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: var(--color-error);
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+}
+
+/* 모바일에서 Safe Area 대응 */
+@media (max-width: 640px) {
+  .floating-notification-button {
+    top: max(0.5rem, env(safe-area-inset-top));
+    right: max(1.25rem, env(safe-area-inset-right));
+  }
+}
+</style>
+
