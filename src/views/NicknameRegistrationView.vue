@@ -81,31 +81,31 @@
               ]"
               @click="selectedRole = 'USER'"
             >
-              <div class="flex items-start gap-4">
-                <div :class="[
+              <span class="flex items-start gap-4">
+                <span :class="[
                   'w-12 h-12 rounded-full flex items-center justify-center text-2xl',
                   selectedRole === 'USER' ? 'bg-primary-100' : 'bg-surface-light'
                 ]">
                   🙋
-                </div>
-                <div class="flex-1">
-                  <h3 :class="[
+                </span>
+                <span class="flex-1 flex flex-col text-left">
+                  <span :class="[
                     'text-lg font-bold mb-1',
                     selectedRole === 'USER' ? 'text-primary-700' : 'text-neutral-900'
                   ]">
                     일반 사용자
-                  </h3>
-                  <p class="text-sm text-textSecondary">
+                  </span>
+                  <span class="text-sm text-textSecondary">
                     맛집을 찾고, 저장하고, 리뷰를 남겨요
-                  </p>
-                </div>
+                  </span>
+                </span>
                 <!-- Check Icon -->
-                <div v-if="selectedRole === 'USER'" class="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                <span v-if="selectedRole === 'USER'" class="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M20 6L9 17L4 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
-                </div>
-              </div>
+                </span>
+              </span>
             </button>
 
             <!-- OWNER 역할 -->
@@ -119,31 +119,31 @@
               ]"
               @click="selectedRole = 'OWNER'"
             >
-              <div class="flex items-start gap-4">
-                <div :class="[
+              <span class="flex items-start gap-4">
+                <span :class="[
                   'w-12 h-12 rounded-full flex items-center justify-center text-2xl',
                   selectedRole === 'OWNER' ? 'bg-primary-100' : 'bg-surface-light'
                 ]">
                   🏪
-                </div>
-                <div class="flex-1">
-                  <h3 :class="[
+                </span>
+                <span class="flex-1 flex flex-col text-left">
+                  <span :class="[
                     'text-lg font-bold mb-1',
                     selectedRole === 'OWNER' ? 'text-primary-700' : 'text-neutral-900'
                   ]">
                     가맹점주
-                  </h3>
-                  <p class="text-sm text-textSecondary">
+                  </span>
+                  <span class="text-sm text-textSecondary">
                     내 가게를 등록하고 관리해요
-                  </p>
-                </div>
+                  </span>
+                </span>
                 <!-- Check Icon -->
-                <div v-if="selectedRole === 'OWNER'" class="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                <span v-if="selectedRole === 'OWNER'" class="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M20 6L9 17L4 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
-                </div>
-              </div>
+                </span>
+              </span>
             </button>
 
             <!-- Confirmed Nickname Display (카드 바로 아래에 붙음) -->
