@@ -99,13 +99,15 @@ onMounted(async () => {
       return
     }
 
-    // 닉네임 유무에 따라 적절한 페이지로 이동
-    if (authStore.user?.nickName) {
-      console.log('[OAuth] 닉네임 있음, 홈으로 이동')
-      toast.success(`환영합니다, ${authStore.user.nickName}님!`)
+    // role에 따라 적절한 페이지로 이동
+    // GUEST: 소셜 로그인만 완료, 닉네임/역할 미설정 → 회원가입 페이지
+    // USER/OWNER: 서비스 등록 완료 → 메인 페이지
+    if (authStore.isRegistered) {
+      console.log('[OAuth] 등록된 사용자, 홈으로 이동')
+      toast.success(`환영합니다, ${authStore.user.nickname || authStore.user.name}님!`)
       router.push('/')
     } else {
-      console.log('[OAuth] 닉네임 없음, 닉네임 등록 페이지로 이동')
+      console.log('[OAuth] GUEST 사용자, 닉네임 등록 페이지로 이동')
       toast.info('닉네임을 등록해주세요.')
       router.push('/nickname')
     }

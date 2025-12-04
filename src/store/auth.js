@@ -12,13 +12,14 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     /**
      * 현재 로그인한 사용자 정보
+     * API 응답 필드: userId, name, email, nickname, profileImageUrl, role
      * @type {{
-     *   id: number|null,
+     *   userId: number|null,
      *   name: string|null,
      *   email: string|null,
-     *   nickName: string|null,
+     *   nickname: string|null,
      *   profileImageUrl: string|null,
-     *   role: 'USER'|'OWNER'|null
+     *   role: 'GUEST'|'USER'|'OWNER'|null
      * }|null}
      */
     user: null,
@@ -40,7 +41,7 @@ export const useAuthStore = defineStore('auth', {
     /**
      * 사용자 ID
      */
-    userId: (state) => state.user?.id || null,
+    userId: (state) => state.user?.userId || null,
 
     /**
      * 사용자 이름
@@ -50,7 +51,7 @@ export const useAuthStore = defineStore('auth', {
     /**
      * 사용자 닉네임 반환 (없으면 'Guest')
      */
-    userNickname: (state) => state.user?.nickName || 'Guest',
+    userNickname: (state) => state.user?.nickname || 'Guest',
 
     /**
      * 게스트 상태 여부
@@ -78,9 +79,15 @@ export const useAuthStore = defineStore('auth', {
     isOwner: (state) => state.user?.role === 'OWNER',
 
     /**
+     * 서비스 등록 완료 여부
+     * GUEST가 아닌 경우(USER 또는 OWNER) 등록 완료로 판단
+     */
+    isRegistered: (state) => state.user?.role && state.user.role !== 'GUEST',
+
+    /**
      * 닉네임 등록 여부
      */
-    hasNickname: (state) => Boolean(state.user?.nickName),
+    hasNickname: (state) => Boolean(state.user?.nickname),
   },
 
   actions: {
@@ -97,9 +104,9 @@ export const useAuthStore = defineStore('auth', {
         this.user = userData
         this.isAuthenticated = true
         console.log('✅ 사용자 정보 조회 성공:')
-        console.log('   - ID:', userData.id)
+        console.log('   - ID:', userData.userId)
         console.log('   - 이름:', userData.name)
-        console.log('   - 닉네임:', userData.nickName)
+        console.log('   - 닉네임:', userData.nickname)
         console.log('   - 이메일:', userData.email)
         console.log('   - 프로필 이미지:', userData.profileImageUrl)
         console.log('   - 역할:', userData.role)

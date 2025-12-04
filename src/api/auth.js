@@ -6,22 +6,37 @@ import { API_ENDPOINTS } from '@/constants';
 
 /**
  * 사용자 정보 조회 (인증 필요)
+ * GET /user
  * @returns {Promise<Object>} 사용자 정보
  */
 export const getUserInfo = async () => {
   const response = await api.get(API_ENDPOINTS.USER.INFO);
-  return response.data.data; // BaseResponse<UserResDto>
+  return response.data.data;
 };
 
 /**
  * 닉네임 중복 확인
+ * GET /user/nickname/check?nickname={nickname}
  * @param {string} nickname - 확인할 닉네임
- * @returns {Promise<boolean>} 중복 여부
+ * @returns {Promise<boolean>} 사용 가능 여부 (true: 사용 가능, false: 중복)
  */
 export const checkNickname = async (nickname) => {
-  const response = await api.get(API_ENDPOINTS.AUTH.NICKNAME_CHECK, {
+  const response = await api.get(API_ENDPOINTS.USER.NICKNAME_CHECK, {
     params: { nickname }
   });
+  return !response.data.data.exists;
+};
+
+/**
+ * 사용자 서비스 등록 (닉네임 + 역할 설정)
+ * POST /user/register
+ * @param {Object} userData - 사용자 정보
+ * @param {string} userData.nickname - 닉네임 (1~12자, 한글/영문만 허용)
+ * @param {string} userData.role - 역할 ('USER' | 'OWNER')
+ * @returns {Promise<Object>} 등록된 사용자 정보
+ */
+export const registerUser = async (userData) => {
+  const response = await api.post(API_ENDPOINTS.USER.REGISTER, userData);
   return response.data.data;
 };
 
@@ -50,3 +65,4 @@ export const updateRole = async (roleData) => {
   const response = await api.patch(API_ENDPOINTS.AUTH.UPDATE_ROLE, roleData);
   return response.data.data;
 };
+

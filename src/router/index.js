@@ -122,10 +122,11 @@ const tryAuthWithToken = async (authStore, targetPath) => {
 
 /**
  * 닉네임 등록이 필요한지 확인
+ * GUEST 권한인 경우에만 닉네임 등록이 필요함
  */
 const needsNicknameRegistration = (authStore, targetPath) => {
     return authStore.isAuthenticated &&
-        !authStore.user?.nickName &&
+        authStore.user?.role === 'GUEST' &&
         targetPath !== '/nickname';
 };
 
@@ -206,7 +207,7 @@ router.beforeEach(async (to, from, next) => {
         // 비인증 상태에서 보호된 페이지 접근 시
         if (!isPublic && !authStore.isAuthenticated) {
             console.log('⚠️ 비인증 상태로 보호된 페이지 접근 → 토큰으로 인증 시도')
-            const redirect = await handleUnauthenticatedUser(authStore, to.path);
+            const redirect = handleUnauthenticatedUser(authStore, to.path);
             console.log('🔹 handleUnauthenticatedUser 결과:', redirect)
             console.groupEnd()
             return redirect ? next(redirect) : next();
