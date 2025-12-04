@@ -21,26 +21,23 @@
 
       <!-- Login Buttons Section -->
       <div class="login-buttons">
-        <button class="login-btn kakao" @click="handleKakaoLogin">
-          <img src="@/assets/kakao_logo.svg" alt="Kakao" class="btn-icon" />
-          <span>카카오로 시작하기</span>
-        </button>
 
         <button class="login-btn naver" @click="handleNaverLogin">
           <img src="@/assets/naver_logo.svg" alt="Naver" class="btn-icon" />
           <span>네이버로 시작하기</span>
         </button>
 
-        <button class="login-btn google" @click="handleGoogleLogin">
-          <img src="@/assets/google_logo.svg" alt="Google" class="btn-icon" />
-          <span>Google로 시작하기</span>
-        </button>
       </div>
 
       <!-- Browse without login -->
-      <button class="browse-without-login" @click="handleBrowseWithoutLogin">
+      <BaseButton
+        variant="ghost"
+        size="medium"
+        class="mt-4"
+        @click="handleBrowseWithoutLogin"
+      >
         로그인 없이 둘러보기
-      </button>
+      </BaseButton>
     </div>
   </div>
 </template>
@@ -48,22 +45,13 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import config from '@/config';
+import BaseButton from '@/components/common/BaseButton.vue';
 
 const router = useRouter();
 
-const handleKakaoLogin = () => {
-  // OAuth2 카카오 로그인 - 백엔드로 리다이렉트
-  window.location.href = `${config.api.baseURL}/oauth2/authorization/kakao`;
-};
-
 const handleNaverLogin = () => {
   // OAuth2 네이버 로그인 - 백엔드로 리다이렉트
-  window.location.href = `${config.api.baseURL}/oauth2/authorization/naver`;
-};
-
-const handleGoogleLogin = () => {
-  // OAuth2 구글 로그인 - 백엔드로 리다이렉트
-  window.location.href = `${config.api.baseURL}/oauth2/authorization/google`;
+  globalThis.location.href = `${config.api.baseURL}/oauth2/authorization/naver`;
 };
 
 const handleBrowseWithoutLogin = () => {
@@ -78,7 +66,7 @@ const handleBrowseWithoutLogin = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f6f8fb;
+  background-color: var(--color-background);
   padding: 2rem 1rem;
 }
 
@@ -98,7 +86,7 @@ const handleBrowseWithoutLogin = () => {
   font-size: 1.375rem;
   font-weight: 700;
   line-height: 1.6;
-  color: #1a1a1a;
+  color: var(--color-textPrimary);
   margin-bottom: 2.5rem;
 }
 
@@ -125,15 +113,15 @@ const handleBrowseWithoutLogin = () => {
 }
 
 .icon.coffee {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: var(--color-primary-500);
 }
 
 .icon.wine {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background-color: var(--color-primary-600);
 }
 
 .icon.cake {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  background-color: var(--color-primary-400);
 }
 
 .login-buttons {
@@ -153,7 +141,7 @@ const handleBrowseWithoutLogin = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   position: relative;
 }
 
@@ -173,35 +161,8 @@ const handleBrowseWithoutLogin = () => {
   left: 1.25rem;
 }
 
-.login-btn.kakao {
-  background-color: #fee500;
-  color: #000000;
-}
-
 .login-btn.naver {
   background-color: #03c75a;
   color: #ffffff;
-}
-
-.login-btn.google {
-  background-color: #ffffff;
-  color: #000000;
-  border: 1px solid #dadce0;
-}
-
-.browse-without-login {
-  background: none;
-  border: none;
-  color: #8b95a1;
-  font-size: 0.875rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  margin-top: 1rem;
-  text-align: center;
-  width: 100%;
-}
-
-.browse-without-login:hover {
-  color: #6b7684;
 }
 </style>

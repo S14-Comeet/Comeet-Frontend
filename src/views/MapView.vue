@@ -9,7 +9,7 @@
         class="absolute inset-0 bg-black/20 flex items-center justify-center z-20"
     >
       <div class="bg-white rounded-lg p-6 shadow-lg">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
         <p class="mt-4 text-textSecondary">지도 로딩 중...</p>
       </div>
     </div>
@@ -104,21 +104,25 @@ onMounted(async () => {
       zoom: 15,
     })
 
-    // 🗺️ 현재 위치 요청
-    await requestLocation()
-
-    // 현재 위치로 지도 이동
-    if (location.value) {
-      map.value.setCenter(new naver.maps.LatLng(location.value.lat, location.value.lng))
+    // 🗺️ 현재 위치 요청 (실패해도 지도는 표시)
+    try {
+      await requestLocation()
+      // 현재 위치로 지도 이동
+      if (location.value && map.value) {
+        map.value.setCenter(new naver.maps.LatLng(location.value.lat, location.value.lng))
+      }
+    } catch {
+      // 위치 권한 거부 또는 타임아웃 - 기본 위치 사용
+      console.warn('[지도] 현재 위치를 가져올 수 없어 기본 위치를 사용합니다.')
     }
 
     // 🗺️ Mock 마커 렌더링
     renderMarkers()
-
-    isLoading.value = false
   } catch (error) {
-    console.error('지도 초기화 실패:', error)
-    toast.error('지도를 불러오는데 실패했습니다')
+    console.error('[지도] 초기화 실패:', error)
+    toast.error('지도를 불러오는데 실패했습니다.')
+  } finally {
+    // 항상 로딩 상태 해제
     isLoading.value = false
   }
 })
