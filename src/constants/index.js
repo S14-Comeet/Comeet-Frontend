@@ -48,6 +48,14 @@ export const API_ENDPOINTS = {
   // 사용자 정보
   USER: {
     INFO: '/user'
+  },
+  // 알림
+  NOTIFICATION: {
+    LIST: '/api/notifications',
+    READ: '/api/notifications/:id/read',
+    READ_ALL: '/api/notifications/read-all',
+    DELETE: '/api/notifications/:id',
+    DELETE_ALL: '/api/notifications/delete-all'
   }
 };
 
