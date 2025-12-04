@@ -1,9 +1,7 @@
-/**
- * Axios 인스턴스 설정
- * Spring 백엔드와 통신하기 위한 설정
- */
+
 import axios from 'axios';
 import config from '@/config';
+import { getAccessToken, setAccessToken, removeAccessToken } from '@/utils/storage';
 
 const api = axios.create({
   baseURL: config.api.baseURL,
@@ -13,41 +11,128 @@ const api = axios.create({
   }
 });
 
-// 요청 인터셉터 (필요시 토큰 추가 등)
+// 요청 인터셉터 - 액세스 토큰 자동 주입
 api.interceptors.request.use(
-  (config) => {
+  (requestConfig) => {
+    // 안전한 스토리지 접근으로 액세스 토큰 가져오기
+    const accessToken = getAccessToken();
+
+    // 토큰이 있으면 Authorization 헤더에 추가
+    if (accessToken) {
+      requestConfig.headers.Authorization = `Bearer ${accessToken}`;
+    }
+
     // 디버그 모드일 때 요청 로깅
     if (import.meta.env.VITE_ENABLE_DEBUG === 'true') {
-      console.log('API Request:', config.method?.toUpperCase(), config.url);
+      console.log('[API 요청]', requestConfig.method?.toUpperCase(), requestConfig.url);
+      if (accessToken) {
+        console.log('[인증] 액세스 토큰 포함:', accessToken.substring(0, 20) + '...');
+      }
     }
-    return config;
+    return requestConfig;
   },
   (error) => {
     return Promise.reject(error);
   }
 );
 
-// 응답 인터셉터 (에러 처리 등)
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  
+  failedQueue = [];
+};
+
+/**
+ * 재발급 중일 때 요청을 큐에 추가하고 대기
+ */
+const waitForTokenRefresh = (originalRequest) => {
+  return new Promise((resolve, reject) => {
+    failedQueue.push({ resolve, reject });
+  }).then(token => {
+    originalRequest.headers.Authorization = `Bearer ${token}`;
+    return api.request(originalRequest);
+  });
+};
+
+/**
+ * 토큰 재발급 처리
+ */
+const handleTokenReissue = async (originalRequest) => {
+  originalRequest._retry = true;
+  isRefreshing = true;
+
+  try {
+    const response = await api.post('/api/auth/reissue');
+    const newAccessToken = response.headers['authorization'];
+
+    if (!newAccessToken) {
+      throw new Error('재발급 응답에 토큰이 없습니다.');
+    }
+
+    const token = newAccessToken.replace('Bearer ', '');
+    setAccessToken(token);
+    originalRequest.headers.Authorization = `Bearer ${token}`;
+    processQueue(null, token);
+
+    if (import.meta.env.VITE_ENABLE_DEBUG === 'true') {
+      console.log('[인증] 토큰 재발급 성공');
+    }
+
+    return api.request(originalRequest);
+  } catch (reissueError) {
+    console.warn('[인증] 토큰 재발급 실패:', reissueError.message);
+    processQueue(reissueError, null);
+    removeAccessToken();
+
+    import('@/store/auth').then(({ useAuthStore }) => {
+      const authStore = useAuthStore();
+      authStore.clearUser();
+    });
+
+    globalThis.location.href = '/login';
+    throw reissueError;
+  } finally {
+    isRefreshing = false;
+  }
+};
+
+// 응답 인터셉터 - 401 에러 처리 및 토큰 재발급
 api.interceptors.response.use(
   (response) => {
-    // 성공 응답
+    const newAccessToken = response.headers['authorization'];
+    if (newAccessToken) {
+      const token = newAccessToken.replace('Bearer ', '');
+      setAccessToken(token);
+
+      if (import.meta.env.VITE_ENABLE_DEBUG === 'true') {
+        console.log('[인증] 액세스 토큰이 응답 헤더에서 갱신되었습니다.');
+      }
+    }
     return response;
   },
   async (error) => {
-    // 401 Unauthorized - 토큰 만료 시 재발급 시도
-    if (error.response?.status === 401) {
-      try {
-        // 토큰 재발급 시도
-        await api.post('/api/auth/reissue');
-        // 원래 요청 재시도
-        return api.request(error.config);
-      } catch (reissueError) {
-        // 재발급 실패 시 로그인 페이지로 이동
-        window.location.href = '/login';
-        return Promise.reject(reissueError);
-      }
+    const originalRequest = error.config;
+    const isUnauthorized = error.response?.status === 401;
+    const isRetryable = !originalRequest._retry;
+
+    if (!isUnauthorized || !isRetryable) {
+      throw error;
     }
-    return Promise.reject(error);
+
+    if (isRefreshing) {
+      return waitForTokenRefresh(originalRequest);
+    }
+
+    return handleTokenReissue(originalRequest);
   }
 );
 

@@ -13,8 +13,7 @@ export const APP_CONSTANTS = {
 
 // 로컬 스토리지 키
 export const STORAGE_KEYS = {
-  AUTH_TOKEN: 'comeet_auth_token',
-  REFRESH_TOKEN: 'comeet_refresh_token',
+  ACCESS_TOKEN: 'access_token',
   USER_INFO: 'comeet_user_info',
   THEME: 'comeet_theme',
   LANGUAGE: 'comeet_language'
@@ -25,6 +24,7 @@ export const ROUTES = {
   HOME: '/',
   LOGIN: '/login',
   NICKNAME: '/nickname',
+  OAUTH_CALLBACK: '/oauth/callback',
   DASHBOARD: '/dashboard',
   PROFILE: '/profile',
   SETTINGS: '/settings'
@@ -68,7 +68,7 @@ export const MESSAGE_TYPES = {
   ERROR: 'error',
   WARNING: 'warning',
   INFO: 'info'
-};
+}
 
 // 유효성 검사 규칙
 export const VALIDATION = {
