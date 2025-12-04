@@ -34,25 +34,28 @@ app.use(Toast, {
     newestOnTop: true,
 })
 
-try {
-    const {useAuthStore} = await import('@/store/auth')
-    const {getAccessToken, removeAccessToken} = await import('@/utils/storage')
-    const authStore = useAuthStore()
+// 앱 초기화 시 사용자 정보 복원
+;(async () => {
+    try {
+        const {useAuthStore} = await import('@/store/auth')
+        const {getAccessToken, removeAccessToken} = await import('@/utils/storage')
+        const authStore = useAuthStore()
 
-    // 안전한 스토리지 접근으로 액세스 토큰 확인
-    const accessToken = getAccessToken()
-    if (accessToken && authStore.isAuthenticated) {
-        try {
-            await authStore.fetchUser()
-        } catch (error) {
-            // 토큰이 유효하지 않으면 정리
-            console.warn('[앱 초기화] 사용자 세션 복원 실패:', error)
-            removeAccessToken()
-            authStore.clearUser()
+        // 안전한 스토리지 접근으로 액세스 토큰 확인
+        const accessToken = getAccessToken()
+        if (accessToken && authStore.isAuthenticated) {
+            try {
+                await authStore.fetchUser()
+            } catch (error) {
+                // 토큰이 유효하지 않으면 정리
+                console.warn('[앱 초기화] 사용자 세션 복원 실패:', error)
+                removeAccessToken()
+                authStore.clearUser()
+            }
         }
+    } catch (error) {
+        console.warn('[앱 초기화] 초기화 중 오류 발생:', error)
     }
-} catch (error) {
-    console.warn('[앱 초기화] 초기화 중 오류 발생:', error)
-}
+})()
 
 app.mount('#app')
