@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { getUserInfo, logout as logoutApi } from '@/api/auth'
+import { safeStorage, removeAccessToken } from '@/utils/storage'
 
 /**
  * 인증 상태 관리 Store
@@ -11,7 +12,14 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     /**
      * 현재 로그인한 사용자 정보
-     * @type {Object|null}
+     * @type {{
+     *   id: number|null,
+     *   name: string|null,
+     *   email: string|null,
+     *   nickName: string|null,
+     *   profileImageUrl: string|null,
+     *   role: 'USER'|'OWNER'|null
+     * }|null}
      */
     user: null,
 
@@ -30,9 +38,19 @@ export const useAuthStore = defineStore('auth', {
 
   getters: {
     /**
+     * 사용자 ID
+     */
+    userId: (state) => state.user?.id || null,
+
+    /**
+     * 사용자 이름
+     */
+    userName: (state) => state.user?.name || '',
+
+    /**
      * 사용자 닉네임 반환 (없으면 'Guest')
      */
-    userNickname: (state) => state.user?.nickname || 'Guest',
+    userNickname: (state) => state.user?.nickName || 'Guest',
 
     /**
      * 게스트 상태 여부
@@ -45,9 +63,24 @@ export const useAuthStore = defineStore('auth', {
     userEmail: (state) => state.user?.email || '',
 
     /**
-     * 사용자 Role
+     * 사용자 프로필 이미지 URL
+     */
+    userProfileImage: (state) => state.user?.profileImageUrl || null,
+
+    /**
+     * 사용자 Role (USER/OWNER)
      */
     userRole: (state) => state.user?.role || null,
+
+    /**
+     * 점주(OWNER) 여부
+     */
+    isOwner: (state) => state.user?.role === 'OWNER',
+
+    /**
+     * 닉네임 등록 여부
+     */
+    hasNickname: (state) => Boolean(state.user?.nickName),
   },
 
   actions: {
@@ -57,12 +90,24 @@ export const useAuthStore = defineStore('auth', {
      */
     async fetchUser() {
       this.isLoading = true
+      console.group('[AuthStore] fetchUser 호출')
+      console.log('🔹 로딩 시작')
       try {
         const userData = await getUserInfo()
         this.user = userData
         this.isAuthenticated = true
+        console.log('✅ 사용자 정보 조회 성공:')
+        console.log('   - ID:', userData.id)
+        console.log('   - 이름:', userData.name)
+        console.log('   - 닉네임:', userData.nickName)
+        console.log('   - 이메일:', userData.email)
+        console.log('   - 프로필 이미지:', userData.profileImageUrl)
+        console.log('   - 역할:', userData.role)
+        console.groupEnd()
         return userData
       } catch (error) {
+        console.error('❌ 사용자 정보 조회 실패:', error)
+        console.groupEnd()
         // 인증 실패 시 상태 초기화
         this.clearUser()
         throw error
@@ -76,13 +121,17 @@ export const useAuthStore = defineStore('auth', {
      * 서버에 로그아웃 요청 후 로컬 상태를 초기화합니다.
      */
     async logout() {
+      console.group('[AuthStore] logout 호출')
       try {
         await logoutApi()
+        console.log('✅ 로그아웃 API 성공')
       } catch (error) {
-        console.error('Logout API failed', error)
+        console.error('❌ 로그아웃 API 실패:', error)
         // API 실패해도 로컬 상태는 초기화
       } finally {
         this.clearUser()
+        console.log('🔹 사용자 상태 초기화 완료')
+        console.groupEnd()
       }
     },
 
@@ -91,8 +140,16 @@ export const useAuthStore = defineStore('auth', {
      * 로그아웃 또는 인증 실패 시 호출됩니다.
      */
     clearUser() {
+      console.log('[AuthStore] clearUser 호출 - 사용자 상태 초기화')
       this.user = null
       this.isAuthenticated = false
+      // 액세스 토큰도 함께 제거
+      try {
+        removeAccessToken()
+        console.log('🔹 액세스 토큰 제거 완료')
+      } catch {
+        console.warn('[인증] 토큰 삭제 실패')
+      }
     },
 
     /**
@@ -101,15 +158,20 @@ export const useAuthStore = defineStore('auth', {
      */
     updateUser(userData) {
       if (this.user) {
+        console.group('[AuthStore] updateUser 호출')
+        console.log('🔹 기존 정보:', this.user)
+        console.log('🔹 업데이트 정보:', userData)
         this.user = { ...this.user, ...userData }
+        console.log('🔹 업데이트 후:', this.user)
+        console.groupEnd()
       }
     },
   },
 
-  // LocalStorage에 자동 저장
+  // LocalStorage에 자동 저장 (안전한 스토리지 어댑터 사용)
   persist: {
     key: 'comeet-auth',
-    storage: localStorage,
+    storage: safeStorage,
     paths: ['user', 'isAuthenticated'], // user, isAuthenticated만 저장
   },
 })
