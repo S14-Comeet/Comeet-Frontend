@@ -23,7 +23,7 @@
       <div class="login-buttons">
 
         <button class="login-btn naver" @click="handleNaverLogin">
-          <img src="@/assets/naver_logo.svg" alt="Naver" class="btn-icon" />
+          <img :src="naverLogo" alt="Naver" class="btn-icon" />
           <span>네이버로 시작하기</span>
         </button>
 
@@ -46,6 +46,7 @@
 import { useRouter } from 'vue-router';
 import config from '@/config';
 import BaseButton from '@/components/common/BaseButton.vue';
+import naverLogo from '@/assets/naver_logo.svg?url';
 
 const router = useRouter();
 
