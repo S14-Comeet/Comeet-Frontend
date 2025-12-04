@@ -180,9 +180,9 @@
 
     <!-- More (3 dots) -->
     <template v-else-if="name === 'more'">
-      <circle cx="12" cy="5" r="1.5" :fill="color" />
-      <circle cx="12" cy="12" r="1.5" :fill="color" />
-      <circle cx="12" cy="19" r="1.5" :fill="color" />
+      <circle cx="12" cy="5" r="2" :fill="color" />
+      <circle cx="12" cy="12" r="2" :fill="color" />
+      <circle cx="12" cy="19" r="2" :fill="color" />
     </template>
 
     <!-- Event (Calendar) -->
@@ -280,6 +280,56 @@
         stroke-width="2"
         stroke-linecap="round"
         fill="none"
+      />
+    </template>
+
+    <!-- Coffee Cup -->
+    <template v-else-if="name === 'coffee'">
+      <path
+        d="M18 8H19C20.0609 8 21.0783 8.42143 21.8284 9.17157C22.5786 9.92172 23 10.9391 23 12C23 13.0609 22.5786 14.0783 21.8284 14.8284C21.0783 15.5786 20.0609 16 19 16H18"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M2 8H18V17C18 17.7956 17.6839 18.5587 17.1213 19.1213C16.5587 19.6839 15.7956 20 15 20H5C4.20435 20 3.44129 19.6839 2.87868 19.1213C2.31607 18.5587 2 17.7956 2 17V8Z"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M6 1V4M10 1V4M14 1V4"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </template>
+
+    <!-- Coffee To-Go -->
+    <template v-else-if="name === 'coffee-to-go'">
+      <path
+        d="M6 3L5 21H19L18 3H6Z"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M4 9H20"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M8 3V1M12 3V1M16 3V1"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
       />
     </template>
 
