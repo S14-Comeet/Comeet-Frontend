@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { getUserInfo, logout as logoutApi } from '@/api/auth'
 import { safeStorage, removeAccessToken } from '@/utils/storage'
 import { createLogger } from '@/utils/logger'
-import { showSuccess, showError } from '@/utils/toast'
+import { showSuccess } from '@/utils/toast'
 
 const logger = createLogger('Auth')
 

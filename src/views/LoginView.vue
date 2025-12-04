@@ -1,5 +1,4 @@
 <template>
-  <!-- 🎨 Tailwind CSS 마이그레이션 완료 -->
   <div class="min-h-screen flex items-center justify-center bg-background px-4 py-8">
     <div class="w-full max-w-[360px] flex flex-col gap-12">
       <!-- Header Section -->

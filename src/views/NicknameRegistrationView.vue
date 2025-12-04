@@ -202,59 +202,36 @@ import BaseButton from '@/components/common/BaseButton.vue';
 const router = useRouter();
 const authStore = useAuthStore();
 
-// ============================================
 // 상태 관리
-// ============================================
-const currentStep = ref(1); // 1: 닉네임 입력, 2: 역할 선택
+const currentStep = ref(1);
 const nickname = ref('');
-const selectedRole = ref(''); // 'USER' | 'OWNER'
-const validationState = ref('idle'); // 'idle', 'success', 'error', 'duplicate', 'checking'
+const selectedRole = ref('');
+const validationState = ref('idle');
 const helperMessage = ref('');
 const isSubmitting = ref(false);
 let debounceTimer = null;
 
-// ============================================
-// Computed
-// ============================================
-
-/**
- * BaseInput status prop에 맞는 상태 변환
- */
+/** BaseInput status prop에 맞는 상태 변환 */
 const inputStatus = computed(() => {
   if (validationState.value === 'success') return 'success';
   if (validationState.value === 'error' || validationState.value === 'duplicate') return 'error';
   return '';
 });
 
-/**
- * Helper text 색상 클래스
- */
+/** Helper text 색상 클래스 */
 const helperTextClass = computed(() => {
   if (validationState.value === 'success') return 'text-sm text-success';
   if (validationState.value === 'error' || validationState.value === 'duplicate') return 'text-sm text-error';
   return 'text-sm text-textSecondary';
 });
 
-/**
- * 닉네임 유효성 (다음 단계 진행 가능 여부)
- */
+/** 닉네임 유효성 (다음 단계 진행 가능 여부) */
 const isNicknameValid = computed(() => {
   return nickname.value.trim().length > 0 && validationState.value === 'success';
 });
 
-// ============================================
-// 닉네임 검증
-// ============================================
-
-/**
- * 닉네임 유효성 검사
- * - 공백 불가
- * - 한글/영문만 허용
- * - 1~12자
- * - 중복 체크 (API)
- */
+/** 닉네임 유효성 검사 */
 const validateNickname = async () => {
-  // 입력이 없으면 초기 상태로
   if (nickname.value.length === 0) {
     validationState.value = 'idle';
     helperMessage.value = '';
@@ -262,7 +239,6 @@ const validateNickname = async () => {
     return;
   }
 
-  // 공백 포함 검사
   if (/\s/.test(nickname.value)) {
     validationState.value = 'error';
     helperMessage.value = '공백은 사용할 수 없습니다';
@@ -303,9 +279,7 @@ const validateNickname = async () => {
   }, DEFAULTS.DEBOUNCE_DELAY);
 };
 
-/**
- * 입력 초기화 핸들러
- */
+/** 입력 초기화 핸들러 */
 const handleClear = () => {
   nickname.value = '';
   validationState.value = 'idle';
@@ -313,30 +287,20 @@ const handleClear = () => {
   clearTimeout(debounceTimer);
 };
 
-// ============================================
-// 단계 전환
-// ============================================
-
-/**
- * 다음 단계로 이동
- */
+/** 다음 단계로 이동 */
 const goToNextStep = () => {
   if (isNicknameValid.value) {
     currentStep.value = 2;
   }
 };
 
-/**
- * 이전 단계로 이동
- */
+/** 이전 단계로 이동 */
 const goToPrevStep = () => {
   currentStep.value = 1;
   selectedRole.value = '';
 };
 
-/**
- * 뒤로 가기
- */
+/** 뒤로 가기 */
 const handleBack = () => {
   if (currentStep.value === 2) {
     goToPrevStep();
@@ -345,14 +309,7 @@ const handleBack = () => {
   }
 };
 
-// ============================================
-// 제출
-// ============================================
-
-/**
- * 사용자 등록 완료
- * POST /user/register API 호출
- */
+/** 사용자 등록 완료 */
 const handleSubmit = async () => {
   if (!isNicknameValid.value || !selectedRole.value || isSubmitting.value) return;
 

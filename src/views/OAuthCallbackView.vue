@@ -22,10 +22,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 const message = ref('로그인 처리 중...')
 
-/**
- * OAuth 콜백 처리
- * URL 파라미터에서 accessToken을 추출하여 저장하고 사용자 정보를 가져옴
- */
+// OAuth 콜백 처리
 onMounted(async () => {
   try {
     const urlParams = new URLSearchParams(globalThis.location.search)
