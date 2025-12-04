@@ -61,16 +61,13 @@ const isFullScreenPage = computed(() => {
 
 .app-main {
   flex: 1;
-  padding: 2rem;
-  max-width: 960px;
   width: 100%;
-  margin: 0 auto;
   overflow-y: auto;
+  background-color: var(--color-background);
 }
 
 .app-main.no-header {
-  padding: 0;
-  max-width: 100%;
+  /* 헤더 없는 페이지도 동일한 스타일 유지 */
 }
 
 /* 전체 화면 페이지 (지도 등) */
@@ -89,7 +86,7 @@ const isFullScreenPage = computed(() => {
 
 /* 네비게이션 바가 있을 때 하단 패딩 추가 (64px = h-16) */
 .app-main.with-nav {
-  padding-bottom: calc(4rem + 64px);
+  padding-bottom: 64px;
 }
 
 /* 전체 화면 + 네비게이션 바: 패딩 없음 (NavigationBar가 absolute이므로) */
@@ -100,8 +97,7 @@ const isFullScreenPage = computed(() => {
 /* 모바일에서 네비게이션 바 표시 시 패딩 조정 */
 @media (max-width: 640px) {
   .app-main.with-nav {
-    padding: 1rem;
-    padding-bottom: calc(1rem + 64px + env(safe-area-inset-bottom));
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
   }
 
   .app-main.full-screen.with-nav {
