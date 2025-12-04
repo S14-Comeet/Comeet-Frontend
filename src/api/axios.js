@@ -2,6 +2,7 @@ import axios from 'axios';
 import config from '@/config';
 import { getAccessToken, setAccessToken, removeAccessToken } from '@/utils/storage';
 import { createLogger } from '@/utils/logger';
+import { showApiError, showWarning } from '@/utils/toast';
 
 const logger = createLogger('API');
 
@@ -90,6 +91,9 @@ const handleTokenReissue = async (originalRequest) => {
     processQueue(reissueError, null);
     removeAccessToken();
 
+    // Toast 알림: 세션 만료
+    showWarning('로그인이 만료되었습니다. 다시 로그인해주세요.');
+
     import('@/store/auth').then(({ useAuthStore }) => {
       const authStore = useAuthStore();
       authStore.clearUser();
@@ -121,6 +125,14 @@ api.interceptors.response.use(
     // API 에러 로깅 (INFO 레벨)
     if (error.response) {
       logger.info(`응답 에러: ${error.response.status} ${originalRequest?.url}`);
+    }
+
+    // 401이 아닌 에러는 Toast로 표시 (400, 500 등)
+    if (!isUnauthorized && error.response?.status >= 400) {
+      // reissue 요청이 아닌 경우에만 Toast 표시
+      if (!originalRequest?.url?.includes('/reissue')) {
+        showApiError(error);
+      }
     }
 
     if (!isUnauthorized || !isRetryable) {

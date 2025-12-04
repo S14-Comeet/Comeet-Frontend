@@ -195,6 +195,7 @@ import { useRouter } from 'vue-router';
 import { checkNickname, registerUser } from '@/api/auth';
 import { useAuthStore } from '@/store/auth';
 import { DEFAULTS, VALIDATION } from '@/constants';
+import { showSuccess } from '@/utils/toast';
 import BaseInput from '@/components/common/BaseInput.vue';
 import BaseButton from '@/components/common/BaseButton.vue';
 
@@ -358,20 +359,20 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
 
   try {
-    const userData = await registerUser({
+    await registerUser({
       nickname: nickname.value.trim(),
       role: selectedRole.value
     });
 
-    console.log('✅ 사용자 등록 성공:', userData);
-
     // 스토어 업데이트
     await authStore.fetchUser();
+
+    // 성공 Toast
+    showSuccess(`환영합니다, ${nickname.value.trim()}님!`);
 
     // 지도 페이지로 이동
     router.push('/map');
   } catch (error) {
-    console.error('❌ 사용자 등록 실패:', error);
 
     const errorCode = error.response?.data?.error?.code;
     const errorMessage = error.response?.data?.error?.message;

@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { getUserInfo, logout as logoutApi } from '@/api/auth'
 import { safeStorage, removeAccessToken } from '@/utils/storage'
 import { createLogger } from '@/utils/logger'
+import { showSuccess, showError } from '@/utils/toast'
 
 const logger = createLogger('Auth')
 
@@ -72,8 +73,11 @@ export const useAuthStore = defineStore('auth', {
       try {
         await logoutApi()
         logger.info('로그아웃 성공')
+        showSuccess('로그아웃 되었습니다.')
       } catch (error) {
         logger.error('로그아웃 API 실패', error)
+        // API 실패해도 로컬 상태는 정리되므로 성공 메시지 표시
+        showSuccess('로그아웃 되었습니다.')
       } finally {
         this.clearUser()
       }

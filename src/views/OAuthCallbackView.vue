@@ -15,6 +15,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
 import { setAccessToken } from '@/utils/storage'
 import { createLogger } from '@/utils/logger'
+import { showSuccess, showError, showInfo } from '@/utils/toast'
 
 const logger = createLogger('OAuth')
 const router = useRouter()
@@ -34,6 +35,7 @@ onMounted(async () => {
     // 에러 또는 토큰 없음
     if (error || !accessToken) {
       logger.warn('OAuth 콜백 실패', { error, hasToken: !!accessToken })
+      showError('로그인에 실패했습니다. 다시 시도해주세요.')
       router.push('/login')
       return
     }
@@ -49,13 +51,17 @@ onMounted(async () => {
     // role에 따라 페이지 이동
     if (authStore.isRegistered) {
       logger.info('등록된 사용자 → 메인 페이지')
+      const nickname = authStore.user?.nickname || authStore.user?.name || '사용자'
+      showSuccess(`환영합니다, ${nickname}님!`)
       router.push('/')
     } else {
       logger.info('미등록 사용자 → 닉네임 등록')
+      showInfo('닉네임을 등록해주세요.')
       router.push('/nickname')
     }
   } catch (err) {
     logger.error('OAuth 콜백 처리 실패', err)
+    showError('로그인 처리 중 오류가 발생했습니다.')
     router.push('/login')
   }
 })
