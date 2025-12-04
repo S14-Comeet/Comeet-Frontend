@@ -55,6 +55,7 @@ import { useGeolocation } from '@/composables/useGeolocation'
 import { useToast } from 'vue-toastification'
 import { useNotificationStore } from '@/store/notification'
 import { useAuthStore } from '@/store/auth'
+import { useSavedStore } from '@/store/saved'
 import MapPlaceInfo from "@/components/map/MapPlaceInfo.vue"
 import MapPlaceDetail from "@/components/map/MapPlaceDetail.vue"
 import BaseIcon from '@/components/common/BaseIcon.vue'
@@ -63,6 +64,7 @@ const router = useRouter()
 const toast = useToast()
 const notificationStore = useNotificationStore()
 const authStore = useAuthStore()
+const savedStore = useSavedStore()
 const mapContainer = ref(null)
 const isLoading = ref(true)
 const {location, requestLocation} = useGeolocation()
@@ -106,16 +108,30 @@ const mockCafes = [
   },
 ]
 
-const renderMarkers = () => {
+const renderMarkers = (cafes = mockCafes) => {
   clearMarkers()
 
-  mockCafes.forEach((cafe) => {
+  cafes.forEach((cafe) => {
     addMarker({
-      position: {lat: cafe.lat, lng: cafe.lng},
+      position: {
+        lat: cafe.lat || cafe.latitude,
+        lng: cafe.lng || cafe.longitude
+      },
       title: cafe.name,
       onClick: () => handleMarkerClick(cafe),
     })
   })
+
+  // 카페 목록이 있을 때 지도 중심 이동
+  if (cafes.length > 0 && map.value) {
+    const firstCafe = cafes[0]
+    const center = new naver.maps.LatLng(
+      firstCafe.lat || firstCafe.latitude,
+      firstCafe.lng || firstCafe.longitude
+    )
+    map.value.setCenter(center)
+    map.value.setZoom(13)
+  }
 }
 
 const handleMarkerClick = (cafe) => {
@@ -135,20 +151,31 @@ onMounted(async () => {
       zoom: 15,
     })
 
-    // 🗺️ 현재 위치 요청 (실패해도 지도는 표시)
-    try {
-      await requestLocation()
-      // 현재 위치로 지도 이동
-      if (location.value && map.value) {
-        map.value.setCenter(new naver.maps.LatLng(location.value.lat, location.value.lng))
-      }
-    } catch {
-      // 위치 권한 거부 또는 타임아웃 - 기본 위치 사용
-      console.warn('[지도] 현재 위치를 가져올 수 없어 기본 위치를 사용합니다.')
-    }
+    // SavedView에서 선택된 폴더 정보 확인 (Pinia store에서)
+    const hasSelectedFolder = savedStore.selectedFolder && savedStore.selectedFolderCafes.length > 0
 
-    // 🗺️ Mock 마커 렌더링
-    renderMarkers()
+    if (hasSelectedFolder) {
+      // 저장된 폴더의 카페를 지도에 표시
+      renderMarkers(savedStore.selectedFolderCafes)
+
+      // 사용 후 store 초기화 (다음 방문 시 기본 지도 표시)
+      savedStore.clearSelectedFolder()
+    } else {
+      // 🗺️ 현재 위치 요청 (실패해도 지도는 표시)
+      try {
+        await requestLocation()
+        // 현재 위치로 지도 이동
+        if (location.value && map.value) {
+          map.value.setCenter(new naver.maps.LatLng(location.value.lat, location.value.lng))
+        }
+      } catch {
+        // 위치 권한 거부 또는 타임아웃 - 기본 위치 사용
+        console.warn('[지도] 현재 위치를 가져올 수 없어 기본 위치를 사용합니다.')
+      }
+
+      // 🗺️ Mock 마커 렌더링
+      renderMarkers()
+    }
   } catch (error) {
     console.error('[지도] 초기화 실패:', error)
     toast.error('지도를 불러오는데 실패했습니다.')
