@@ -1,114 +1,63 @@
 import { defineStore } from 'pinia'
 import { getUserInfo, logout as logoutApi } from '@/api/auth'
 import { safeStorage, removeAccessToken } from '@/utils/storage'
+import { createLogger } from '@/utils/logger'
+import { showSuccess } from '@/utils/toast'
+
+const logger = createLogger('Auth')
 
 /**
  * 인증 상태 관리 Store
- *
- * 사용자 로그인 상태, 사용자 정보를 관리하고
- * LocalStorage에 자동으로 persist 합니다.
+ * 사용자 로그인 상태와 정보를 관리하고 LocalStorage에 자동 persist
  */
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    /**
-     * 현재 로그인한 사용자 정보
-     * @type {{
-     *   id: number|null,
-     *   name: string|null,
-     *   email: string|null,
-     *   nickName: string|null,
-     *   profileImageUrl: string|null,
-     *   role: 'USER'|'OWNER'|null
-     * }|null}
-     */
+    /** 현재 로그인한 사용자 정보 */
     user: null,
-
-    /**
-     * 로그인 상태
-     * @type {boolean}
-     */
+    /** 로그인 상태 */
     isAuthenticated: false,
-
-    /**
-     * 로딩 상태 (API 요청 중)
-     * @type {boolean}
-     */
+    /** 로딩 상태 */
     isLoading: false,
   }),
 
   getters: {
-    /**
-     * 사용자 ID
-     */
-    userId: (state) => state.user?.id || null,
-
-    /**
-     * 사용자 이름
-     */
+    /** 사용자 ID */
+    userId: (state) => state.user?.userId || null,
+    /** 사용자 이름 */
     userName: (state) => state.user?.name || '',
-
-    /**
-     * 사용자 닉네임 반환 (없으면 'Guest')
-     */
-    userNickname: (state) => state.user?.nickName || 'Guest',
-
-    /**
-     * 게스트 상태 여부
-     */
+    /** 사용자 닉네임 (없으면 'Guest') */
+    userNickname: (state) => state.user?.nickname || 'Guest',
+    /** 게스트 상태 여부 */
     isGuest: (state) => !state.isAuthenticated,
-
-    /**
-     * 사용자 이메일
-     */
+    /** 사용자 이메일 */
     userEmail: (state) => state.user?.email || '',
-
-    /**
-     * 사용자 프로필 이미지 URL
-     */
+    /** 사용자 프로필 이미지 URL */
     userProfileImage: (state) => state.user?.profileImageUrl || null,
-
-    /**
-     * 사용자 Role (USER/OWNER)
-     */
+    /** 사용자 Role */
     userRole: (state) => state.user?.role || null,
-
-    /**
-     * 점주(OWNER) 여부
-     */
+    /** 점주(OWNER) 여부 */
     isOwner: (state) => state.user?.role === 'OWNER',
-
-    /**
-     * 닉네임 등록 여부
-     */
-    hasNickname: (state) => Boolean(state.user?.nickName),
+    /** 서비스 등록 완료 여부 */
+    isRegistered: (state) => state.user?.role && state.user.role !== 'GUEST',
+    /** 닉네임 등록 여부 */
+    hasNickname: (state) => Boolean(state.user?.nickname),
   },
 
   actions: {
     /**
      * 사용자 정보 조회
-     * 로그인 후 또는 페이지 새로고침 시 호출하여 사용자 정보를 가져옵니다.
+     * 로그인 후 또는 페이지 새로고침 시 호출
      */
     async fetchUser() {
       this.isLoading = true
-      console.group('[AuthStore] fetchUser 호출')
-      console.log('🔹 로딩 시작')
       try {
         const userData = await getUserInfo()
         this.user = userData
         this.isAuthenticated = true
-        console.log('✅ 사용자 정보 조회 성공:')
-        console.log('   - ID:', userData.id)
-        console.log('   - 이름:', userData.name)
-        console.log('   - 닉네임:', userData.nickName)
-        console.log('   - 이메일:', userData.email)
-        console.log('   - 프로필 이미지:', userData.profileImageUrl)
-        console.log('   - 역할:', userData.role)
-        console.groupEnd()
+        logger.info('사용자 인증 성공', { userId: userData.userId, role: userData.role })
         return userData
       } catch (error) {
-        console.error('❌ 사용자 정보 조회 실패:', error)
-        console.groupEnd()
-        // 인증 실패 시 상태 초기화
+        logger.warn('사용자 인증 실패')
         this.clearUser()
         throw error
       } finally {
@@ -118,37 +67,33 @@ export const useAuthStore = defineStore('auth', {
 
     /**
      * 로그아웃
-     * 서버에 로그아웃 요청 후 로컬 상태를 초기화합니다.
+     * 서버 로그아웃 요청 후 로컬 상태 초기화
      */
     async logout() {
-      console.group('[AuthStore] logout 호출')
       try {
         await logoutApi()
-        console.log('✅ 로그아웃 API 성공')
+        logger.info('로그아웃 성공')
+        showSuccess('로그아웃 되었습니다.')
       } catch (error) {
-        console.error('❌ 로그아웃 API 실패:', error)
-        // API 실패해도 로컬 상태는 초기화
+        logger.error('로그아웃 API 실패', error)
+        // API 실패해도 로컬 상태는 정리되므로 성공 메시지 표시
+        showSuccess('로그아웃 되었습니다.')
       } finally {
         this.clearUser()
-        console.log('🔹 사용자 상태 초기화 완료')
-        console.groupEnd()
       }
     },
 
     /**
      * 사용자 상태 초기화
-     * 로그아웃 또는 인증 실패 시 호출됩니다.
+     * 로그아웃 또는 인증 실패 시 호출
      */
     clearUser() {
-      console.log('[AuthStore] clearUser 호출 - 사용자 상태 초기화')
       this.user = null
       this.isAuthenticated = false
-      // 액세스 토큰도 함께 제거
       try {
         removeAccessToken()
-        console.log('🔹 액세스 토큰 제거 완료')
       } catch {
-        console.warn('[인증] 토큰 삭제 실패')
+        logger.warn('토큰 삭제 실패')
       }
     },
 
@@ -158,20 +103,15 @@ export const useAuthStore = defineStore('auth', {
      */
     updateUser(userData) {
       if (this.user) {
-        console.group('[AuthStore] updateUser 호출')
-        console.log('🔹 기존 정보:', this.user)
-        console.log('🔹 업데이트 정보:', userData)
         this.user = { ...this.user, ...userData }
-        console.log('🔹 업데이트 후:', this.user)
-        console.groupEnd()
+        logger.debug('사용자 정보 업데이트', userData)
       }
     },
   },
 
-  // LocalStorage에 자동 저장 (안전한 스토리지 어댑터 사용)
   persist: {
     key: 'comeet-auth',
     storage: safeStorage,
-    paths: ['user', 'isAuthenticated'], // user, isAuthenticated만 저장
+    paths: ['user', 'isAuthenticated'],
   },
 })

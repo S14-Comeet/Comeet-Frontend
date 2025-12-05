@@ -1,7 +1,7 @@
 <template>
-  <!-- Outer wrapper: 데스크톱에서 회색 배경 -->
+  <!-- 데스크톱 배경 -->
   <div class="min-h-screen bg-gray-100">
-    <!-- Inner wrapper: 모바일 뷰 컨테이너 -->
+    <!-- 모바일 뷰 컨테이너 -->
     <div class="app-shell">
       <BaseHeader
         v-if="showHeader"

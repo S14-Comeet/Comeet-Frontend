@@ -1,18 +1,18 @@
 /**
  * 로컬 스토리지 안전 접근 유틸리티
- *
- * 브라우저 제한(iframe, 시크릿 모드 등)으로 인해
- * storage 접근이 차단될 수 있는 상황을 안전하게 처리합니다.
+ * 브라우저 제한(iframe, 시크릿 모드 등)에서도 안전하게 동작
  */
 
 import { STORAGE_KEYS } from '@/constants'
 
-// 메모리 폴백 스토리지 (localStorage 접근 불가 시 사용)
+/** 메모리 폴백 스토리지 */
 const memoryStorage = new Map()
+
+/** 스토리지 접근 가능 여부 캐시 */
+let storageAvailable = null
 
 /**
  * Storage 접근 가능 여부 확인
- * @returns {boolean}
  */
 const isStorageAvailable = () => {
   try {
@@ -20,14 +20,14 @@ const isStorageAvailable = () => {
     localStorage.setItem(testKey, testKey)
     localStorage.removeItem(testKey)
     return true
-  } catch (e) {
-    console.warn('[Storage] localStorage 접근 불가:', e.message)
+  } catch {
     return false
   }
 }
 
-// 스토리지 접근 가능 여부 캐시
-let storageAvailable = null
+/**
+ * 스토리지 가용성 확인 (캐시 사용)
+ */
 const checkStorageAvailable = () => {
   if (storageAvailable === null) {
     storageAvailable = isStorageAvailable()
@@ -36,25 +36,23 @@ const checkStorageAvailable = () => {
 }
 
 /**
- * 로컬 스토리지에서 값 가져오기 (안전)
+ * 로컬 스토리지에서 값 가져오기
  * @param {string} key - 스토리지 키
  * @returns {string|null}
  */
 export const getItem = (key) => {
   try {
     if (!checkStorageAvailable()) {
-      console.log('[Storage] 메모리 폴백 사용 (getItem):', key)
       return memoryStorage.get(key) || null
     }
     return localStorage.getItem(key)
-  } catch (e) {
-    console.warn('[Storage] localStorage 접근이 차단되었습니다:', e.message)
+  } catch {
     return memoryStorage.get(key) || null
   }
 }
 
 /**
- * 로컬 스토리지에 값 저장 (안전)
+ * 로컬 스토리지에 값 저장
  * @param {string} key - 스토리지 키
  * @param {string} value - 저장할 값
  * @returns {boolean} 저장 성공 여부
@@ -62,22 +60,19 @@ export const getItem = (key) => {
 export const setItem = (key, value) => {
   try {
     if (!checkStorageAvailable()) {
-      console.log('[Storage] 메모리 폴백 사용 (setItem):', key)
       memoryStorage.set(key, value)
       return true
     }
     localStorage.setItem(key, value)
-    console.log('[Storage] 저장 성공:', key)
     return true
-  } catch (e) {
-    console.warn('[Storage] localStorage 저장 실패, 메모리 폴백 사용:', e.message)
+  } catch {
     memoryStorage.set(key, value)
-    return true // 메모리에 저장했으므로 true 반환
+    return true
   }
 }
 
 /**
- * 로컬 스토리지에서 값 삭제 (안전)
+ * 로컬 스토리지에서 값 삭제
  * @param {string} key - 스토리지 키
  * @returns {boolean} 삭제 성공 여부
  */
@@ -88,10 +83,9 @@ export const removeItem = (key) => {
       return true
     }
     localStorage.removeItem(key)
-    memoryStorage.delete(key) // 메모리에서도 삭제
+    memoryStorage.delete(key)
     return true
-  } catch (e) {
-    console.warn('[Storage] localStorage 삭제가 차단되었습니다:', e.message)
+  } catch {
     memoryStorage.delete(key)
     return true
   }
@@ -99,32 +93,21 @@ export const removeItem = (key) => {
 
 /**
  * 액세스 토큰 가져오기
- * @returns {string|null}
  */
-export const getAccessToken = () => {
-  return getItem(STORAGE_KEYS.ACCESS_TOKEN)
-}
+export const getAccessToken = () => getItem(STORAGE_KEYS.ACCESS_TOKEN)
 
 /**
  * 액세스 토큰 저장
- * @param {string} token
- * @returns {boolean}
  */
-export const setAccessToken = (token) => {
-  return setItem(STORAGE_KEYS.ACCESS_TOKEN, token)
-}
+export const setAccessToken = (token) => setItem(STORAGE_KEYS.ACCESS_TOKEN, token)
 
 /**
  * 액세스 토큰 삭제
- * @returns {boolean}
  */
-export const removeAccessToken = () => {
-  return removeItem(STORAGE_KEYS.ACCESS_TOKEN)
-}
+export const removeAccessToken = () => removeItem(STORAGE_KEYS.ACCESS_TOKEN)
 
 /**
  * Pinia persist용 안전한 스토리지 어댑터
- * pinia-plugin-persistedstate에서 사용
  */
 export const safeStorage = {
   getItem: (key) => {
@@ -133,8 +116,7 @@ export const safeStorage = {
         return memoryStorage.get(key) || null
       }
       return localStorage.getItem(key)
-    } catch (e) {
-      console.warn('[Storage] persist 읽기 실패:', e.message)
+    } catch {
       return memoryStorage.get(key) || null
     }
   },
@@ -145,8 +127,7 @@ export const safeStorage = {
         return
       }
       localStorage.setItem(key, value)
-    } catch (e) {
-      console.warn('[Storage] persist 저장 실패, 메모리 폴백 사용:', e.message)
+    } catch {
       memoryStorage.set(key, value)
     }
   },
@@ -158,8 +139,7 @@ export const safeStorage = {
       }
       localStorage.removeItem(key)
       memoryStorage.delete(key)
-    } catch (e) {
-      console.warn('[Storage] persist 삭제 실패:', e.message)
+    } catch {
       memoryStorage.delete(key)
     }
   }
@@ -175,4 +155,3 @@ export default {
   removeAccessToken,
   safeStorage
 }
-

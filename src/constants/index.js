@@ -40,14 +40,14 @@ export const API_ENDPOINTS = {
   },
   // 인증 관련
   AUTH: {
-    LOGOUT: '/api/auth/logout',
-    REISSUE: '/api/auth/reissue',
-    NICKNAME_CHECK: '/api/auth/nickName/check',
-    UPDATE_ROLE: '/api/auth/role'
+    LOGOUT: '/auth/logout',
+    REISSUE: '/auth/reissue',
   },
   // 사용자 정보
   USER: {
-    INFO: '/user'
+    INFO: '/user',
+    NICKNAME_CHECK: '/user/nickname/check',
+    REGISTER: '/user/register'
   },
   // 알림
   NOTIFICATION: {
@@ -81,9 +81,10 @@ export const MESSAGE_TYPES = {
 // 유효성 검사 규칙
 export const VALIDATION = {
   NICKNAME: {
-    MIN_LENGTH: 2,
-    MAX_LENGTH: 20,
-    PATTERN: /^[가-힣a-zA-Z0-9_]+$/
+    MIN_LENGTH: 1,
+    MAX_LENGTH: 12,
+    // 한글(가-힣), 영문(a-z, A-Z)만 허용, 공백 불가
+    PATTERN: /^[가-힣a-zA-Z]+$/
   },
   PASSWORD: {
     MIN_LENGTH: 8,
