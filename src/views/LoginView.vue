@@ -1,32 +1,41 @@
 <template>
-  <div class="login-container">
-    <div class="content-wrapper">
+  <div class="min-h-screen flex items-center justify-center bg-background px-4 py-8">
+    <div class="w-full max-w-[360px] flex flex-col gap-12">
       <!-- Header Section -->
-      <div class="header-section">
-        <h1 class="title">Commeet<br>커피테스트</h1>
+      <div class="text-center">
+        <h1 class="text-[1.375rem] font-bold leading-relaxed text-textPrimary mb-10">
+          Commeet<br>커피테스트
+        </h1>
 
         <!-- Icon Group -->
-        <div class="icon-group">
-          <div class="icon-item">
-            <div class="icon coffee">☕</div>
+        <div class="flex justify-center gap-6 mb-4">
+          <div class="relative">
+            <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-[2rem] shadow-md bg-primary-500">
+              ☕
+            </div>
           </div>
-          <div class="icon-item">
-            <div class="icon wine">🍷</div>
+          <div class="relative">
+            <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-[2rem] shadow-md bg-primary-600">
+              🍷
+            </div>
           </div>
-          <div class="icon-item">
-            <div class="icon cake">🎂</div>
+          <div class="relative">
+            <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-[2rem] shadow-md bg-primary-400">
+              🎂
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Login Buttons Section -->
-      <div class="login-buttons">
-
-        <button class="login-btn naver" @click="handleNaverLogin">
-          <img :src="naverLogo" alt="Naver" class="btn-icon" />
+      <div class="flex flex-col gap-3">
+        <button
+          class="w-full h-[52px] border-none rounded-lg text-base font-semibold cursor-pointer flex items-center justify-center relative transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 bg-[#03c75a] text-white"
+          @click="handleNaverLogin"
+        >
+          <img :src="naverLogo" alt="Naver" class="w-5 h-5 absolute left-5" />
           <span>네이버로 시작하기</span>
         </button>
-
       </div>
 
       <!-- Browse without login -->
@@ -60,110 +69,3 @@ const handleBrowseWithoutLogin = () => {
   router.push('/');
 };
 </script>
-
-<style scoped>
-.login-container {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--color-background);
-  padding: 2rem 1rem;
-}
-
-.content-wrapper {
-  width: 100%;
-  max-width: 360px;
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
-}
-
-.header-section {
-  text-align: center;
-}
-
-.title {
-  font-size: 1.375rem;
-  font-weight: 700;
-  line-height: 1.6;
-  color: var(--color-textPrimary);
-  margin-bottom: 2.5rem;
-}
-
-.icon-group {
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.icon-item {
-  position: relative;
-}
-
-.icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.icon.coffee {
-  background-color: var(--color-primary-500);
-}
-
-.icon.wine {
-  background-color: var(--color-primary-600);
-}
-
-.icon.cake {
-  background-color: var(--color-primary-400);
-}
-
-.login-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.login-btn {
-  width: 100%;
-  height: 52px;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  position: relative;
-}
-
-.login-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.login-btn:active {
-  transform: translateY(0);
-}
-
-.btn-icon {
-  width: 20px;
-  height: 20px;
-  position: absolute;
-  left: 1.25rem;
-}
-
-.login-btn.naver {
-  background-color: #03c75a;
-  color: #ffffff;
-}
-</style>

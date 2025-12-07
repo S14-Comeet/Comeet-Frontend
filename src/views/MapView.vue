@@ -16,16 +16,16 @@
 
     <!-- Floating 알림 아이콘 (우측 상단) - 로그인 상태일 때만 표시 -->
     <button
-      v-if="isAuthenticated"
-      @click="handleNotificationClick"
-      class="floating-notification-button"
-      aria-label="알림"
+        v-if="isAuthenticated"
+        @click="handleNotificationClick"
+        class="floating-notification-button"
+        aria-label="알림"
     >
-      <BaseIcon name="notice" :size="24" color="var(--color-neutral-900)" />
+      <BaseIcon name="notice" :size="24" color="var(--color-neutral-900)"/>
       <!-- 읽지 않은 알림 배지 -->
       <span
-        v-if="hasUnreadNotifications"
-        class="notification-badge"
+          v-if="hasUnreadNotifications"
+          class="notification-badge"
       ></span>
     </button>
 
@@ -48,14 +48,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { useNaverMap } from '@/composables/useNaverMap'
-import { useGeolocation } from '@/composables/useGeolocation'
-import { useToast } from 'vue-toastification'
-import { useNotificationStore } from '@/store/notification'
-import { useAuthStore } from '@/store/auth'
-import { useSavedStore } from '@/store/saved'
+import {ref, onMounted, computed} from 'vue'
+import {useRouter} from 'vue-router'
+import {useNaverMap} from '@/composables/useNaverMap'
+import {useGeolocation} from '@/composables/useGeolocation'
+import {useToast} from 'vue-toastification'
+import {useNotificationStore} from '@/store/notification'
+import {useAuthStore} from '@/store/auth'
+import {useSavedStore} from '@/store/saved'
 import MapPlaceInfo from "@/components/map/MapPlaceInfo.vue"
 import MapPlaceDetail from "@/components/map/MapPlaceDetail.vue"
 import BaseIcon from '@/components/common/BaseIcon.vue'
@@ -83,7 +83,7 @@ const handleNotificationClick = () => {
   router.push('/notifications')
 }
 
-// 🗺️ Mock 카페 데이터
+// Mock 카페 데이터 (개발용)
 const mockCafes = [
   {
     id: 1,
@@ -126,8 +126,8 @@ const renderMarkers = (cafes = mockCafes) => {
   if (cafes.length > 0 && map.value) {
     const firstCafe = cafes[0]
     const center = new naver.maps.LatLng(
-      firstCafe.lat || firstCafe.latitude,
-      firstCafe.lng || firstCafe.longitude
+        firstCafe.lat || firstCafe.latitude,
+        firstCafe.lng || firstCafe.longitude
     )
     map.value.setCenter(center)
     map.value.setZoom(13)
@@ -173,14 +173,13 @@ onMounted(async () => {
         console.warn('[지도] 현재 위치를 가져올 수 없어 기본 위치를 사용합니다.')
       }
 
-      // 🗺️ Mock 마커 렌더링
+      // 마커 렌더링
       renderMarkers()
     }
   } catch (error) {
-    console.error('[지도] 초기화 실패:', error)
+    console.error('[MapView] 초기화 실패:', error)
     toast.error('지도를 불러오는데 실패했습니다.')
   } finally {
-    // 항상 로딩 상태 해제
     isLoading.value = false
   }
 })
