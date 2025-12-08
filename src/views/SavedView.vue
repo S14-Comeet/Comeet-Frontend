@@ -1,28 +1,44 @@
 <template>
   <div class="flex flex-col min-h-full h-full bg-background">
-    <!-- 폴더 목록 화면 -->
-    <SavedFolderList
-      v-if="!selectedFolder"
-      :folders="folders"
-      :is-loading="isLoadingFolders"
-      :selected-folder-id="selectedFolder?.id"
-      @select="handleSelectFolder"
-      @add-folder="showAddFolderModal = true"
-      @edit="handleEditFolder"
-      @delete="handleDeleteFolder"
-    />
+    <!-- 로그인 필요 메시지 -->
+    <div v-if="!isAuthenticated" class="flex flex-col items-center justify-center py-20 px-4 text-center">
+      <BaseIcon name="user-line" :size="64" class="text-textSecondary mb-6" />
+      <!-- <h2 class="text-2xl font-bold text-textPrimary mb-3">로그인이 필요합니다</h2> -->
+      <p class="text-textSecondary text-base mb-6">저장 목록을 확인하려면 로그인해주세요</p>
+      <button
+        @click="goToLogin"
+        class="px-6 py-3 bg-primary text-white rounded-lg text-base font-medium hover:bg-primary-700 transition-colors"
+      >
+        로그인하기
+      </button>
+    </div>
 
-    <!-- 카페 목록 화면 -->
-    <SavedCafeList
-      v-else
-      :folder-name="selectedFolder.name"
-      :cafes="cafes"
-      :is-loading="isLoadingCafes"
-      @back="handleBack"
-      @select="handleSelectCafe"
-      @show-on-map="handleShowOnMap"
-      @delete="handleDeleteCafe"
-    />
+    <!-- 인증된 사용자용 컨텐츠 -->
+    <template v-else>
+      <!-- 폴더 목록 화면 -->
+      <SavedFolderList
+        v-if="!selectedFolder"
+        :folders="folders"
+        :is-loading="isLoadingFolders"
+        :selected-folder-id="selectedFolder?.id"
+        @select="handleSelectFolder"
+        @add-folder="showAddFolderModal = true"
+        @edit="handleEditFolder"
+        @delete="handleDeleteFolder"
+      />
+
+      <!-- 카페 목록 화면 -->
+      <SavedCafeList
+        v-else
+        :folder-name="selectedFolder.name"
+        :cafes="cafes"
+        :is-loading="isLoadingCafes"
+        @back="handleBack"
+        @select="handleSelectCafe"
+        @show-on-map="handleShowOnMap"
+        @delete="handleDeleteCafe"
+      />
+    </template>
 
     <!-- 폴더 추가 모달 -->
     <AddFolderModal
@@ -54,20 +70,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useSavedStore } from '@/store/saved'
+import { useAuthStore } from '@/store/auth'
 import SavedFolderList from '@/components/saved/SavedFolderList.vue'
 import SavedCafeList from '@/components/saved/SavedCafeList.vue'
 import AddFolderModal from '@/components/saved/AddFolderModal.vue'
 import EditFolderModal from '@/components/saved/EditFolderModal.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
+import BaseIcon from '@/components/common/BaseIcon.vue'
 import { getFolders, getCafesByFolder } from '@/api/cafe'
 
 const router = useRouter()
 const toast = useToast()
 const savedStore = useSavedStore()
+const authStore = useAuthStore()
+
+// 인증 상태 확인
+const isAuthenticated = computed(() => authStore.isAuthenticated)
 
 const folders = ref([])
 const selectedFolder = ref(null)
@@ -80,8 +102,18 @@ const showDeleteConfirm = ref(false)
 const editingFolder = ref(null)
 const deletingFolder = ref(null)
 
+// 로그인 페이지로 이동
+const goToLogin = () => {
+  router.push('/login')
+}
+
 // 폴더 목록 불러오기
 const loadFolders = async () => {
+  // 인증되지 않은 사용자는 폴더 목록을 불러오지 않음
+  if (!isAuthenticated.value) {
+    return
+  }
+
   isLoadingFolders.value = true
   try {
     const response = await getFolders()
