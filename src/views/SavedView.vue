@@ -1,9 +1,8 @@
 <template>
   <div class="flex flex-col min-h-full h-full bg-background">
-    <!-- 로그인 필요 메시지 -->
+    <!-- 비로그인 사용자 - 로그인 필요 메시지 -->
     <div v-if="!isAuthenticated" class="flex flex-col items-center justify-center py-20 px-4 text-center">
       <BaseIcon name="user-line" :size="64" class="text-textSecondary mb-6" />
-      <!-- <h2 class="text-2xl font-bold text-textPrimary mb-3">로그인이 필요합니다</h2> -->
       <p class="text-textSecondary text-base mb-6">저장 목록을 확인하려면 로그인해주세요</p>
       <button
         @click="goToLogin"
@@ -13,7 +12,24 @@
       </button>
     </div>
 
-    <!-- 인증된 사용자용 컨텐츠 -->
+    <!-- 로그인했지만 권한 없음 (GUEST) -->
+    <div v-else-if="!hasAccessPermission" class="flex flex-col items-center justify-center py-20 px-4 text-center">
+      <BaseIcon name="lock-line" :size="64" class="text-textSecondary mb-6" />
+      <p class="text-textSecondary text-base mb-6">
+        {{ authStore.userRole === 'GUEST'
+          ? '이용하려면 회원 등록을 완료해주세요'
+          : '저장 목록은 일반 사용자만 이용할 수 있습니다' }}
+      </p>
+      <button
+        v-if="authStore.userRole === 'GUEST'"
+        @click="router.push('/nickname')"
+        class="px-6 py-3 bg-primary text-white rounded-lg text-base font-medium hover:bg-primary-700 transition-colors"
+      >
+        서비스 등록하기
+      </button>
+    </div>
+
+    <!-- 권한이 있는 사용자 (USER) - 정상 컨텐츠 -->
     <template v-else>
       <!-- 폴더 목록 화면 -->
       <SavedFolderList
@@ -82,6 +98,7 @@ import EditFolderModal from '@/components/saved/EditFolderModal.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import { getFolders, getCafesByFolder } from '@/api/cafe'
+import { canAccessSaved } from '@/utils/permissions'
 
 const router = useRouter()
 const toast = useToast()
@@ -90,6 +107,8 @@ const authStore = useAuthStore()
 
 // 인증 상태 확인
 const isAuthenticated = computed(() => authStore.isAuthenticated)
+// 저장 목록 접근 권한 확인 (USER 역할만 허용)
+const hasAccessPermission = computed(() => canAccessSaved(authStore.userRole))
 
 const folders = ref([])
 const selectedFolder = ref(null)
@@ -109,8 +128,8 @@ const goToLogin = () => {
 
 // 폴더 목록 불러오기
 const loadFolders = async () => {
-  // 인증되지 않은 사용자는 폴더 목록을 불러오지 않음
-  if (!isAuthenticated.value) {
+  // 인증되지 않았거나 권한이 없는 사용자는 폴더 목록을 불러오지 않음
+  if (!isAuthenticated.value || !hasAccessPermission.value) {
     return
   }
 

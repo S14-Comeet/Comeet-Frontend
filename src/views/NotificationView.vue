@@ -1,28 +1,59 @@
 <template>
   <div class="notification-view">
-    <!-- 헤더 -->
-    <div class="notification-header">
-      <h1 class="text-xl font-bold text-textPrimary">알림</h1>
-      <div class="flex gap-2">
-        <button
-          v-if="notifications.length > 0"
-          @click="handleMarkAllAsRead"
-          class="text-sm text-primary hover:text-primary-700 font-medium transition-colors"
-        >
-          모두 읽음
-        </button>
-        <button
-          v-if="notifications.length > 0"
-          @click="showDeleteAllModal = true"
-          class="text-sm text-textSecondary hover:text-error font-medium transition-colors"
-        >
-          모두 지우기
-        </button>
-      </div>
+    <!-- 비로그인 사용자 - 로그인 필요 메시지 -->
+    <div v-if="!isAuthenticated" class="auth-required-state">
+      <BaseIcon name="user-line" :size="64" color="var(--color-textSecondary)" />
+      <p class="auth-message">알림을 확인하려면 로그인해주세요</p>
+      <button
+        @click="router.push('/login')"
+        class="auth-button"
+      >
+        로그인하기
+      </button>
     </div>
 
-    <!-- 알림 목록 -->
-    <div class="notification-list">
+    <!-- 로그인했지만 권한 없음 (GUEST) -->
+    <div v-else-if="!hasAccessPermission" class="auth-required-state">
+      <BaseIcon name="lock-line" :size="64" color="var(--color-textSecondary)" />
+      <p class="auth-message">
+        {{ authStore.userRole === 'GUEST'
+          ? '이용하려면 회원 등록을 완료해주세요'
+          : '알림은 일반 사용자만 이용할 수 있습니다' }}
+      </p>
+      <button
+        v-if="authStore.userRole === 'GUEST'"
+        @click="router.push('/nickname')"
+        class="auth-button"
+      >
+        서비스 등록하기
+      </button>
+    </div>
+
+    <!-- 권한이 있는 사용자 (USER, OWNER) - 정상 컨텐츠 -->
+    <template v-else>
+      <!-- 헤더 -->
+      <div class="notification-header">
+        <h1 class="text-xl font-bold text-textPrimary">알림</h1>
+        <div class="flex gap-2">
+          <button
+            v-if="notifications.length > 0"
+            @click="handleMarkAllAsRead"
+            class="text-sm text-primary hover:text-primary-700 font-medium transition-colors"
+          >
+            모두 읽음
+          </button>
+          <button
+            v-if="notifications.length > 0"
+            @click="showDeleteAllModal = true"
+            class="text-sm text-textSecondary hover:text-error font-medium transition-colors"
+          >
+            모두 지우기
+          </button>
+        </div>
+      </div>
+
+      <!-- 알림 목록 -->
+      <div class="notification-list">
       <!-- 읽지 않은 알림 -->
       <template v-if="unreadNotifications.length > 0">
         <div class="notification-section">
@@ -92,38 +123,39 @@
         </div>
       </template>
 
-      <!-- 빈 상태 -->
-      <div v-if="notifications.length === 0" class="empty-state">
-        <BaseIcon name="notice" :size="64" color="var(--color-textDisabled)" />
-        <p class="empty-text">알림이 없습니다</p>
-      </div>
-    </div>
-
-    <!-- 모두 지우기 확인 모달 -->
-    <div
-      v-if="showDeleteAllModal"
-      class="modal-overlay"
-      @click="showDeleteAllModal = false"
-    >
-      <div class="modal-content" @click.stop>
-        <h3 class="modal-title">모든 알림을 삭제하시겠습니까?</h3>
-        <p class="modal-description">삭제된 알림은 복구할 수 없습니다.</p>
-        <div class="modal-buttons">
-          <BaseButton
-            variant="secondary"
-            size="medium"
-            label="취소"
-            @click="showDeleteAllModal = false"
-          />
-          <BaseButton
-            variant="primary"
-            size="medium"
-            label="삭제"
-            @click="handleDeleteAll"
-          />
+        <!-- 빈 상태 -->
+        <div v-if="notifications.length === 0" class="empty-state">
+          <BaseIcon name="notice" :size="64" color="var(--color-textDisabled)" />
+          <p class="empty-text">알림이 없습니다</p>
         </div>
       </div>
-    </div>
+
+      <!-- 모두 지우기 확인 모달 -->
+      <div
+        v-if="showDeleteAllModal"
+        class="modal-overlay"
+        @click="showDeleteAllModal = false"
+      >
+        <div class="modal-content" @click.stop>
+          <h3 class="modal-title">모든 알림을 삭제하시겠습니까?</h3>
+          <p class="modal-description">삭제된 알림은 복구할 수 없습니다.</p>
+          <div class="modal-buttons">
+            <BaseButton
+              variant="secondary"
+              size="medium"
+              label="취소"
+              @click="showDeleteAllModal = false"
+            />
+            <BaseButton
+              variant="primary"
+              size="medium"
+              label="삭제"
+              @click="handleDeleteAll"
+            />
+          </div>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -131,13 +163,20 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useNotificationStore } from '@/store/notification'
+import { useAuthStore } from '@/store/auth'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import { canAccessNotification } from '@/utils/permissions'
 
 const router = useRouter()
 const notificationStore = useNotificationStore()
+const authStore = useAuthStore()
 
 const showDeleteAllModal = ref(false)
+
+// 인증 및 권한 체크
+const isAuthenticated = computed(() => authStore.isAuthenticated)
+const hasAccessPermission = computed(() => canAccessNotification(authStore.userRole))
 
 // Computed
 const notifications = computed(() => notificationStore.sortedNotifications)
@@ -216,9 +255,12 @@ const handleDeleteAll = () => {
 
 // 컴포넌트 마운트 시 Mock 데이터 생성 (개발용)
 onMounted(() => {
-  // Mock 데이터가 없으면 생성
-  if (notificationStore.notifications.length === 0) {
-    notificationStore.generateMockNotifications()
+  // 권한이 있는 사용자만 Mock 데이터 생성
+  if (isAuthenticated.value && hasAccessPermission.value) {
+    // Mock 데이터가 없으면 생성
+    if (notificationStore.notifications.length === 0) {
+      notificationStore.generateMockNotifications()
+    }
   }
 })
 </script>
@@ -228,6 +270,41 @@ onMounted(() => {
   min-height: 100vh;
   background-color: var(--color-background);
   padding-bottom: 2rem;
+}
+
+/* 인증 필요 상태 */
+.auth-required-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 1.25rem;
+  text-align: center;
+  gap: 1.5rem;
+}
+
+.auth-message {
+  color: var(--color-textSecondary);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.auth-button {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background-color 200ms ease;
+}
+
+.auth-button:hover {
+  background-color: var(--color-primary-700);
+}
+
+.auth-button:active {
+  background-color: var(--color-primary-800);
 }
 
 /* 헤더 */
