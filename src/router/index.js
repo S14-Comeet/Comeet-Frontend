@@ -149,36 +149,57 @@ router.beforeEach(async (to, from, next) => {
 
   logger.debug(`네비게이션: ${from.path} → ${to.path}`);
 
-  // 공개 페이지는 바로 통과
+  // ============================================================
+  // 1단계: 공개 페이지 처리 (/map, /saved, /notifications 등)
+  // - 비로그인 사용자: 접근 허용 (페이지 내부에서 로그인 유도)
+  // - GUEST 사용자: 닉네임 설정 페이지로 강제 이동
+  // - 정상 로그인 사용자: 접근 허용
+  // ============================================================
   if (isPublicPage(to.path)) {
-    // 인증된 사용자가 로그인 페이지 접근 시 메인으로 리다이렉트
+    // 특수 케이스: 이미 로그인한 사용자가 로그인 페이지 접근 시 메인으로
     if (to.path === '/login' && authStore.isAuthenticated) {
       logger.info('인증된 사용자 로그인 페이지 접근 → 메인으로 리다이렉트');
       next('/');
       return;
     }
+
+    // GUEST 체크: 로그인은 했지만 닉네임 미설정 시 닉네임 페이지로 강제
+    if (authStore.isAuthenticated && needsNicknameRegistration(authStore, to.path)) {
+      logger.info('GUEST 사용자 공개 페이지 접근 → /nickname로 리다이렉트');
+      next('/nickname');
+      return;
+    }
+
+    // 그 외 모든 경우 접근 허용
     next();
     return;
   }
 
-  // 인증되지 않은 사용자
+  // ============================================================
+  // 2단계: 비공개 페이지 처리 (/home, /profile 등)
+  // - 비로그인 사용자: 토큰으로 재인증 시도 → 실패 시 로그인 페이지로
+  // - GUEST 사용자: 닉네임 설정 페이지로 강제 이동
+  // - 정상 로그인 사용자: 접근 허용
+  // ============================================================
+
+  // 비인증 상태: 토큰으로 재인증 시도 (페이지 새로고침 등의 경우)
   if (!authStore.isAuthenticated) {
     const redirect = await handleUnauthenticatedUser(authStore, to.path);
     if (redirect) {
-      logger.info(`인증 필요 → ${redirect}로 리다이렉트`);
+      logger.info(`비인증 사용자 비공개 페이지 접근 → ${redirect}로 리다이렉트`);
       next(redirect);
       return;
     }
   }
 
-  // 인증된 사용자
-  const redirect = handleAuthenticatedUser(authStore, to.path);
-  if (redirect) {
-    logger.info(`추가 등록 필요 → ${redirect}로 리다이렉트`);
-    next(redirect);
+  // 인증 완료 후 GUEST 체크: 닉네임 미설정 시 닉네임 페이지로 강제
+  if (needsNicknameRegistration(authStore, to.path)) {
+    logger.info('GUEST 사용자 비공개 페이지 접근 → /nickname로 리다이렉트');
+    next('/nickname');
     return;
   }
 
+  // 모든 검증 통과: 접근 허용
   next();
 });
 
