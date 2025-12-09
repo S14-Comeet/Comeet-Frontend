@@ -12,24 +12,7 @@
       </button>
     </div>
 
-    <!-- 로그인했지만 권한 없음 (GUEST) -->
-    <div v-else-if="!hasAccessPermission" class="auth-required-state">
-      <BaseIcon name="lock-line" :size="64" color="var(--color-textSecondary)" />
-      <p class="auth-message">
-        {{ authStore.userRole === 'GUEST'
-          ? '이용하려면 회원 등록을 완료해주세요'
-          : '알림은 일반 사용자만 이용할 수 있습니다' }}
-      </p>
-      <button
-        v-if="authStore.userRole === 'GUEST'"
-        @click="router.push('/nickname')"
-        class="auth-button"
-      >
-        서비스 등록하기
-      </button>
-    </div>
-
-    <!-- 권한이 있는 사용자 (USER, OWNER) - 정상 컨텐츠 -->
+    <!-- 로그인한 사용자 - 정상 컨텐츠 -->
     <template v-else>
       <!-- 헤더 -->
       <div class="notification-header">
@@ -166,7 +149,6 @@ import { useNotificationStore } from '@/store/notification'
 import { useAuthStore } from '@/store/auth'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
-import { canAccessNotification } from '@/utils/permissions'
 
 const router = useRouter()
 const notificationStore = useNotificationStore()
@@ -174,9 +156,8 @@ const authStore = useAuthStore()
 
 const showDeleteAllModal = ref(false)
 
-// 인증 및 권한 체크
+// 인증 체크
 const isAuthenticated = computed(() => authStore.isAuthenticated)
-const hasAccessPermission = computed(() => canAccessNotification(authStore.userRole))
 
 // Computed
 const notifications = computed(() => notificationStore.sortedNotifications)
@@ -255,8 +236,8 @@ const handleDeleteAll = () => {
 
 // 컴포넌트 마운트 시 Mock 데이터 생성 (개발용)
 onMounted(() => {
-  // 권한이 있는 사용자만 Mock 데이터 생성
-  if (isAuthenticated.value && hasAccessPermission.value) {
+  // 인증된 사용자만 Mock 데이터 생성
+  if (isAuthenticated.value) {
     // Mock 데이터가 없으면 생성
     if (notificationStore.notifications.length === 0) {
       notificationStore.generateMockNotifications()
