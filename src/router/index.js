@@ -156,21 +156,17 @@ router.beforeEach(async (to, from, next) => {
   // - 정상 로그인 사용자: 접근 허용
   // ============================================================
   if (isPublicPage(to.path)) {
-    // 특수 케이스: 이미 로그인한 사용자가 로그인 페이지 접근 시 메인으로
-    if (to.path === '/login' && authStore.isAuthenticated) {
-      logger.info('인증된 사용자 로그인 페이지 접근 → 메인으로 리다이렉트');
-      next('/');
-      return;
+    // 인증된 사용자는 추가 검증 (로그인 페이지 리다이렉트, GUEST 체크)
+    if (authStore.isAuthenticated) {
+      const redirect = handleAuthenticatedUser(authStore, to.path);
+      if (redirect) {
+        logger.info(`인증된 사용자 공개 페이지 리다이렉트 → ${redirect}`);
+        next(redirect);
+        return;
+      }
     }
 
-    // GUEST 체크: 로그인은 했지만 닉네임 미설정 시 닉네임 페이지로 강제
-    if (authStore.isAuthenticated && needsNicknameRegistration(authStore, to.path)) {
-      logger.info('GUEST 사용자 공개 페이지 접근 → /nickname로 리다이렉트');
-      next('/nickname');
-      return;
-    }
-
-    // 그 외 모든 경우 접근 허용
+    // 비인증 사용자는 접근 허용
     next();
     return;
   }
@@ -192,10 +188,11 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  // 인증 완료 후 GUEST 체크: 닉네임 미설정 시 닉네임 페이지로 강제
-  if (needsNicknameRegistration(authStore, to.path)) {
-    logger.info('GUEST 사용자 비공개 페이지 접근 → /nickname로 리다이렉트');
-    next('/nickname');
+  // 인증 완료 후 추가 검증 (GUEST 체크 등)
+  const redirect = handleAuthenticatedUser(authStore, to.path);
+  if (redirect) {
+    logger.info(`인증된 사용자 추가 검증 → ${redirect}로 리다이렉트`);
+    next(redirect);
     return;
   }
 
