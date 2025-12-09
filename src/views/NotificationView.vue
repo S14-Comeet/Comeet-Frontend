@@ -1,19 +1,5 @@
 <template>
   <div class="notification-view">
-    <!-- 비로그인 사용자 - 로그인 필요 메시지 -->
-    <div v-if="!isAuthenticated" class="auth-required-state">
-      <BaseIcon name="user-line" :size="64" color="var(--color-textSecondary)" />
-      <p class="auth-message">알림을 확인하려면 로그인해주세요</p>
-      <button
-        @click="router.push('/login')"
-        class="auth-button"
-      >
-        로그인하기
-      </button>
-    </div>
-
-    <!-- 로그인한 사용자 - 정상 컨텐츠 -->
-    <template v-else>
       <!-- 헤더 -->
       <div class="notification-header">
         <h1 class="text-xl font-bold text-textPrimary">알림</h1>
@@ -138,7 +124,6 @@
           </div>
         </div>
       </div>
-    </template>
   </div>
 </template>
 
@@ -146,18 +131,13 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useNotificationStore } from '@/store/notification'
-import { useAuthStore } from '@/store/auth'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 
 const router = useRouter()
 const notificationStore = useNotificationStore()
-const authStore = useAuthStore()
 
 const showDeleteAllModal = ref(false)
-
-// 인증 체크
-const isAuthenticated = computed(() => authStore.isAuthenticated)
 
 // Computed
 const notifications = computed(() => notificationStore.sortedNotifications)
@@ -236,12 +216,9 @@ const handleDeleteAll = () => {
 
 // 컴포넌트 마운트 시 Mock 데이터 생성 (개발용)
 onMounted(() => {
-  // 인증된 사용자만 Mock 데이터 생성
-  if (isAuthenticated.value) {
-    // Mock 데이터가 없으면 생성
-    if (notificationStore.notifications.length === 0) {
-      notificationStore.generateMockNotifications()
-    }
+  // Mock 데이터가 없으면 생성
+  if (notificationStore.notifications.length === 0) {
+    notificationStore.generateMockNotifications()
   }
 })
 </script>
@@ -251,41 +228,6 @@ onMounted(() => {
   min-height: 100vh;
   background-color: var(--color-background);
   padding-bottom: 2rem;
-}
-
-/* 인증 필요 상태 */
-.auth-required-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 5rem 1.25rem;
-  text-align: center;
-  gap: 1.5rem;
-}
-
-.auth-message {
-  color: var(--color-textSecondary);
-  font-size: 1rem;
-  line-height: 1.5;
-}
-
-.auth-button {
-  padding: 0.75rem 1.5rem;
-  background-color: var(--color-primary);
-  color: white;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: background-color 200ms ease;
-}
-
-.auth-button:hover {
-  background-color: var(--color-primary-700);
-}
-
-.auth-button:active {
-  background-color: var(--color-primary-800);
 }
 
 /* 헤더 */

@@ -65,7 +65,7 @@ const router = createRouter({
 });
 
 /** 공개 페이지 목록 (인증 불필요) */
-const PUBLIC_PAGES = new Set(['/login', '/oauth/callback', '/test-components', '/map', '/saved', '/notifications']);
+const PUBLIC_PAGES = new Set(['/login', '/oauth/callback', '/test-components', '/map', '/saved']);
 
 /**
  * 토큰으로 사용자 인증 시도
