@@ -1,28 +1,28 @@
 <template>
   <div class="notification-view">
-    <!-- 헤더 -->
-    <div class="notification-header">
-      <h1 class="text-xl font-bold text-textPrimary">알림</h1>
-      <div class="flex gap-2">
-        <button
-          v-if="notifications.length > 0"
-          @click="handleMarkAllAsRead"
-          class="text-sm text-primary hover:text-primary-700 font-medium transition-colors"
-        >
-          모두 읽음
-        </button>
-        <button
-          v-if="notifications.length > 0"
-          @click="showDeleteAllModal = true"
-          class="text-sm text-textSecondary hover:text-error font-medium transition-colors"
-        >
-          모두 지우기
-        </button>
+      <!-- 헤더 -->
+      <div class="notification-header">
+        <h1 class="text-xl font-bold text-textPrimary">알림</h1>
+        <div class="flex gap-2">
+          <button
+            v-if="notifications.length > 0"
+            @click="handleMarkAllAsRead"
+            class="text-sm text-primary hover:text-primary-700 font-medium transition-colors"
+          >
+            모두 읽음
+          </button>
+          <button
+            v-if="notifications.length > 0"
+            @click="showDeleteAllModal = true"
+            class="text-sm text-textSecondary hover:text-error font-medium transition-colors"
+          >
+            모두 지우기
+          </button>
+        </div>
       </div>
-    </div>
 
-    <!-- 알림 목록 -->
-    <div class="notification-list">
+      <!-- 알림 목록 -->
+      <div class="notification-list">
       <!-- 읽지 않은 알림 -->
       <template v-if="unreadNotifications.length > 0">
         <div class="notification-section">
@@ -92,38 +92,38 @@
         </div>
       </template>
 
-      <!-- 빈 상태 -->
-      <div v-if="notifications.length === 0" class="empty-state">
-        <BaseIcon name="notice" :size="64" color="var(--color-textDisabled)" />
-        <p class="empty-text">알림이 없습니다</p>
-      </div>
-    </div>
-
-    <!-- 모두 지우기 확인 모달 -->
-    <div
-      v-if="showDeleteAllModal"
-      class="modal-overlay"
-      @click="showDeleteAllModal = false"
-    >
-      <div class="modal-content" @click.stop>
-        <h3 class="modal-title">모든 알림을 삭제하시겠습니까?</h3>
-        <p class="modal-description">삭제된 알림은 복구할 수 없습니다.</p>
-        <div class="modal-buttons">
-          <BaseButton
-            variant="secondary"
-            size="medium"
-            label="취소"
-            @click="showDeleteAllModal = false"
-          />
-          <BaseButton
-            variant="primary"
-            size="medium"
-            label="삭제"
-            @click="handleDeleteAll"
-          />
+        <!-- 빈 상태 -->
+        <div v-if="notifications.length === 0" class="empty-state">
+          <BaseIcon name="notice" :size="64" color="var(--color-textDisabled)" />
+          <p class="empty-text">알림이 없습니다</p>
         </div>
       </div>
-    </div>
+
+      <!-- 모두 지우기 확인 모달 -->
+      <div
+        v-if="showDeleteAllModal"
+        class="modal-overlay"
+        @click="showDeleteAllModal = false"
+      >
+        <div class="modal-content" @click.stop>
+          <h3 class="modal-title">모든 알림을 삭제하시겠습니까?</h3>
+          <p class="modal-description">삭제된 알림은 복구할 수 없습니다.</p>
+          <div class="modal-buttons">
+            <BaseButton
+              variant="secondary"
+              size="medium"
+              label="취소"
+              @click="showDeleteAllModal = false"
+            />
+            <BaseButton
+              variant="primary"
+              size="medium"
+              label="삭제"
+              @click="handleDeleteAll"
+            />
+          </div>
+        </div>
+      </div>
   </div>
 </template>
 
