@@ -3,7 +3,7 @@
     <div
       v-for="menu in menus"
       :key="menu.id"
-      class="menu-item"
+      class="menu-item shadow-sm hover:shadow"
     >
       <div class="menu-image-wrapper">
         <img
@@ -24,7 +24,7 @@
         <p class="menu-description">{{ menu.description }}</p>
         <div class="menu-footer">
           <p class="menu-price">{{ formatPrice(menu.price) }}원</p>
-          <button class="auth-button" @click="handleAuth(menu)">
+          <button class="auth-button hover:shadow-button-hover" @click="handleAuth(menu)">
             인증
           </button>
         </div>
@@ -67,12 +67,10 @@ const handleAuth = (menu) => {
   background: white;
   border-radius: 12px;
   padding: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   transition: all 0.2s;
 }
 
 .menu-item:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   transform: translateY(-1px);
 }
 
@@ -92,12 +90,12 @@ const handleAuth = (menu) => {
 .menu-image-placeholder {
   width: 100%;
   height: 100%;
-  background-color: #f3f4f6;
+  background-color: var(--color-primary-100);
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #9ca3af;
+  color: var(--color-primary-300);
   font-size: 0.75rem;
 }
 
@@ -126,26 +124,26 @@ const handleAuth = (menu) => {
   display: inline-block;
   flex-shrink: 0;
   padding: 0.15rem 0.5rem;
-  background-color: #f3f4f6;
-  color: #374151;
+  background-color: var(--color-primary-100);
+  color: var(--color-primary-700);
   border-radius: 9999px;
   font-size: 0.7rem;
   font-weight: 500;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-primary-200);
   white-space: nowrap;
 }
 
 .menu-name {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-primary-950);
   margin: 0;
   line-height: 1.3;
 }
 
 .menu-description {
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--color-textSecondary);
   line-height: 1.4;
   margin: 0;
   white-space: pre-line;
@@ -166,13 +164,13 @@ const handleAuth = (menu) => {
 .menu-price {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-primary-950);
   margin: 0;
 }
 
 .auth-button {
   padding: 0.4rem 0.9rem;
-  background-color: #667eea;
+  background-color: var(--color-primary-600);
   color: white;
   border: none;
   border-radius: 6px;
@@ -185,9 +183,8 @@ const handleAuth = (menu) => {
 }
 
 .auth-button:hover {
-  background-color: #5568d3;
+  background-color: var(--color-primary-700);
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
 }
 
 .auth-button:active {

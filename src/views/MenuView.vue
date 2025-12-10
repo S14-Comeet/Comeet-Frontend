@@ -85,7 +85,7 @@ const menuData = ref([
 .page-title {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-primary-950);
   margin: 0;
 }
 
