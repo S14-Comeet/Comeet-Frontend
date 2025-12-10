@@ -56,6 +56,11 @@ const routes = [
     path: '/oauth/callback',
     name: 'oauth-callback',
     component: () => import('@/views/OAuthCallbackView.vue')
+  },https://github.com/S14-Comeet/Comeet-Frontend/pull/18/conflict?name=src%252Frouter%252Findex.js&ancestor_oid=cb13c09ef28de2b24f53b1c4218336bbf12e1d31&base_oid=e9ba7236a1ab068cb73a1289e72c81323c81ef7a&head_oid=5132d4a26c98f45bf4663ce9e8b057627f94a8cc
+  {
+    path: '/menu',
+    name: 'menu',
+    component: () => import('@/views/MenuView.vue')
   }
 ];
 
