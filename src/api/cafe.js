@@ -1,5 +1,4 @@
-// TODO: 실제 API 구현 시 사용
-// import api from './axios'
+import api from './axios'
 
 /**
  * Mock 데이터 - 추후 백엔드 API 구현 시 제거
@@ -274,4 +273,97 @@ export const getAllCafes = async () => {
       })
     }, 300)
   })
+}
+
+/**
+ * 특정 카페 상세 조회
+ * @param {string|number} storeId
+ */
+export const getCafeById = async (storeId) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const cafe = MOCK_CAFES.find(c => c.storeId === storeId || c.storeId === String(storeId));
+      if (cafe) {
+        resolve({ data: cafe });
+      } else {
+        // Fallback for demo if not found in MOCK_CAFES (since storeId might be real '1' from user input)
+        // If not found, return a dummy cafe to allow flow testing
+        resolve({
+          data: {
+             storeId: storeId,
+             name: 'Unknown Cafe',
+             latitude: 37.5665,
+             longitude: 126.9780
+          }
+        });
+      }
+    }, 300);
+  });
+}
+
+/**
+ * 위치 기반 가맹점 목록 조회 (실제 API)
+ * @param {Object} params
+ * @param {number} params.latitude - 중심 위도 (required)
+ * @param {number} params.longitude - 중심 경도 (required)
+ * @param {number} params.radius - 검색 반경 (기본 1000m)
+ * @param {string} params.categories - 카테고리 필터 (콤마 구분)
+ * @param {string} params.keyword - 검색 키워드
+ * @returns {Promise<Object>} { totalCount, stores }
+ */
+export const getStoresByLocation = async (params) => {
+  const response = await api.get('/stores', { params })
+  return response.data
+}
+
+/**
+ * 가맹점 상세 조회 (실제 API)
+ * @param {string|number} storeId - 가맹점 ID
+ * @returns {Promise<Object>} Store details
+ *
+ * TODO: 백엔드 API 엔드포인트 확인 필요
+ * 예상 응답 형식:
+ * {
+ *   id, name, description, address, latitude, longitude,
+ *   phoneNumber, category, thumbnailUrl, openTime, closeTime,
+ *   averageRating, reviewCount, visitCount, isClosed
+ * }
+ */
+export const getStoreById = async (storeId) => {
+  try {
+    const response = await api.get(`/stores/${storeId}`)
+    return response.data
+  } catch (error) {
+    // API가 아직 구현되지 않은 경우 Mock 데이터 반환
+    console.warn('Store detail API not available, using mock data')
+    const cafe = MOCK_CAFES.find(c => c.storeId === storeId || c.storeId === String(storeId))
+    if (cafe) {
+      return { data: cafe }
+    }
+    return {
+      data: {
+        storeId: storeId,
+        name: 'Unknown Cafe',
+        latitude: 37.5665,
+        longitude: 126.9780
+      }
+    }
+  }
+}
+
+/**
+ * 가맹점 리뷰 목록 조회 (실제 API)
+ * @param {string|number} storeId - 가맹점 ID
+ * @param {Object} params - 페이지네이션 등 추가 파라미터
+ * @returns {Promise<Object>} { reviews, totalCount, ... }
+ */
+export const getStoreReviews = async (storeId, params = {}) => {
+  try {
+    const response = await api.get(`/stores/${storeId}/reviews`, { params })
+    return response.data
+  } catch (error) {
+    // API가 아직 구현되지 않은 경우 빈 배열 반환
+    console.warn('Store reviews API not available, returning empty')
+    return { data: [] }
+  }
 }
