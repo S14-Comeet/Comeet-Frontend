@@ -13,10 +13,16 @@
           <span v-if="store.isClosed" class="closed-badge">영업종료</span>
         </div>
         <p class="store-address">{{ store.address || '주소 정보 없음' }}</p>
-        <div v-if="store.averageRating" class="store-rating">
-          <BaseIcon name="star-fill" :size="14" class="text-accent" />
-          <span class="rating-value">{{ formatRating(store.averageRating) }}</span>
-          <span class="review-count">({{ store.reviewCount || 0 }})</span>
+        <div class="store-meta-row">
+          <div v-if="store.averageRating" class="store-rating">
+            <BaseIcon name="star-fill" :size="14" class="text-accent" />
+            <span class="rating-value">{{ formatRating(store.averageRating) }}</span>
+            <span class="review-count">({{ store.reviewCount || 0 }})</span>
+          </div>
+          <span v-if="store.distanceText" class="store-distance">
+            <BaseIcon name="map-marker" :size="12" class="distance-icon" />
+            {{ store.distanceText }}
+          </span>
         </div>
       </div>
       <BaseIcon name="chevron-right" :size="20" class="text-primary-300 flex-shrink-0" />
@@ -221,6 +227,12 @@ const handleImageError = () => {
   margin-bottom: 0.25rem;
 }
 
+.store-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .store-rating {
   display: flex;
   align-items: center;
@@ -233,6 +245,19 @@ const handleImageError = () => {
 .review-count {
   color: var(--color-textSecondary);
   font-weight: 400;
+}
+
+.store-distance {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-primary-600);
+}
+
+.distance-icon {
+  color: var(--color-primary-500);
 }
 
 /* Detailed variant styles */
