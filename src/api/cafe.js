@@ -338,15 +338,13 @@ export const getStoreById = async (storeId) => {
     console.warn('Store detail API not available, using mock data')
     const cafe = MOCK_CAFES.find(c => c.storeId === storeId || c.storeId === String(storeId))
     if (cafe) {
-      return { data: cafe }
+      return cafe
     }
     return {
-      data: {
-        storeId: storeId,
-        name: 'Unknown Cafe',
-        latitude: 37.5665,
-        longitude: 126.9780
-      }
+      storeId: storeId,
+      name: 'Unknown Cafe',
+      latitude: 37.5665,
+      longitude: 126.9780
     }
   }
 }
@@ -364,6 +362,6 @@ export const getStoreReviews = async (storeId, params = {}) => {
   } catch (error) {
     // API가 아직 구현되지 않은 경우 빈 배열 반환
     console.warn('Store reviews API not available, returning empty')
-    return { data: [] }
+    return []
   }
 }

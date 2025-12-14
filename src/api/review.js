@@ -76,20 +76,20 @@ export const getMyReviews = async ({ page = 1, size = 10 } = {}) => {
  */
 export const createCuppingNote = async (reviewId, cuppingNote) => {
   const payload = {
-    roastLevel: cuppingNote.roastLevel || null,
-    fragranceScore: cuppingNote.fragranceScore || null,
-    aromaScore: cuppingNote.aromaScore || null,
-    flavorScore: cuppingNote.flavorScore || null,
-    aftertasteScore: cuppingNote.aftertasteScore || null,
-    acidityScore: cuppingNote.acidityScore || null,
-    sweetnessScore: cuppingNote.sweetnessScore || null,
-    mouthfeelScore: cuppingNote.mouthfeelScore || null,
-    fragranceAromaDetail: cuppingNote.fragranceAromaDetail || null,
-    flavorAftertasteDetail: cuppingNote.flavorAftertasteDetail || null,
-    acidityNotes: cuppingNote.acidityNotes || null,
-    sweetnessNotes: cuppingNote.sweetnessNotes || null,
-    mouthfeelNotes: cuppingNote.mouthfeelNotes || null,
-    overallNotes: cuppingNote.overallNotes || null
+    roastLevel: cuppingNote.roastLevel ?? null,
+    fragranceScore: cuppingNote.fragranceScore ?? null,
+    aromaScore: cuppingNote.aromaScore ?? null,
+    flavorScore: cuppingNote.flavorScore ?? null,
+    aftertasteScore: cuppingNote.aftertasteScore ?? null,
+    acidityScore: cuppingNote.acidityScore ?? null,
+    sweetnessScore: cuppingNote.sweetnessScore ?? null,
+    mouthfeelScore: cuppingNote.mouthfeelScore ?? null,
+    fragranceAromaDetail: cuppingNote.fragranceAromaDetail ?? null,
+    flavorAftertasteDetail: cuppingNote.flavorAftertasteDetail ?? null,
+    acidityNotes: cuppingNote.acidityNotes ?? null,
+    sweetnessNotes: cuppingNote.sweetnessNotes ?? null,
+    mouthfeelNotes: cuppingNote.mouthfeelNotes ?? null,
+    overallNotes: cuppingNote.overallNotes ?? null
   };
 
   logger.debug('Creating cupping note for review:', reviewId, payload);
@@ -107,20 +107,20 @@ export const createCuppingNote = async (reviewId, cuppingNote) => {
  */
 export const updateCuppingNote = async (reviewId, cuppingNote) => {
   const payload = {
-    roastLevel: cuppingNote.roastLevel || null,
-    fragranceScore: cuppingNote.fragranceScore || null,
-    aromaScore: cuppingNote.aromaScore || null,
-    flavorScore: cuppingNote.flavorScore || null,
-    aftertasteScore: cuppingNote.aftertasteScore || null,
-    acidityScore: cuppingNote.acidityScore || null,
-    sweetnessScore: cuppingNote.sweetnessScore || null,
-    mouthfeelScore: cuppingNote.mouthfeelScore || null,
-    fragranceAromaDetail: cuppingNote.fragranceAromaDetail || null,
-    flavorAftertasteDetail: cuppingNote.flavorAftertasteDetail || null,
-    acidityNotes: cuppingNote.acidityNotes || null,
-    sweetnessNotes: cuppingNote.sweetnessNotes || null,
-    mouthfeelNotes: cuppingNote.mouthfeelNotes || null,
-    overallNotes: cuppingNote.overallNotes || null
+    roastLevel: cuppingNote.roastLevel ?? null,
+    fragranceScore: cuppingNote.fragranceScore ?? null,
+    aromaScore: cuppingNote.aromaScore ?? null,
+    flavorScore: cuppingNote.flavorScore ?? null,
+    aftertasteScore: cuppingNote.aftertasteScore ?? null,
+    acidityScore: cuppingNote.acidityScore ?? null,
+    sweetnessScore: cuppingNote.sweetnessScore ?? null,
+    mouthfeelScore: cuppingNote.mouthfeelScore ?? null,
+    fragranceAromaDetail: cuppingNote.fragranceAromaDetail ?? null,
+    flavorAftertasteDetail: cuppingNote.flavorAftertasteDetail ?? null,
+    acidityNotes: cuppingNote.acidityNotes ?? null,
+    sweetnessNotes: cuppingNote.sweetnessNotes ?? null,
+    mouthfeelNotes: cuppingNote.mouthfeelNotes ?? null,
+    overallNotes: cuppingNote.overallNotes ?? null
   };
 
   logger.debug('Updating cupping note for review:', reviewId, payload);
