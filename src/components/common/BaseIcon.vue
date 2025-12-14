@@ -333,6 +333,138 @@
       />
     </template>
 
+    <!-- Star Fill -->
+    <template v-else-if="name === 'star-fill'">
+      <path
+        d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+        :fill="color"
+      />
+    </template>
+
+    <!-- Lock -->
+    <template v-else-if="name === 'lock'">
+      <rect
+        x="3"
+        y="11"
+        width="18"
+        height="11"
+        rx="2"
+        ry="2"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M7 11V7C7 5.67392 7.52678 4.40215 8.46447 3.46447C9.40215 2.52678 10.6739 2 12 2C13.3261 2 14.5979 2.52678 15.5355 3.46447C16.4732 4.40215 17 5.67392 17 7V11"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </template>
+
+    <!-- Edit (Pencil) -->
+    <template v-else-if="name === 'edit'">
+      <path
+        d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M18.5 2.50001C18.8978 2.10219 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10219 21.5 2.50001C21.8978 2.89784 22.1213 3.4374 22.1213 4.00001C22.1213 4.56262 21.8978 5.10219 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </template>
+
+    <!-- Close (Same as X) -->
+    <template v-else-if="name === 'close'">
+      <path
+        d="M18 6L6 18M6 6L18 18"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </template>
+
+    <!-- Map Marker (Location Pin) -->
+    <template v-else-if="name === 'map-marker'">
+      <path
+        d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </template>
+
+    <!-- Call (Phone) -->
+    <template v-else-if="name === 'call'">
+      <path
+        d="M22 16.92V19.92C22.0011 20.1985 21.9441 20.4742 21.8325 20.7293C21.7209 20.9845 21.5573 21.2136 21.3521 21.4019C21.1468 21.5901 20.9046 21.7335 20.6407 21.8227C20.3769 21.9119 20.0974 21.9451 19.82 21.92C16.7428 21.5856 13.787 20.5341 11.19 18.85C8.77382 17.3147 6.72533 15.2662 5.18999 12.85C3.49997 10.2412 2.44824 7.27097 2.11999 4.17999C2.09501 3.90344 2.12787 3.62474 2.21649 3.3616C2.30512 3.09846 2.44756 2.85666 2.63476 2.6516C2.82196 2.44653 3.0498 2.28268 3.30379 2.17052C3.55777 2.05836 3.83233 2.00024 4.10999 1.99999H7.10999C7.5953 1.9952 8.06579 2.16705 8.43376 2.48353C8.80173 2.80001 9.04207 3.23942 9.10999 3.71999C9.23662 4.68005 9.47144 5.6227 9.80999 6.52999C9.94454 6.88791 9.97366 7.27689 9.89389 7.65086C9.81411 8.02482 9.62886 8.36809 9.35999 8.63999L8.08999 9.90999C9.51355 12.4135 11.5864 14.4864 14.09 15.91L15.36 14.64C15.6319 14.3711 15.9751 14.1858 16.3491 14.1061C16.7231 14.0263 17.1121 14.0554 17.47 14.19C18.3773 14.5285 19.3199 14.7634 20.28 14.89C20.7658 14.9585 21.2094 15.2032 21.5265 15.5775C21.8437 15.9518 22.0122 16.4296 22 16.92Z"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </template>
+
+    <!-- Time (Clock) -->
+    <template v-else-if="name === 'time'">
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M12 6V12L16 14"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </template>
+
+    <!-- File Copy (Copy) -->
+    <template v-else-if="name === 'file-copy'">
+      <rect
+        x="9"
+        y="9"
+        width="13"
+        height="13"
+        rx="2"
+        ry="2"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M5 15H4C3.46957 15 2.96086 14.7893 2.58579 14.4142C2.21071 14.0391 2 13.5304 2 13V4C2 3.46957 2.21071 2.96086 2.58579 2.58579C2.96086 2.21071 3.46957 2 4 2H13C13.5304 2 14.0391 2.21071 14.4142 2.58579C14.7893 2.96086 15 3.46957 15 4V5"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </template>
+
     <!-- Fallback: Unknown icon -->
     <template v-else>
       <circle cx="12" cy="12" r="2" :fill="color" />

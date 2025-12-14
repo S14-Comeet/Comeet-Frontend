@@ -25,6 +25,13 @@
 
       <!-- 메뉴 목록 -->
       <div class="bg-white rounded-lg shadow-sm">
+        <button
+          class="w-full flex items-center justify-between p-4 border-b border-primary-200 hover:bg-primary-50 transition-colors"
+          @click="goToMyReviews"
+        >
+          <span class="text-textPrimary">내 리뷰</span>
+          <span class="text-textSecondary">›</span>
+        </button>
         <!-- TODO: 내 정보 수정 기능 구현 필요 -->
         <button class="w-full flex items-center justify-between p-4 border-b border-primary-200 hover:bg-primary-50 transition-colors">
           <span class="text-textPrimary">내 정보 수정</span>
@@ -112,6 +119,13 @@ const confirmLogout = () => {
  */
 const cancelLogout = () => {
   showLogoutModal.value = false
+}
+
+/**
+ * 내 리뷰 페이지로 이동
+ */
+const goToMyReviews = () => {
+  router.push('/my-reviews')
 }
 
 /**

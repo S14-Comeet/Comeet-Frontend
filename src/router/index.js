@@ -61,6 +61,26 @@ const routes = [
     path: '/menu',
     name: 'menu',
     component: () => import('@/views/MenuView.vue')
+  },
+  {
+    path: '/review/select',
+    name: 'review-select',
+    component: () => import('@/views/ReviewSelectView.vue')
+  },
+  {
+    path: '/review/write',
+    name: 'review-write',
+    component: () => import('@/views/ReviewWriteView.vue')
+  },
+  {
+    path: '/my-reviews',
+    name: 'my-reviews',
+    component: () => import('@/views/MyReviewsView.vue')
+  },
+  {
+    path: '/store/:storeId',
+    name: 'store-detail',
+    component: () => import('@/views/StoreDetailView.vue')
   }
 ];
 
@@ -71,6 +91,11 @@ const router = createRouter({
 
 /** 공개 페이지 목록 (인증 불필요) */
 const PUBLIC_PAGES = new Set(['/login', '/oauth/callback', '/test-components', '/map', '/saved']);
+
+/** 동적 경로 패턴 체크 함수 */
+const PUBLIC_PATH_PATTERNS = [
+  /^\/store\/\d+$/  // /store/:storeId
+];
 
 /**
  * 토큰으로 사용자 인증 시도
@@ -118,7 +143,10 @@ const needsNicknameRegistration = (authStore, targetPath) => {
 /**
  * 공개 페이지 여부 확인
  */
-const isPublicPage = (path) => PUBLIC_PAGES.has(path);
+const isPublicPage = (path) => {
+  if (PUBLIC_PAGES.has(path)) return true;
+  return PUBLIC_PATH_PATTERNS.some(pattern => pattern.test(path));
+};
 
 /**
  * 비인증 사용자 라우팅 처리

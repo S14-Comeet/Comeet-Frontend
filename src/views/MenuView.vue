@@ -5,12 +5,21 @@
     </div>
 
     <MenuList :menus="menuData" />
+
+    <!-- Review Button Section -->
+    <div class="review-button-section">
+      <ReviewButton @click="goToReview" />
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import MenuList from '@/components/MenuList.vue'
+import ReviewButton from '@/components/review/ReviewButton.vue'
+
+const router = useRouter()
 
 // Mock 데이터 - 추후 API 연결 시 제거 예정
 const menuData = ref([
@@ -52,22 +61,18 @@ const menuData = ref([
   }
 ])
 
-// API 연결 예시 (추후 사용)
-// import axios from 'axios'
-// import { onMounted } from 'vue'
-//
-// const fetchMenus = async () => {
-//   try {
-//     const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/menus`)
-//     menuData.value = response.data
-//   } catch (error) {
-//     console.error('메뉴 데이터 로딩 실패:', error)
-//   }
-// }
-//
-// onMounted(() => {
-//   fetchMenus()
-// })
+const goToReview = () => {
+  // Use store_id from first item or default to 1
+  const storeId = menuData.value.length > 0 ? menuData.value[0].store_id : 1
+
+  router.push({
+    name: 'review-select',
+    query: {
+      storeId: storeId,
+      name: '커핏 강남점' // Mock name, ideally fetched or passed
+    }
+  })
+}
 </script>
 
 <style scoped>
@@ -75,6 +80,7 @@ const menuData = ref([
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
+  padding-bottom: 100px;
 }
 
 .header-section {
@@ -89,9 +95,20 @@ const menuData = ref([
   margin: 0;
 }
 
+.review-button-section {
+  position: fixed;
+  bottom: 80px;
+  left: 0;
+  right: 0;
+  padding: 0 1.5rem;
+  max-width: 448px;
+  margin: 0 auto;
+}
+
 @media (max-width: 640px) {
   .menu-view {
     padding: 1rem 0.5rem;
+    padding-bottom: 140px;
   }
 
   .header-section {
@@ -101,6 +118,11 @@ const menuData = ref([
 
   .page-title {
     font-size: 1.5rem;
+  }
+
+  .review-button-section {
+    bottom: calc(64px + env(safe-area-inset-bottom) + 16px);
+    padding: 0 1rem;
   }
 }
 </style>

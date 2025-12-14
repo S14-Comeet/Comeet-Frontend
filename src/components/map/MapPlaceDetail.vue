@@ -49,17 +49,50 @@
             </p>
           </div>
         </div>
+
+        <!-- 리뷰 작성 버튼 (New) -->
+        <div class="mt-8 pt-4 border-t border-border flex justify-end">
+          <BaseButton
+            label="리뷰 작성하기"
+            variant="primary"
+            size="medium"
+            @click="goToReview"
+          />
+        </div>
       </div>
     </dialog>
   </transition>
 </template>
 
 <script setup>
-defineProps({
+import { useRouter } from 'vue-router'
+import BaseButton from '@/components/common/BaseButton.vue'
+
+const props = defineProps({
   place: Object,
 })
 
-defineEmits(['close'])
+const emit = defineEmits(['close'])
+const router = useRouter()
+
+const goToReview = () => {
+  if (!props.place) return
+  // Use storeId or fallback to id
+  const id = props.place.storeId || props.place.id
+  
+  if (!id) {
+    console.warn('Store ID not found in place object:', props.place)
+    return
+  }
+
+  router.push({
+    name: 'review-write',
+    query: {
+      storeId: id,
+      name: props.place.name
+    }
+  })
+}
 </script>
 
 <style scoped>

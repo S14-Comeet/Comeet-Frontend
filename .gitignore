@@ -350,3 +350,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+.bmad
+.serena
+docs

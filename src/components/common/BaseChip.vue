@@ -1,9 +1,10 @@
 <template>
   <div
     :class="[
-      'box-border flex gap-2.5 h-10 items-center justify-center py-2.5 rounded-full transition-opacity transition-transform duration-200',
+      'box-border flex gap-2 h-10 items-center justify-center rounded-full transition-opacity transition-transform duration-200',
       chipClasses,
-      clickable && 'cursor-pointer hover:opacity-80 active:scale-95'
+      clickable && 'cursor-pointer hover:opacity-80 active:scale-95',
+      removable && 'pr-2' // Adjust padding for remove button
     ]"
     :role="clickable ? 'button' : undefined"
     :tabindex="clickable ? 0 : undefined"
@@ -60,6 +61,18 @@
     >
       {{ label }}
     </p>
+
+    <!-- Removable X button -->
+    <button
+      v-if="removable"
+      class="flex items-center justify-center w-5 h-5 rounded-full hover:bg-black/10 transition-colors"
+      @click.stop="$emit('remove')"
+      aria-label="삭제"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+      </svg>
+    </button>
   </div>
 </template>
 
@@ -114,10 +127,17 @@ const props = defineProps({
   clickable: {
     type: Boolean,
     default: false
+  },
+  /**
+   * Show remove button
+   */
+  removable: {
+    type: Boolean,
+    default: false
   }
 })
 
-const emit = defineEmits(['click'])
+const emit = defineEmits(['click', 'remove'])
 
 const handleClick = () => {
   if (props.clickable) {

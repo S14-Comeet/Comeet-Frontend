@@ -3,7 +3,8 @@
     <div
       v-for="menu in menus"
       :key="menu.id"
-      class="menu-item shadow-sm hover:shadow"
+      class="menu-item shadow-sm hover:shadow cursor-pointer"
+      @click="$emit('select-menu', menu)"
     >
       <div class="menu-image-wrapper">
         <img
@@ -24,9 +25,6 @@
         <p class="menu-description">{{ menu.description }}</p>
         <div class="menu-footer">
           <p class="menu-price">{{ formatPrice(menu.price) }}원</p>
-          <button class="auth-button hover:shadow-button-hover" @click="handleAuth(menu)">
-            인증
-          </button>
         </div>
       </div>
     </div>
@@ -42,13 +40,10 @@ const props = defineProps({
   }
 })
 
+const emit = defineEmits(['select-menu'])
+
 const formatPrice = (price) => {
   return price?.toLocaleString('ko-KR') || '0'
-}
-
-// 인증 버튼 핸들러 - 추후 기능 구현 예정
-const handleAuth = (menu) => {
-  console.log('메뉴 인증:', menu.name)
 }
 </script>
 
@@ -85,6 +80,11 @@ const handleAuth = (menu) => {
   height: 100%;
   object-fit: cover;
   border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary-300);
+  font-size: 0.75rem;
 }
 
 .menu-image-placeholder {
@@ -168,29 +168,6 @@ const handleAuth = (menu) => {
   margin: 0;
 }
 
-.auth-button {
-  padding: 0.4rem 0.9rem;
-  background-color: var(--color-primary-600);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.auth-button:hover {
-  background-color: var(--color-primary-700);
-  transform: translateY(-1px);
-}
-
-.auth-button:active {
-  transform: translateY(0);
-}
-
 @media (max-width: 640px) {
   .menu-item {
     flex-direction: row;
@@ -213,11 +190,6 @@ const handleAuth = (menu) => {
 
   .menu-price {
     font-size: 0.95rem;
-  }
-
-  .auth-button {
-    padding: 0.35rem 0.75rem;
-    font-size: 0.75rem;
   }
 }
 </style>

@@ -436,6 +436,50 @@
           </div>
         </div>
       </section>
+
+      <!-- StarRating Component -->
+      <section class="mb-12 bg-white p-6 rounded-lg shadow">
+        <h2 class="text-2xl font-bold text-textPrimary mb-4">StarRating Component</h2>
+
+        <div class="space-y-6">
+          <div>
+            <h3 class="text-sm font-medium text-textSecondary mb-2">Interactive Rating (Large)</h3>
+            <StarRating v-model="starRating1" :size="40" />
+            <p class="text-sm text-textSecondary mt-2">선택된 별점: {{ starRating1 }}점</p>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-medium text-textSecondary mb-2">Interactive Rating (Medium)</h3>
+            <StarRating v-model="starRating2" :size="32" />
+            <p class="text-sm text-textSecondary mt-2">선택된 별점: {{ starRating2 }}점</p>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-medium text-textSecondary mb-2">Readonly Rating (Small)</h3>
+            <StarRating :modelValue="4" :size="24" :readonly="true" />
+            <p class="text-sm text-textSecondary mt-2">읽기 전용 모드</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ReviewCard Component -->
+      <section class="mb-12 bg-white p-6 rounded-lg shadow">
+        <h2 class="text-2xl font-bold text-textPrimary mb-4">ReviewCard Component</h2>
+
+        <div class="space-y-4">
+          <ReviewCard
+            v-for="review in mockReviews"
+            :key="review.reviewId"
+            :review="review"
+            :storeName="review.storeName"
+            :menuName="review.menuName"
+          />
+        </div>
+
+        <div class="mt-4 text-sm text-textSecondary">
+          <p>리뷰 카드는 작성일자, 카페명, 메뉴명, 공개/비공개 상태, 이미지, 내용, 맛 배지를 표시합니다.</p>
+        </div>
+      </section>
     </div>
   </div>
 </template>
@@ -448,6 +492,8 @@ import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseHeader from '@/components/common/BaseHeader.vue'
+import StarRating from '@/components/common/StarRating.vue'
+import ReviewCard from '@/components/review/ReviewCard.vue'
 
 // Dropdown state
 const dropdownValue1 = ref('')
@@ -479,4 +525,57 @@ const handleNoticeClick = () => {
 const handleLogin = () => {
   console.log('Login button clicked')
 }
+
+// StarRating states
+const starRating1 = ref(3)
+const starRating2 = ref(0)
+
+// Mock review data
+const mockReviews = ref([
+  {
+    reviewId: 1,
+    storeId: 101,
+    menuId: 201,
+    storeName: '카페 모닝글로리',
+    menuName: '아메리카노',
+    content: '정말 맛있는 아메리카노였어요! 분위기도 좋고 커피 향이 일품이에요. 재방문 의사 100%입니다.',
+    isPublic: true,
+    createdAt: '2025-01-15T10:30:00',
+    imageUrl: 'https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800',
+    flavorBadges: [
+      { flavorId: 1, name: '고소한', colorHex: '#8B4513' },
+      { flavorId: 2, name: '부드러운', colorHex: '#D2691E' },
+      { flavorId: 3, name: '달콤한', colorHex: '#FF6B6B' }
+    ]
+  },
+  {
+    reviewId: 2,
+    storeId: 102,
+    menuId: 202,
+    storeName: '스타벅스 강남점',
+    menuName: '카페 라떼',
+    content: '우유 거품이 부드럽고 좋았어요. 다만 가격이 조금 비싼 감이 있습니다.',
+    isPublic: false,
+    createdAt: '2025-01-10T14:20:00',
+    imageUrl: null,
+    flavorBadges: [
+      { flavorId: 4, name: '크리미한', colorHex: '#FFE4B5' }
+    ]
+  },
+  {
+    reviewId: 3,
+    storeId: 103,
+    menuId: 203,
+    storeName: '블루보틀 성수점',
+    menuName: '콜드브루',
+    content: '산미가 강한 편이지만 깔끔한 맛이었어요. 여름에 마시기 딱 좋을 것 같아요!',
+    isPublic: true,
+    createdAt: '2024-12-25T16:45:00',
+    imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800',
+    flavorBadges: [
+      { flavorId: 5, name: '상큼한', colorHex: '#4ECDC4' },
+      { flavorId: 6, name: '깔끔한', colorHex: '#95E1D3' }
+    ]
+  }
+])
 </script>
