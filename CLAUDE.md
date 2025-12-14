@@ -64,14 +64,17 @@ src/
 **Application Entry**: `src/main.js` initializes Vue app with Pinia (with persist plugin), Vue Router, and Vue Toastification. On app startup, it attempts to restore user session from localStorage if an access token exists.
 
 **Authentication Flow**:
-- OAuth-based authentication with JWT tokens stored in localStorage
+- OAuth-based authentication supporting Naver, Kakao, and Google providers (configured in `src/config.js`)
+- JWT tokens stored in localStorage
 - `src/api/axios.js` has request/response interceptors that:
   - Automatically inject access token into request headers
   - Handle 401 errors with automatic token refresh via `/api/auth/reissue` endpoint
   - Implement request queue during token refresh to prevent race conditions
   - Non-401 errors (4xx, 5xx) automatically trigger toast notifications
 - `src/router/index.js` has navigation guards with two-phase logic:
-  - **Public pages** (`PUBLIC_PAGES` Set: `/map`, `/saved`, `/login`, `/oauth/callback`, `/test-components`):
+  - **Public pages** (`PUBLIC_PAGES` Set + `PUBLIC_PATH_PATTERNS` regex array):
+    - Static paths: `/map`, `/saved`, `/login`, `/oauth/callback`, `/test-components`
+    - Dynamic patterns: `/store/:storeId` (matched via regex)
     - Unauthenticated users: Access granted
     - Authenticated users with role `GUEST`: Redirect to `/nickname`
     - Authenticated users trying to access `/login`: Redirect to `/`
@@ -91,7 +94,7 @@ src/
 
 **State Management**:
 - Pinia stores in `src/store/` with automatic localStorage persistence
-- Main stores: `useAuthStore` (auth.js), `useSavedStore` (saved.js), `useNotificationStore` (notification.js), `useAppStore` (index.js)
+- Main stores: `useAuthStore` (auth.js), `useSavedStore` (saved.js), `useNotificationStore` (notification.js), `useFlavorStore` (flavor.js), `useAppStore` (index.js)
 - All stores use `persist: { storage: safeStorage }` for safe cross-environment persistence
 
 **API Layer**:
@@ -157,7 +160,7 @@ import { getItem, setItem, removeItem } from '@/utils/storage'
 
 **Adding New Routes**: Remember to update multiple locations:
 1. Route definition in `router/index.js`
-2. `PUBLIC_PAGES` Set in `router/index.js:78` (if unauthenticated access needed - NOTE: public pages still enforce GUEST checks for authenticated users)
+2. `PUBLIC_PAGES` Set or `PUBLIC_PATH_PATTERNS` array in `router/index.js` (if unauthenticated access needed - NOTE: public pages still enforce GUEST checks for authenticated users)
 3. `pagesWithoutHeader` Set in `App.vue:33` (if header should be hidden)
 4. `pagesWithoutNavigation` Set in `App.vue:36` (if bottom nav should be hidden)
 5. `isFullScreenPage` computed in `App.vue:47` (if page needs full viewport without padding)
