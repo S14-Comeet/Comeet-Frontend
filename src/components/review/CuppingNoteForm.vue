@@ -168,7 +168,7 @@
           ></textarea>
         </div>
 
-        <div class="note-item full-width">
+        <div class="note-item">
           <label class="note-label">종합 평가</label>
           <textarea
             v-model="form.overallNotes"
@@ -488,8 +488,8 @@ const getLabelPosition = (index, offset) => {
 
 /* Notes Grid */
 .notes-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
 }
 
@@ -499,9 +499,6 @@ const getLabelPosition = (index, offset) => {
   gap: 0.375rem;
 }
 
-.note-item.full-width {
-  grid-column: 1 / -1;
-}
 
 .note-label {
   font-size: 0.75rem;
@@ -536,10 +533,6 @@ const getLabelPosition = (index, offset) => {
 
   .radar-chart {
     width: 160px;
-  }
-
-  .notes-grid {
-    grid-template-columns: 1fr;
   }
 }
 </style>
