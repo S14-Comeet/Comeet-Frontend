@@ -161,15 +161,16 @@ const isPublic = ref(true)
 const isSubmitting = ref(false)
 
 // Cupping note state
+const DEFAULT_CUPPING_SCORE = 6.5
 const cuppingNote = ref({
   roastLevel: null,
-  fragranceScore: 0,
-  aromaScore: 0,
-  flavorScore: 0,
-  aftertasteScore: 0,
-  acidityScore: 0,
-  sweetnessScore: 0,
-  mouthfeelScore: 0,
+  fragranceScore: DEFAULT_CUPPING_SCORE,
+  aromaScore: DEFAULT_CUPPING_SCORE,
+  flavorScore: DEFAULT_CUPPING_SCORE,
+  aftertasteScore: DEFAULT_CUPPING_SCORE,
+  acidityScore: DEFAULT_CUPPING_SCORE,
+  sweetnessScore: DEFAULT_CUPPING_SCORE,
+  mouthfeelScore: DEFAULT_CUPPING_SCORE,
   fragranceAromaDetail: '',
   flavorAftertasteDetail: '',
   acidityNotes: '',

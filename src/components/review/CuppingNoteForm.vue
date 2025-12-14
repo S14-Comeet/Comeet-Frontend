@@ -80,7 +80,7 @@
 
           <!-- Total Score -->
           <div class="total-score">
-            <span class="total-value">{{ totalScore.toFixed(1) }}</span>
+            <span class="total-value">{{ totalScore.toFixed(2) }}</span>
             <span class="total-max">/105</span>
           </div>
         </div>
@@ -95,7 +95,7 @@
             <div class="score-header">
               <span class="score-label">{{ score.label }}</span>
               <span class="score-value" :style="{ color: getScoreColor(form[score.key]) }">
-                {{ form[score.key]?.toFixed(1) || '0.0' }}
+                {{ form[score.key]?.toFixed(2) || '0.00' }}
               </span>
             </div>
             <input
@@ -195,15 +195,17 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
+const DEFAULT_SCORE = 6.5
+
 const form = reactive({
   roastLevel: props.modelValue.roastLevel || null,
-  fragranceScore: props.modelValue.fragranceScore || 0,
-  aromaScore: props.modelValue.aromaScore || 0,
-  flavorScore: props.modelValue.flavorScore || 0,
-  aftertasteScore: props.modelValue.aftertasteScore || 0,
-  acidityScore: props.modelValue.acidityScore || 0,
-  sweetnessScore: props.modelValue.sweetnessScore || 0,
-  mouthfeelScore: props.modelValue.mouthfeelScore || 0,
+  fragranceScore: props.modelValue.fragranceScore ?? DEFAULT_SCORE,
+  aromaScore: props.modelValue.aromaScore ?? DEFAULT_SCORE,
+  flavorScore: props.modelValue.flavorScore ?? DEFAULT_SCORE,
+  aftertasteScore: props.modelValue.aftertasteScore ?? DEFAULT_SCORE,
+  acidityScore: props.modelValue.acidityScore ?? DEFAULT_SCORE,
+  sweetnessScore: props.modelValue.sweetnessScore ?? DEFAULT_SCORE,
+  mouthfeelScore: props.modelValue.mouthfeelScore ?? DEFAULT_SCORE,
   fragranceAromaDetail: props.modelValue.fragranceAromaDetail || '',
   flavorAftertasteDetail: props.modelValue.flavorAftertasteDetail || '',
   acidityNotes: props.modelValue.acidityNotes || '',
