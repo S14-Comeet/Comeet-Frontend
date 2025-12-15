@@ -100,6 +100,8 @@ src/
 **API Layer**:
 - Centralized axios instance in `src/api/axios.js` with `baseURL` from config
 - Credentials included (`withCredentials: true`) for cookie-based refresh tokens
+- 30-second request timeout with network error handling (timeout/offline detection)
+- Token refresh queue with max 10 pending requests to prevent memory leaks
 - Domain-specific API clients in `src/api/` (e.g., `auth.js`, `cafe.js`)
 - Error handling: Non-401 errors trigger toast notifications via `showApiError()`
 
@@ -137,6 +139,11 @@ src/
 - `src/composables/useNaverMap.js` provides map initialization and marker management
 - Global Naver Maps script loaded via `index.html` with client ID from env
 - `waitForNaverMaps()` helper polls for `window.naver.maps` availability before initialization
+
+**Geolocation**:
+- `src/composables/useGeolocation.js` provides location access with comprehensive error handling
+- Supports options: `showToast` (default: true), `timeout` (default: 10000ms), `maximumAge` (default: 60000ms)
+- Returns `location` (with lat, lng, accuracy, timestamp), `isLoading`, `error`, `requestLocation()`, `clearLocation()`
 
 ## Configuration Notes
 
