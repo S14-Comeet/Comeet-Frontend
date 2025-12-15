@@ -114,7 +114,7 @@ const isSearching = ref(false)
 const isLocating = ref(false)
 const showSearchButton = ref(false)
 const {location, requestLocation} = useGeolocation()
-const {map, initMap, addMarker, clearMarkers} = useNaverMap()
+const {map, markers, initMap, addMarker, clearMarkers} = useNaverMap()
 const popupStore = ref(null)
 const popupPosition = ref({ x: 0, y: 0 })
 const detailPlace = ref(null)
@@ -155,6 +155,12 @@ const forceSheetState = ref(null)
 const isGlobalSearch = ref(false)
 const searchKeyword = ref('')
 const searchCategories = ref([])
+
+// 줌 중심으로 사용할 포커스된 위치 (내 위치, 선택한 마커 등)
+const focusedLocation = ref(null)
+
+// 마커 업데이트 디바운스 타이머
+let markerUpdateTimer = null
 
 // 인증 상태
 const isAuthenticated = computed(() => authStore.isAuthenticated)
@@ -312,18 +318,40 @@ const formatDistance = (meters) => {
   return `${(meters / 1000).toFixed(1)}km`
 }
 
-// 카페 마커 아이콘 생성
-const createCafeMarkerIcon = () => {
+// 줌 레벨에 따른 마커 스케일 계산 (확대할수록 작아짐)
+const getMarkerScale = (zoom) => {
+  // 줌 12~19 범위에서 촘촘하게 변화
+  const maxSizeZoom = 12  // 이 줌 이하에서 최대 크기
+  const minSizeZoom = 19  // 이 줌 이상에서 최소 크기
+  const maxScale = 1.25   // 최대 크기 스케일 (줌 12 이하) → 40x50px
+  const minScale = 0.8    // 최소 크기 스케일 (줌 19 이상) → 26x32px
+
+  if (zoom <= maxSizeZoom) return maxScale
+  if (zoom >= minSizeZoom) return minScale
+
+  // 줌 12~19 사이에서 선형 보간
+  const ratio = (zoom - maxSizeZoom) / (minSizeZoom - maxSizeZoom)
+  return maxScale - ratio * (maxScale - minScale)
+}
+
+// 카페 마커 아이콘 생성 (줌 레벨에 따른 크기 조정)
+const createCafeMarkerIcon = (zoom = 15) => {
+  const scale = getMarkerScale(zoom)
+  const baseWidth = 32  // 기본 크기
+  const baseHeight = 40 // 기본 크기
+  const width = Math.round(baseWidth * scale)
+  const height = Math.round(baseHeight * scale)
+
   return {
     content: `
       <div style="
         position: relative;
-        width: 32px;
-        height: 40px;
+        width: ${width}px;
+        height: ${height}px;
         cursor: pointer;
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+        filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
       ">
-        <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="${width}" height="${height}" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M16 0C7.16 0 0 7.16 0 16C0 24 10 36 14.4 39.2C15.3 39.8 16.7 39.8 17.6 39.2C22 36 32 24 32 16C32 7.16 24.84 0 16 0Z" fill="#846148"/>
           <circle cx="16" cy="16" r="9" fill="#FFF8F0"/>
           <!-- 커피잔 -->
@@ -343,15 +371,40 @@ const createCafeMarkerIcon = () => {
         </svg>
       </div>
     `,
-    size: new naver.maps.Size(32, 40),
-    anchor: new naver.maps.Point(16, 40)
+    size: new naver.maps.Size(width, height),
+    anchor: new naver.maps.Point(width / 2, height)
   }
+}
+
+// 현재 표시 중인 카페 목록 (줌 변경 시 마커 업데이트용)
+const currentCafes = ref([])
+
+// 마커 크기 업데이트 (줌 변경 시 호출, 디바운스 적용)
+const updateMarkerSizes = () => {
+  // 이전 타이머 취소
+  if (markerUpdateTimer) {
+    clearTimeout(markerUpdateTimer)
+  }
+
+  // 100ms 디바운스 - 연속 줌 시 마지막에만 업데이트
+  markerUpdateTimer = setTimeout(() => {
+    if (!map.value || markers.value.length === 0) return
+
+    const zoom = map.value.getZoom()
+    const newIcon = createCafeMarkerIcon(zoom)
+
+    markers.value.forEach((marker) => {
+      marker.setIcon(newIcon)
+    })
+  }, 100)
 }
 
 const renderMarkers = (cafes = [], moveToFirst = false) => {
   clearMarkers()
+  currentCafes.value = cafes
 
-  const markerIcon = createCafeMarkerIcon()
+  const zoom = map.value ? map.value.getZoom() : 15
+  const markerIcon = createCafeMarkerIcon(zoom)
 
   cafes.forEach((cafe) => {
     addMarker({
@@ -479,6 +532,10 @@ const showStorePopup = (store) => {
 
 // 마커 클릭 시 - 지도 이동 없이 팝업만 표시
 const handleMarkerClick = (cafe) => {
+  const lat = cafe.lat || cafe.latitude
+  const lng = cafe.lng || cafe.longitude
+  // 클릭한 마커를 줌 중심으로 설정
+  focusedLocation.value = { lat, lng }
   showPopupOnly(cafe)
 }
 
@@ -502,6 +559,11 @@ const closePopup = () => {
 // 바텀시트에서 가게 선택 - 마커로 이동 + 팝업 표시 + 시트 축소
 const handleStoreSelect = (store) => {
   if (store) {
+    const lat = store.lat || store.latitude
+    const lng = store.lng || store.longitude
+    // 선택한 가게를 줌 중심으로 설정
+    focusedLocation.value = { lat, lng }
+
     // 시트를 1/3 크기로 축소
     forceSheetState.value = 'half'
     // 다음 변경을 감지할 수 있도록 리셋
@@ -601,18 +663,118 @@ const handleSearchThisArea = async () => {
   }
 }
 
-// 확대
+// 줌 중심점 계산 (포커스된 위치 우선, 없으면 시각적 중심)
+const getZoomCenter = () => {
+  if (!map.value) return null
+
+  // 포커스된 위치가 있으면 그 위치를 줌 중심으로 사용
+  if (focusedLocation.value) {
+    return new naver.maps.LatLng(focusedLocation.value.lat, focusedLocation.value.lng)
+  }
+
+  // 포커스된 위치가 없으면 바텀시트를 고려한 시각적 중심 계산
+  const mapSize = map.value.getSize()
+  const projection = map.value.getProjection()
+
+  // 바텀시트가 차지하는 높이 비율 계산
+  let bottomSheetRatio = 0
+  if (sheetState.value === 'collapsed') {
+    bottomSheetRatio = 100 / mapSize.height  // 약 100px
+  } else if (sheetState.value === 'half') {
+    bottomSheetRatio = 0.33  // 33vh
+  } else if (sheetState.value === 'full') {
+    bottomSheetRatio = 0.85  // 85vh
+  }
+
+  // 보이는 영역의 중심 Y 좌표 (상단 0 ~ 바텀시트 시작점의 중간)
+  const visibleHeight = mapSize.height * (1 - bottomSheetRatio)
+  const visualCenterY = visibleHeight / 2
+
+  // 실제 지도 중심과의 Y 차이
+  const actualCenterY = mapSize.height / 2
+  const deltaY = visualCenterY - actualCenterY
+
+  // 화면 좌표 차이를 지도 좌표로 변환
+  const centerOffset = projection.fromCoordToOffset(map.value.getCenter())
+  const visualCenterOffset = new naver.maps.Point(centerOffset.x, centerOffset.y + deltaY)
+
+  return projection.fromOffsetToCoord(visualCenterOffset)
+}
+
+// 특정 좌표를 피벗으로 줌 (해당 좌표가 현재 화면 위치 유지)
+const zoomAtPivot = (pivotLat, pivotLng, newZoom) => {
+  if (!map.value) return
+
+  const currentZoom = map.value.getZoom()
+  if (newZoom === currentZoom) return
+
+  const projection = map.value.getProjection()
+  const pivot = new naver.maps.LatLng(pivotLat, pivotLng)
+  const center = map.value.getCenter()
+
+  // 현재 줌에서 피벗의 오프셋과 중심의 오프셋
+  const pivotOffset = projection.fromCoordToOffset(pivot)
+  const centerOffset = projection.fromCoordToOffset(center)
+
+  // 중심에서 피벗까지의 픽셀 거리
+  const deltaX = pivotOffset.x - centerOffset.x
+  const deltaY = pivotOffset.y - centerOffset.y
+
+  // 줌 비율 (줌 1 증가 = 스케일 2배)
+  const zoomRatio = Math.pow(2, newZoom - currentZoom)
+
+  // 줌 후 피벗이 같은 화면 위치에 있으려면, 새 중심 오프셋 계산
+  const newCenterOffsetX = pivotOffset.x - deltaX / zoomRatio
+  const newCenterOffsetY = pivotOffset.y - deltaY / zoomRatio
+
+  const newCenterOffset = new naver.maps.Point(newCenterOffsetX, newCenterOffsetY)
+  const newCenter = projection.fromOffsetToCoord(newCenterOffset)
+
+  // 애니메이션 없이 즉시 적용 (끊김 방지)
+  map.value.setZoom(newZoom, false)
+  map.value.setCenter(newCenter)
+}
+
+// 확대 (포커스된 위치 또는 시각적 중심을 피벗으로)
 const handleZoomIn = () => {
   if (!map.value) return
   const currentZoom = map.value.getZoom()
-  map.value.setZoom(currentZoom + 1)
+
+  // 최대 줌 레벨 체크 (19)
+  if (currentZoom >= 19) return
+
+  if (focusedLocation.value) {
+    // 포커스된 위치를 피벗으로 줌
+    zoomAtPivot(focusedLocation.value.lat, focusedLocation.value.lng, currentZoom + 1)
+  } else {
+    // 시각적 중심을 피벗으로 줌
+    const zoomCenter = getZoomCenter()
+    if (zoomCenter) {
+      zoomAtPivot(zoomCenter.lat(), zoomCenter.lng(), currentZoom + 1)
+    } else {
+      map.value.setZoom(currentZoom + 1)
+    }
+  }
 }
 
-// 축소
+// 축소 (포커스된 위치 또는 시각적 중심을 피벗으로)
 const handleZoomOut = () => {
   if (!map.value) return
   const currentZoom = map.value.getZoom()
-  map.value.setZoom(currentZoom - 1)
+
+  // 최소 줌 레벨 체크 (10)
+  if (currentZoom <= 10) return
+
+  if (focusedLocation.value) {
+    zoomAtPivot(focusedLocation.value.lat, focusedLocation.value.lng, currentZoom - 1)
+  } else {
+    const zoomCenter = getZoomCenter()
+    if (zoomCenter) {
+      zoomAtPivot(zoomCenter.lat(), zoomCenter.lng(), currentZoom - 1)
+    } else {
+      map.value.setZoom(currentZoom - 1)
+    }
+  }
 }
 
 // 내 위치로 이동
@@ -629,6 +791,8 @@ const handleMyLocation = async () => {
       panToWithOffset(location.value.lat, location.value.lng, { offsetRatio: 0.3 })
       updateMyLocationMarker(location.value.lat, location.value.lng)
       userLocation.value = { lat: location.value.lat, lng: location.value.lng }
+      // 내 위치를 줌 중심으로 설정
+      focusedLocation.value = { lat: location.value.lat, lng: location.value.lng }
       showSearchButton.value = true
     }
   } catch {
@@ -682,6 +846,8 @@ onMounted(async () => {
           panToWithOffset(centerLat, centerLng, { offsetRatio: 0.3 })
           updateMyLocationMarker(centerLat, centerLng)
           userLocation.value = { lat: centerLat, lng: centerLng }
+          // 내 위치를 줌 중심으로 설정
+          focusedLocation.value = { lat: centerLat, lng: centerLng }
         }
       } catch {
         console.warn('[지도] 현재 위치를 가져올 수 없어 기본 위치를 사용합니다.')
@@ -702,9 +868,16 @@ onMounted(async () => {
       })
 
       // 지도 이동/줌 중 팝업 위치 실시간 업데이트 (쓰로틀 적용)
-      naver.maps.Event.addListener(map.value, 'zoom_changed', throttledUpdatePopupPosition)
+      naver.maps.Event.addListener(map.value, 'zoom_changed', () => {
+        throttledUpdatePopupPosition()
+        updateMarkerSizes()  // 줌 변경 시 마커 크기 업데이트
+      })
       naver.maps.Event.addListener(map.value, 'center_changed', throttledUpdatePopupPosition)
-      naver.maps.Event.addListener(map.value, 'drag', throttledUpdatePopupPosition)
+      naver.maps.Event.addListener(map.value, 'drag', () => {
+        throttledUpdatePopupPosition()
+        // 지도 드래그 시 포커스 해제 (시각적 중심으로 줌하도록)
+        focusedLocation.value = null
+      })
       naver.maps.Event.addListener(map.value, 'zooming', throttledUpdatePopupPosition)
 
       // 지도 클릭 시 팝업 닫기
@@ -724,6 +897,11 @@ onUnmounted(() => {
   if (rafId) {
     cancelAnimationFrame(rafId)
     rafId = null
+  }
+  // 마커 업데이트 타이머 정리
+  if (markerUpdateTimer) {
+    clearTimeout(markerUpdateTimer)
+    markerUpdateTimer = null
   }
 })
 </script>
