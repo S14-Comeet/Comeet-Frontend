@@ -545,13 +545,19 @@ const handleSearch = async (searchParams) => {
       categories: searchParams.categories
     })
 
-    renderMarkers(storeList, searchParams.isGlobalSearch && storeList.length > 0)
+    renderMarkers(storeList, false)
 
     searchKeyword.value = searchParams.keyword || ''
     searchCategories.value = searchParams.categories ? searchParams.categories.split(',') : []
     isGlobalSearch.value = searchParams.isGlobalSearch
 
     lastSearchCenter.value = { lat, lng }
+
+    // 검색 후 바텀시트를 최대 상태로 확장
+    forceSheetState.value = 'full'
+    setTimeout(() => {
+      forceSheetState.value = null
+    }, 100)
 
     if (storeList.length === 0) {
       toast.info('검색 결과가 없습니다.')
