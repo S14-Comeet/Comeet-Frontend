@@ -323,8 +323,8 @@ const getMarkerScale = (zoom) => {
   // 줌 12~19 범위에서 촘촘하게 변화
   const maxSizeZoom = 12  // 이 줌 이하에서 최대 크기
   const minSizeZoom = 19  // 이 줌 이상에서 최소 크기
-  const maxScale = 1.25   // 최대 크기 스케일 (줌 12 이하) → 40x50px
-  const minScale = 0.8    // 최소 크기 스케일 (줌 19 이상) → 26x32px
+  const maxScale = 1.05   // 최대 크기 스케일 (줌 12 이하) → 40x50px
+  const minScale = 0.85    // 최소 크기 스케일 (줌 19 이상) → 26x32px
 
   if (zoom <= maxSizeZoom) return maxScale
   if (zoom >= minSizeZoom) return minScale
