@@ -570,6 +570,11 @@ const handleSearch = async (searchParams) => {
 // 바텀시트 상태 변경
 const handleSheetStateChange = (state) => {
   sheetState.value = state
+
+  // 바텀시트가 full로 확장되면 팝업 닫기
+  if (state === 'full') {
+    closePopup()
+  }
 }
 
 // 이 지역 검색
