@@ -35,24 +35,20 @@ export function useNaverMap() {
      * 네이버 지도 초기화
      */
     const initMap = async (container, options = {}) => {
-        try {
-            // Naver Maps API 로드 대기
-            await waitForNaverMaps()
+        // Naver Maps API 로드 대기
+        await waitForNaverMaps()
 
-            const {center = {lat: 37.5665, lng: 126.978}, zoom = 15} = options
+        const {center = {lat: 37.5665, lng: 126.978}, zoom = 15} = options
 
-            map.value = new naver.maps.Map(container, {
-                center: new naver.maps.LatLng(center.lat, center.lng),
-                zoom: zoom,
-                minZoom: 10,
-                maxZoom: 19,
-                zoomControl: false, // 줌 컨트롤 비활성화
-            })
+        map.value = new naver.maps.Map(container, {
+            center: new naver.maps.LatLng(center.lat, center.lng),
+            zoom: zoom,
+            minZoom: 10,
+            maxZoom: 19,
+            zoomControl: false, // 줌 컨트롤 비활성화
+        })
 
-            return map.value
-        } catch (error) {
-            throw error
-        }
+        return map.value
     }
 
     /**

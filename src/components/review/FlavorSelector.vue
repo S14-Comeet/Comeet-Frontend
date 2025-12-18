@@ -76,8 +76,8 @@
           :style="{ backgroundColor: `${viewingLevel1.color}10` }"
         >
           <button 
-            @click="viewingLevel1 = null"
             class="p-2 -ml-2 rounded-full hover:bg-black/5 transition-colors"
+            @click="viewingLevel1 = null"
           >
             <BaseIcon name="chevron-left" :size="24" :color="viewingLevel1.color" />
           </button>
@@ -90,13 +90,13 @@
           </h3>
           
           <button
-            @click="toggleFlavor(viewingLevel1)"
             class="px-3 py-1.5 rounded-full text-xs font-bold transition-all border shadow-sm"
             :style="{
               backgroundColor: isSelected(viewingLevel1.id) ? viewingLevel1.color : 'white',
               borderColor: viewingLevel1.color,
               color: isSelected(viewingLevel1.id) ? 'white' : viewingLevel1.color
             }"
+            @click="toggleFlavor(viewingLevel1)"
           >
             {{ isSelected(viewingLevel1.id) ? '전체 선택됨' : '전체 선택' }}
           </button>
@@ -116,9 +116,9 @@
                 {{ l2.name }}
               </h4>
               <button
-                @click="toggleFlavor(l2)"
                 class="text-xs font-bold px-2 py-1 rounded transition-colors hover:bg-black/5"
                 :style="{ color: isSelected(l2.id) ? viewingLevel1.color : '#888' }"
+                @click="toggleFlavor(l2)"
               >
                 {{ isSelected(l2.id) ? '✔ 그룹 선택됨' : '+ 그룹 선택' }}
               </button>
@@ -129,7 +129,6 @@
               <button
                 v-for="l3 in l2.flavors"
                 :key="l3.id"
-                @click="toggleFlavor(l3)"
                 class="px-3 py-2 rounded-xl text-sm font-bold transition-all duration-200 border shadow-sm active:scale-95"
                 :class="[
                   isSelected(l3.id) ? 'text-white' : 'bg-white'
@@ -139,6 +138,7 @@
                   borderColor: l3.color,
                   color: isSelected(l3.id) ? 'white' : '#555' // Use generic dark text for unselected for readability, or use l3.color? l3.color might be too light. Let's use dark gray.
                 }"
+                @click="toggleFlavor(l3)"
               >
                 {{ l3.name }}
               </button>
@@ -148,9 +148,9 @@
                    But users might miss it. Let's add a visual cue or a placeholder chip that acts as L2 select. -->
               <div v-if="(!l2.flavors || l2.flavors.length === 0)" class="w-full">
                  <button 
-                    @click="toggleFlavor(l2)"
                     class="w-full text-left px-3 py-3 rounded-xl border border-dashed flex items-center gap-2 hover:bg-neutral-50 transition-colors"
                     :style="{ borderColor: viewingLevel1.color }"
+                    @click="toggleFlavor(l2)"
                  >
                     <div 
                       class="w-4 h-4 rounded-full border flex items-center justify-center"

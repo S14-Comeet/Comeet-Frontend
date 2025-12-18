@@ -465,6 +465,41 @@
       />
     </template>
 
+    <!-- Globe (World) -->
+    <template v-else-if="name === 'globe'">
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M2 12H22"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M12 2C14.5013 4.73835 15.9228 8.29203 16 12C15.9228 15.708 14.5013 19.2616 12 22C9.49872 19.2616 8.07725 15.708 8 12C8.07725 8.29203 9.49872 4.73835 12 2Z"
+        :stroke="color"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </template>
+
+    <!-- Map Pin -->
+    <template v-else-if="name === 'mapPin'">
+      <path
+        d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z"
+        :fill="color"
+      />
+    </template>
+
     <!-- Fallback: Unknown icon -->
     <template v-else>
       <circle cx="12" cy="12" r="2" :fill="color" />

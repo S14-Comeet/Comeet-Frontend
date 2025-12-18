@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col h-full bg-white">
-    <BaseHeader showBackButton />
+    <BaseHeader show-back-button />
 
     <div class="flex-1 overflow-y-auto">
       <div class="px-5 py-6">
@@ -79,6 +79,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { createLogger } from '@/utils/logger'
 import BaseHeader from '@/components/common/BaseHeader.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
@@ -86,6 +87,8 @@ import MenuList from '@/components/MenuList.vue'
 import { verifyVisit } from '@/api/visit'
 import { showSuccess, showError, showWarning } from '@/utils/toast'
 import { useGeolocation } from '@/composables/useGeolocation'
+
+const logger = createLogger('ReviewSelectView')
 
 const route = useRoute()
 const router = useRouter()
@@ -160,7 +163,7 @@ const fetchMenus = async () => {
         image_url: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=400&fit=crop'
       }
     ]
-  } catch (e) {
+  } catch {
     showError('메뉴 목록을 불러오지 못했습니다.')
   } finally {
     isLoadingMenus.value = false
@@ -197,12 +200,11 @@ const handleVerifyVisit = async () => {
     const userLoc = { latitude: geoLocation.value.lat, longitude: geoLocation.value.lng }
 
     // Debug: 좌표 확인 로그
-    console.log('=== 방문 인증 디버그 ===')
-    console.log('가게 정보:', { storeId, name: cafeName.value })
-    console.log('가게 위치:', storeLoc)
-    console.log('사용자 위치:', userLoc)
-    console.log('Google Maps 링크 (가게):', `https://www.google.com/maps?q=${storeLoc.latitude},${storeLoc.longitude}`)
-    console.log('Google Maps 링크 (사용자):', `https://www.google.com/maps?q=${userLoc.latitude},${userLoc.longitude}`)
+    logger.debug('방문 인증 시도', {
+      store: { storeId, name: cafeName.value },
+      storeLoc,
+      userLoc
+    })
 
     // 3. Call Verify API
     const result = await verifyVisit({
@@ -233,7 +235,7 @@ const handleVerifyVisit = async () => {
     verificationMessage.value = '방문 인증 요청 중 오류가 발생했습니다.'
     verificationStatus.value = 'error'
     showError(e.response?.data?.message || '방문 인증에 실패했습니다.')
-    console.error(e)
+    logger.error('방문 인증 실패', e)
   } finally {
     isVerifying.value = false
   }

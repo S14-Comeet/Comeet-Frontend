@@ -1,4 +1,7 @@
 import api from './axios'
+import { createLogger } from '@/utils/logger'
+
+const logger = createLogger('CafeAPI')
 
 /**
  * Mock 데이터 - 추후 백엔드 API 구현 시 제거
@@ -280,7 +283,7 @@ export const getAllCafes = async () => {
  * @param {string|number} storeId
  */
 export const getCafeById = async (storeId) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     setTimeout(() => {
       const cafe = MOCK_CAFES.find(c => c.storeId === storeId || c.storeId === String(storeId));
       if (cafe) {
@@ -333,9 +336,9 @@ export const getStoreById = async (storeId) => {
   try {
     const response = await api.get(`/stores/${storeId}`)
     return response.data
-  } catch (error) {
+  } catch {
     // API가 아직 구현되지 않은 경우 Mock 데이터 반환
-    console.warn('Store detail API not available, using mock data')
+    logger.warn('Store detail API not available, using mock data')
     const cafe = MOCK_CAFES.find(c => c.storeId === storeId || c.storeId === String(storeId))
     if (cafe) {
       return cafe
@@ -359,9 +362,9 @@ export const getStoreReviews = async (storeId, params = {}) => {
   try {
     const response = await api.get(`/stores/${storeId}/reviews`, { params })
     return response.data
-  } catch (error) {
+  } catch {
     // API가 아직 구현되지 않은 경우 빈 배열 반환
-    console.warn('Store reviews API not available, returning empty')
+    logger.warn('Store reviews API not available, returning empty')
     return []
   }
 }

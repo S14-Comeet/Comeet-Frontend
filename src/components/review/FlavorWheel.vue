@@ -82,18 +82,18 @@
     <transition name="slide-up">
       <div v-if="selectedL2" class="detail-panel">
         <div class="detail-header" :style="{ borderColor: selectedCategory?.color }">
-          <button @click="selectedL2 = null" class="back-btn">
+          <button class="back-btn" @click="selectedL2 = null">
             <BaseIcon name="chevron-left" :size="20" />
           </button>
           <h4 class="detail-title">{{ selectedL2.name }}</h4>
           <button
-            @click="toggleFlavor(selectedL2)"
             class="select-all-btn"
             :class="{ 'selected': isSelected(selectedL2.id) }"
             :style="{
               backgroundColor: isSelected(selectedL2.id) ? selectedCategory?.color : 'transparent',
               borderColor: selectedCategory?.color
             }"
+            @click="toggleFlavor(selectedL2)"
           >
             {{ isSelected(selectedL2.id) ? '선택됨' : '전체' }}
           </button>
@@ -104,7 +104,6 @@
           <button
             v-for="l3 in selectedL2.flavors"
             :key="l3.id"
-            @click="toggleFlavor(l3)"
             class="flavor-chip"
             :class="{ 'selected': isSelected(l3.id) }"
             :style="{
@@ -112,16 +111,17 @@
               borderColor: l3.color,
               color: isSelected(l3.id) ? 'white' : l3.color
             }"
+            @click="toggleFlavor(l3)"
           >
-            <span class="chip-dot" :style="{ backgroundColor: l3.color }" v-if="!isSelected(l3.id)"></span>
+            <span v-if="!isSelected(l3.id)" class="chip-dot" :style="{ backgroundColor: l3.color }"></span>
             {{ l3.name }}
           </button>
 
           <div v-if="!selectedL2.flavors?.length" class="no-children">
             <button
-              @click="toggleFlavor(selectedL2)"
               class="select-single-btn"
               :style="{ borderColor: selectedCategory?.color }"
+              @click="toggleFlavor(selectedL2)"
             >
               <BaseIcon :name="isSelected(selectedL2.id) ? 'check' : 'plus'" :size="16" />
               {{ selectedL2.name }} 선택

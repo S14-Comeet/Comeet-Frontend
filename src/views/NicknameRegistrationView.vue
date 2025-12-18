@@ -3,8 +3,8 @@
     <!-- Back Button -->
     <button
       class="absolute top-4 left-4 w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity z-10"
-      @click="handleBack"
       aria-label="뒤로 가기"
+      @click="handleBack"
     >
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -82,14 +82,16 @@
               @click="selectedRole = 'USER'"
             >
               <span class="flex items-start gap-4">
-                <span :class="[
+                <span
+:class="[
                   'w-12 h-12 rounded-full flex items-center justify-center text-2xl',
                   selectedRole === 'USER' ? 'bg-primary-100' : 'bg-surface-light'
                 ]">
                   🙋
                 </span>
                 <span class="flex-1 flex flex-col text-left">
-                  <span :class="[
+                  <span
+:class="[
                     'text-lg font-bold mb-1',
                     selectedRole === 'USER' ? 'text-primary-700' : 'text-neutral-900'
                   ]">
@@ -120,14 +122,16 @@
               @click="selectedRole = 'OWNER'"
             >
               <span class="flex items-start gap-4">
-                <span :class="[
+                <span
+:class="[
                   'w-12 h-12 rounded-full flex items-center justify-center text-2xl',
                   selectedRole === 'OWNER' ? 'bg-primary-100' : 'bg-surface-light'
                 ]">
                   🏪
                 </span>
                 <span class="flex-1 flex flex-col text-left">
-                  <span :class="[
+                  <span
+:class="[
                     'text-lg font-bold mb-1',
                     selectedRole === 'OWNER' ? 'text-primary-700' : 'text-neutral-900'
                   ]">
@@ -196,9 +200,11 @@ import { checkNickname, registerUser } from '@/api/auth';
 import { useAuthStore } from '@/store/auth';
 import { DEFAULTS, VALIDATION } from '@/constants';
 import { showSuccess } from '@/utils/toast';
+import { createLogger } from '@/utils/logger';
 import BaseInput from '@/components/common/BaseInput.vue';
 import BaseButton from '@/components/common/BaseButton.vue';
 
+const logger = createLogger('NicknameRegistrationView');
 const router = useRouter();
 const authStore = useAuthStore();
 
@@ -272,7 +278,7 @@ const validateNickname = async () => {
         helperMessage.value = '이미 사용 중인 닉네임입니다';
       }
     } catch (error) {
-      console.error('닉네임 중복 확인 실패:', error);
+      logger.error('닉네임 중복 확인 실패', error);
       validationState.value = 'error';
       helperMessage.value = '중복 확인에 실패했습니다. 다시 시도해 주세요.';
     }

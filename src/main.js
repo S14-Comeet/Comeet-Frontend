@@ -6,6 +6,9 @@ import 'vue-toastification/dist/index.css'
 import App from '@/App.vue'
 import router from '@/router'
 import '@/assets/main.css'
+import { createLogger } from '@/utils/logger'
+
+const logger = createLogger('App')
 
 const app = createApp(App)
 
@@ -48,13 +51,13 @@ app.use(Toast, {
                 await authStore.fetchUser()
             } catch (error) {
                 // 토큰이 유효하지 않으면 정리
-                console.warn('[앱 초기화] 사용자 세션 복원 실패:', error)
+                logger.warn('사용자 세션 복원 실패', error)
                 removeAccessToken()
                 authStore.clearUser()
             }
         }
     } catch (error) {
-        console.warn('[앱 초기화] 초기화 중 오류 발생:', error)
+        logger.warn('초기화 중 오류 발생', error)
     }
 })()
 

@@ -4,8 +4,8 @@
     <div class="flex items-center justify-between">
       <h2 class="text-xl font-bold text-textPrimary">즐겨찾기 목록</h2>
       <button
-        @click="$emit('add-folder')"
         class="flex items-center gap-1.5 px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
+        @click="$emit('add-folder')"
       >
         <BaseIcon name="plus" :size="18" color="currentColor" />
         <span>추가</span>
@@ -31,8 +31,8 @@
       >
         <!-- 클릭 가능한 영역 -->
         <div
-          @click="selectFolder(folder)"
           class="flex items-start gap-4 flex-1 min-w-0 cursor-pointer"
+          @click="selectFolder(folder)"
         >
           <!-- 아이콘 -->
           <div class="flex-shrink-0 pt-1">
@@ -78,9 +78,9 @@
         <!-- More 버튼 -->
         <div class="flex-shrink-0 pt-1 relative">
           <button
-            @click.stop="toggleMenu(folder.id)"
             class="p-1 hover:bg-primary-100 rounded-full transition-colors"
             :aria-label="`${folder.name} 옵션`"
+            @click.stop="toggleMenu(folder.id)"
           >
             <BaseIcon
               name="more"
@@ -95,15 +95,15 @@
               class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-border py-1 z-10 min-w-[120px]"
             >
               <button
-                @click.stop="handleEdit(folder)"
                 class="w-full px-4 py-2 text-left text-sm text-textPrimary hover:bg-primary-50 transition-colors flex items-center gap-2"
+                @click.stop="handleEdit(folder)"
               >
                 <BaseIcon name="check" :size="16" color="var(--color-text-primary)" />
                 <span>수정</span>
               </button>
               <button
-                @click.stop="handleDelete(folder)"
                 class="w-full px-4 py-2 text-left text-sm text-error hover:bg-error/10 transition-colors flex items-center gap-2"
+                @click.stop="handleDelete(folder)"
               >
                 <BaseIcon name="x" :size="16" color="var(--color-error)" />
                 <span>삭제</span>
@@ -120,8 +120,8 @@
       <p class="text-textPrimary text-lg font-medium mb-2">즐겨찾기 목록이 없습니다</p>
       <p class="text-textSecondary text-sm mb-4">마음에 드는 카페를 폴더에 저장해보세요</p>
       <button
-        @click="$emit('add-folder')"
         class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
+        @click="$emit('add-folder')"
       >
         첫 목록 만들기
       </button>

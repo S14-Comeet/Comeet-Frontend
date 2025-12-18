@@ -18,9 +18,6 @@
       <!-- Input Element -->
       <input
         :value="modelValue"
-        @input="handleInput"
-        @focus="isFocused = true"
-        @blur="isFocused = false"
         :placeholder="placeholder"
         :disabled="disabled"
         :type="inputType"
@@ -30,15 +27,18 @@
           'flex-1 bg-transparent outline-none text-base leading-normal',
           inputClasses
         ]"
+        @input="handleInput"
+        @focus="isFocused = true"
+        @blur="isFocused = false"
       />
 
       <!-- Right Icon (Clear X) -->
       <button
         v-if="clearable && modelValue && !disabled"
-        @click="handleClear"
         class="shrink-0 w-5 h-5 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors"
         type="button"
         aria-label="Clear input"
+        @click="handleClear"
       >
         <BaseIcon name="x" :size="12" color="currentColor" />
       </button>

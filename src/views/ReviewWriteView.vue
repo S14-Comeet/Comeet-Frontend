@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col h-full bg-white relative">
-    <BaseHeader showBackButton />
+    <BaseHeader show-back-button />
 
     <div class="flex-1 overflow-y-auto pb-24">
       <div class="px-5 py-6">
@@ -9,17 +9,17 @@
         <!-- Review Mode Toggle -->
         <div class="mode-toggle mb-6">
           <button
-            @click="reviewMode = 'simple'"
             class="mode-btn"
             :class="{ 'active': reviewMode === 'simple' }"
+            @click="reviewMode = 'simple'"
           >
             <BaseIcon name="coffee" :size="18" />
             간편 리뷰
           </button>
           <button
-            @click="reviewMode = 'professional'"
             class="mode-btn"
             :class="{ 'active': reviewMode === 'professional' }"
+            @click="reviewMode = 'professional'"
           >
             <BaseIcon name="edit" :size="18" />
             전문 커핑
@@ -106,8 +106,8 @@
               <p class="text-sm text-textSecondary">다른 사용자에게 리뷰를 공개합니다</p>
             </div>
             <input
-              type="checkbox"
               v-model="isPublic"
+              type="checkbox"
               class="toggle-checkbox"
             />
           </label>
@@ -132,6 +132,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { createLogger } from '@/utils/logger'
 import BaseHeader from '@/components/common/BaseHeader.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
@@ -139,6 +140,8 @@ import TastingWheel from '@/components/review/TastingWheel.vue'
 import CuppingNoteForm from '@/components/review/CuppingNoteForm.vue'
 import { createReview, createCuppingNote } from '@/api/review'
 import { showSuccess, showError } from '@/utils/toast'
+
+const logger = createLogger('ReviewWriteView')
 
 const route = useRoute()
 const router = useRouter()
@@ -228,7 +231,7 @@ const handleSubmit = async () => {
       try {
         await createCuppingNote(reviewResponse.data.reviewId, cuppingNote.value)
       } catch (cuppingError) {
-        console.warn('Failed to save cupping note:', cuppingError)
+        logger.warn('Failed to save cupping note', cuppingError)
         // Don't fail the whole review if cupping note fails
       }
     }
@@ -237,7 +240,7 @@ const handleSubmit = async () => {
     router.push({ name: 'map' })
   } catch (error) {
     showError('리뷰 등록에 실패했습니다.')
-    console.error(error)
+    logger.error('리뷰 등록 실패', error)
   } finally {
     isSubmitting.value = false
   }

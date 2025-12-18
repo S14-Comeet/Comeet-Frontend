@@ -27,14 +27,14 @@
       <!-- 액션 버튼 -->
       <div class="flex gap-2 mt-4">
         <button
-            @click="$emit('detail')"
             class="flex-1 px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-500 transition-colors"
+            @click="$emit('detail')"
         >
           상세보기
         </button>
         <button
-            @click="$emit('close')"
             class="px-4 py-2 border border-border rounded-lg text-textSecondary hover:bg-primary-50 transition-colors"
+            @click="$emit('close')"
         >
           닫기
         </button>

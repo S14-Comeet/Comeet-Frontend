@@ -238,8 +238,8 @@
           <div>
             <h3 class="text-sm font-medium text-textSecondary mb-2">로그인 상태 (알림 있음)</h3>
             <BaseHeader
-              :hasNotifications="true"
-              :forceAuthState="true"
+              :has-notifications="true"
+              :force-auth-state="true"
               @notice-click="handleNoticeClick"
               @login="handleLogin"
             />
@@ -248,8 +248,8 @@
           <div>
             <h3 class="text-sm font-medium text-textSecondary mb-2">로그인 상태 (알림 없음)</h3>
             <BaseHeader
-              :hasNotifications="false"
-              :forceAuthState="true"
+              :has-notifications="false"
+              :force-auth-state="true"
               @notice-click="handleNoticeClick"
               @login="handleLogin"
             />
@@ -259,8 +259,8 @@
           <div>
             <h3 class="text-sm font-medium text-textSecondary mb-2">비로그인 상태 (로그인 버튼 표시)</h3>
             <BaseHeader
-              :hasNotifications="false"
-              :forceAuthState="false"
+              :has-notifications="false"
+              :force-auth-state="false"
               @notice-click="handleNoticeClick"
               @login="handleLogin"
             />
@@ -270,9 +270,9 @@
           <div>
             <h3 class="text-sm font-medium text-textSecondary mb-2">로그인 상태 + 뒤로가기 버튼 (알림 페이지용)</h3>
             <BaseHeader
-              :hasNotifications="true"
-              :showBackButton="true"
-              :forceAuthState="true"
+              :has-notifications="true"
+              :show-back-button="true"
+              :force-auth-state="true"
               @notice-click="handleNoticeClick"
               @login="handleLogin"
             />
@@ -331,7 +331,7 @@
               v-model="inputValue6"
               placeholder="Success input"
               status="success"
-              helperText="This is a success message"
+              helper-text="This is a success message"
             />
           </div>
 
@@ -341,7 +341,7 @@
               v-model="inputValue7"
               placeholder="Error input"
               status="error"
-              helperText="This is an error message"
+              helper-text="This is an error message"
               clearable
             />
           </div>
@@ -401,7 +401,7 @@
 
           <div>
             <h3 class="text-sm font-medium text-textSecondary mb-3">Full Width Button</h3>
-            <BaseButton variant="primary" size="large" fullWidth>Full Width Button</BaseButton>
+            <BaseButton variant="primary" size="large" full-width>Full Width Button</BaseButton>
           </div>
         </div>
       </section>
@@ -456,7 +456,7 @@
 
           <div>
             <h3 class="text-sm font-medium text-textSecondary mb-2">Readonly Rating (Small)</h3>
-            <StarRating :modelValue="4" :size="24" :readonly="true" />
+            <StarRating :model-value="4" :size="24" :readonly="true" />
             <p class="text-sm text-textSecondary mt-2">읽기 전용 모드</p>
           </div>
         </div>
@@ -471,8 +471,8 @@
             v-for="review in mockReviews"
             :key="review.reviewId"
             :review="review"
-            :storeName="review.storeName"
-            :menuName="review.menuName"
+            :store-name="review.storeName"
+            :menu-name="review.menuName"
           />
         </div>
 
@@ -512,7 +512,7 @@ const dropdownOptions = [
 const inputValue1 = ref('')
 const inputValue2 = ref('검색어 입력')
 const inputValue3 = ref('Sample text with X')
-const inputValue4 = ref('')
+const _inputValue4 = ref('')
 const inputValue5 = ref('Disabled input')
 const inputValue6 = ref('Success input')
 const inputValue7 = ref('Error input')

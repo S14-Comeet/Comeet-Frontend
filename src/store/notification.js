@@ -1,5 +1,8 @@
 import { defineStore } from 'pinia'
 import { safeStorage } from '@/utils/storage'
+import { createLogger } from '@/utils/logger'
+
+const logger = createLogger('NotificationStore')
 
 /**
  * 알림 상태 관리 Store
@@ -44,7 +47,7 @@ export const useNotificationStore = defineStore('notification', {
         await new Promise(resolve => setTimeout(resolve, 300))
         return this.notifications
       } catch (error) {
-        console.error('[NotificationStore] 알림 목록 조회 실패:', error)
+        logger.error('알림 목록 조회 실패', error)
         throw error
       } finally {
         this.isLoading = false

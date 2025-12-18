@@ -17,12 +17,11 @@
     <!-- Floating 알림 아이콘 (우측 상단) - 로그인 상태일 때만 표시 -->
     <button
         v-if="isAuthenticated"
-        @click="handleNotificationClick"
         class="floating-notification-button"
         aria-label="알림"
+        @click="handleNotificationClick"
     >
       <BaseIcon name="notice" :size="24" color="var(--color-neutral-900)"/>
-      <!-- 읽지 않은 알림 배지 -->
       <span
           v-if="hasUnreadNotifications"
           class="notification-badge"
@@ -32,9 +31,9 @@
     <!-- 이 지역 검색 버튼 (상단 중앙) -->
     <button
         v-if="showSearchButton"
-        @click="handleSearchThisArea"
         class="search-area-button"
         :disabled="isSearching"
+        @click="handleSearchThisArea"
     >
       <BaseIcon v-if="isSearching" name="spinner" :size="16" class="animate-spin" />
       <BaseIcon v-else name="search" :size="16" />
@@ -43,18 +42,15 @@
 
     <!-- 지도 컨트롤 버튼들 (우측) -->
     <div class="map-controls" :style="controlsBottomStyle">
-      <!-- 확대 버튼 -->
-      <button @click="handleZoomIn" class="control-button" aria-label="확대">
+      <button class="control-button" aria-label="확대" @click="handleZoomIn">
         <BaseIcon name="plus" :size="20" />
       </button>
-      <!-- 축소 버튼 -->
-      <button @click="handleZoomOut" class="control-button" aria-label="축소">
+      <button class="control-button" aria-label="축소" @click="handleZoomOut">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M5 12H19" stroke-linecap="round" />
         </svg>
       </button>
-      <!-- 내 위치 버튼 -->
-      <button @click="handleMyLocation" class="control-button" aria-label="내 위치" :disabled="isLocating">
+      <button class="control-button" aria-label="내 위치" :disabled="isLocating" @click="handleMyLocation">
         <BaseIcon v-if="isLocating" name="spinner" :size="20" class="animate-spin" />
         <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="3" />
@@ -63,20 +59,25 @@
       </button>
     </div>
 
-    <!-- 가게 리스트 바텀시트 -->
+    <!-- 통합 검색 + 가게 리스트 바텀시트 -->
     <StoreListSheet
         :stores="stores"
+        :is-searching="isSearching"
+        :initial-keyword="searchKeyword"
+        :initial-categories="searchCategories"
+        :initial-global-search="isGlobalSearch"
+        :force-state="forceSheetState"
         @select-store="handleStoreSelect"
         @state-change="handleSheetStateChange"
+        @search="handleSearch"
     />
 
-    <!-- 마커 클릭 시 간단 정보 (바텀시트 위에 표시) -->
-    <MapPlaceInfo
-        v-if="selectedPlace"
-        :place="selectedPlace"
-        @close="selectedPlace = null"
-        @detail="handleShowDetail"
-        class="absolute bottom-0 left-0 right-0 z-50"
+    <!-- 마커 클릭 시 팝업 (마커 위치에 표시) -->
+    <MarkerPopup
+        :store="popupStore"
+        :position="popupPosition"
+        @close="closePopup"
+        @detail="handlePopupDetail"
     />
 
     <MapPlaceDetail
@@ -88,228 +89,278 @@
 </template>
 
 <script setup>
-import {ref, onMounted, computed} from 'vue'
-import {useRouter} from 'vue-router'
-import {useNaverMap} from '@/composables/useNaverMap'
-import {useGeolocation} from '@/composables/useGeolocation'
-import {useToast} from 'vue-toastification'
-import {useNotificationStore} from '@/store/notification'
-import {useAuthStore} from '@/store/auth'
-import {useSavedStore} from '@/store/saved'
-import {getStoresByLocation} from '@/api/cafe'
-import MapPlaceInfo from "@/components/map/MapPlaceInfo.vue"
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useNaverMap } from '@/composables/useNaverMap'
+import { useGeolocation } from '@/composables/useGeolocation'
+import { useMapMarkers } from '@/composables/useMapMarkers'
+import { useMapPopup } from '@/composables/useMapPopup'
+import { useMapControls } from '@/composables/useMapControls'
+import { useToast } from 'vue-toastification'
+import { useNotificationStore } from '@/store/notification'
+import { useAuthStore } from '@/store/auth'
+import { useSavedStore } from '@/store/saved'
+import { getStoresByLocation } from '@/api/cafe'
+import { calculateDistance, formatDistance } from '@/utils/geo'
+import { createLogger } from '@/utils/logger'
+import MarkerPopup from "@/components/map/MarkerPopup.vue"
 import MapPlaceDetail from "@/components/map/MapPlaceDetail.vue"
 import StoreListSheet from "@/components/map/StoreListSheet.vue"
 import BaseIcon from '@/components/common/BaseIcon.vue'
 
+const logger = createLogger('MapView')
 const router = useRouter()
 const toast = useToast()
 const notificationStore = useNotificationStore()
 const authStore = useAuthStore()
 const savedStore = useSavedStore()
+
+// 기본 상태
 const mapContainer = ref(null)
 const isLoading = ref(true)
 const isSearching = ref(false)
 const isLocating = ref(false)
 const showSearchButton = ref(false)
-const {location, requestLocation} = useGeolocation()
-const {map, initMap, addMarker, clearMarkers} = useNaverMap()
-const selectedPlace = ref(null)
 const detailPlace = ref(null)
-
-// 마지막 검색 위치 (중복 검색 방지)
+const stores = ref([])
+const userLocation = ref(null)
 const lastSearchCenter = ref(null)
+const forceSheetState = ref(null)
 
-// 내 위치 마커 (가게 마커와 별도 관리)
-const myLocationMarker = ref(null)
+// 검색 관련 상태
+const isGlobalSearch = ref(false)
+const searchKeyword = ref('')
+const searchCategories = ref([])
+const searchLocation = ref(null) // 검색용 위치 (키워드/"이 지역" 검색 시에만 업데이트)
 
-// 바텀시트 상태
-const sheetState = ref('collapsed')
+// Composables
+const { location, requestLocation } = useGeolocation()
+const { map, markers, initMap, addMarker, clearMarkers } = useNaverMap()
+
+// Map composables (map이 초기화된 후 사용)
+const {
+  updateMyLocationMarker,
+  updateMarkerSizes,
+  renderMarkers: renderMarkersBase,
+  cleanup: cleanupMarkers
+} = useMapMarkers(map, markers, clearMarkers, addMarker)
+
+const {
+  popupStore,
+  popupPosition,
+  updatePopupPosition,
+  throttledUpdatePopupPosition,
+  showPopupOnly,
+  closePopup,
+  cleanup: cleanupPopup
+} = useMapPopup(map)
+
+const {
+  controlsBottomStyle,
+  getRadiusFromBounds,
+  panToWithOffset,
+  handleZoomIn,
+  handleZoomOut,
+  setFocusedLocation,
+  clearFocusedLocation,
+  setSheetState
+} = useMapControls(map)
 
 // 인증 상태
 const isAuthenticated = computed(() => authStore.isAuthenticated)
-
-// 읽지 않은 알림이 있는지
 const hasUnreadNotifications = computed(() => notificationStore.hasUnread)
-
-// 시트 상태에 따른 컨트롤 버튼 위치
-const controlsBottomStyle = computed(() => {
-  const bottomValues = {
-    collapsed: '100px',
-    half: 'calc(50vh + 16px)',
-    full: 'calc(85vh + 16px)'
-  }
-  return { bottom: bottomValues[sheetState.value] || '100px' }
-})
 
 // 알림 아이콘 클릭 핸들러
 const handleNotificationClick = () => {
   router.push('/notifications')
 }
 
-// 내 위치 마커 생성/업데이트
-const updateMyLocationMarker = (lat, lng) => {
-  if (!map.value) return
-
-  // 기존 마커가 있으면 위치만 업데이트
-  if (myLocationMarker.value) {
-    myLocationMarker.value.setPosition(new naver.maps.LatLng(lat, lng))
-    return
-  }
-
-  // 내 위치 마커 스타일 (파란 점 + 펄스 효과)
-  const markerIcon = {
-    content: `
-      <div style="position: relative;">
-        <div style="
-          width: 16px;
-          height: 16px;
-          background-color: #4285F4;
-          border: 3px solid white;
-          border-radius: 50%;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-        "></div>
-        <div style="
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 40px;
-          height: 40px;
-          background-color: rgba(66, 133, 244, 0.2);
-          border-radius: 50%;
-          animation: pulse 2s infinite;
-        "></div>
-      </div>
-      <style>
-        @keyframes pulse {
-          0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
-          100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
-        }
-      </style>
-    `,
-    anchor: new naver.maps.Point(8, 8)
-  }
-
-  myLocationMarker.value = new naver.maps.Marker({
-    position: new naver.maps.LatLng(lat, lng),
-    map: map.value,
-    icon: markerIcon,
-    zIndex: 1000 // 가게 마커보다 위에 표시
-  })
-}
-
-// Haversine 공식으로 두 좌표 간 거리 계산 (미터 단위)
-const calculateDistance = (lat1, lng1, lat2, lng2) => {
-  const R = 6371000 // 지구 반지름 (미터)
-  const dLat = (lat2 - lat1) * Math.PI / 180
-  const dLng = (lng2 - lng1) * Math.PI / 180
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLng / 2) * Math.sin(dLng / 2)
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-  return R * c
-}
-
-// 지도 bounds에서 radius 계산
-const getRadiusFromBounds = () => {
-  if (!map.value) return 1000
-
-  const bounds = map.value.getBounds()
-  const center = map.value.getCenter()
-  const ne = bounds.getNE() // 북동쪽 꼭지점
-
-  const radius = calculateDistance(
-    center.lat(), center.lng(),
-    ne.lat(), ne.lng()
-  )
-
-  // 최소 100m, 최대 50km
-  return Math.max(100, Math.min(Math.round(radius), 50000))
-}
-
-// 가게 목록
-const stores = ref([])
-
 // 위치 기반 가게 목록 불러오기
-const fetchStores = async (latitude, longitude, radius = 1000) => {
+const fetchStores = async (latitude, longitude, radius = 1000, options = {}) => {
   try {
-    const response = await getStoresByLocation({ latitude, longitude, radius })
+    const params = { latitude, longitude, radius }
+
+    if (options.keyword) {
+      params.keyword = options.keyword
+    }
+    if (options.categories) {
+      params.categories = options.categories
+    }
+
+    const response = await getStoresByLocation(params)
     if (response.data && response.data.stores) {
-      stores.value = response.data.stores
-      return response.data.stores
+      let storeList = response.data.stores
+
+      const refLat = userLocation.value?.lat || latitude
+      const refLng = userLocation.value?.lng || longitude
+
+      storeList = storeList.map(store => {
+        const storeLat = store.lat || store.latitude
+        const storeLng = store.lng || store.longitude
+        const distance = calculateDistance(refLat, refLng, storeLat, storeLng)
+        return {
+          ...store,
+          distance,
+          distanceText: formatDistance(distance)
+        }
+      })
+
+      storeList.sort((a, b) => a.distance - b.distance)
+
+      stores.value = storeList
+      return storeList
     }
     return []
   } catch (error) {
-    console.error('[MapView] 가게 목록 조회 실패:', error)
-    toast.error('가게 목록을 불러오는데 실패했습니다.')
+    logger.error('가게 목록 조회 실패', error)
     return []
   }
 }
 
+// 마커 렌더링 (클릭 핸들러 포함)
 const renderMarkers = (cafes = [], moveToFirst = false) => {
-  clearMarkers()
+  renderMarkersBase(cafes, handleMarkerClick)
 
-  cafes.forEach((cafe) => {
-    addMarker({
-      position: {
-        lat: cafe.lat || cafe.latitude,
-        lng: cafe.lng || cafe.longitude
-      },
-      title: cafe.name,
-      onClick: () => handleMarkerClick(cafe),
-    })
-  })
-
-  // moveToFirst가 true일 때만 첫 번째 카페로 이동
   if (moveToFirst && cafes.length > 0 && map.value) {
     const firstCafe = cafes[0]
-    const center = new naver.maps.LatLng(
-        firstCafe.lat || firstCafe.latitude,
-        firstCafe.lng || firstCafe.longitude
-    )
-    map.value.setCenter(center)
+    const lat = firstCafe.lat || firstCafe.latitude
+    const lng = firstCafe.lng || firstCafe.longitude
     map.value.setZoom(13)
+    setTimeout(() => {
+      panToWithOffset(lat, lng, { offsetRatio: 0.3 })
+    }, 50)
   }
 }
 
-const handleMarkerClick = (cafe) => {
-  selectedPlace.value = cafe
+// 지도 이동 후 팝업 표시
+const showStorePopup = (store) => {
+  if (!map.value) return
+
+  const lat = store.lat || store.latitude
+  const lng = store.lng || store.longitude
+
+  panToWithOffset(lat, lng, { offsetRatio: 0.25 })
+
+  setTimeout(() => {
+    popupStore.value = store
+    updatePopupPosition()
+  }, 150)
 }
 
-const handleShowDetail = () => {
-  if (selectedPlace.value) {
-    const storeId = selectedPlace.value.storeId || selectedPlace.value.id
+// 마커 클릭 핸들러
+const handleMarkerClick = (cafe) => {
+  const lat = cafe.lat || cafe.latitude
+  const lng = cafe.lng || cafe.longitude
+  setFocusedLocation(lat, lng)
+  showPopupOnly(cafe)
+}
+
+// 팝업에서 상세보기 클릭
+const handlePopupDetail = (store) => {
+  if (store) {
+    const storeId = store.storeId || store.id
     router.push({
       name: 'store-detail',
       params: { storeId }
     })
   }
-  selectedPlace.value = null
+  popupStore.value = null
 }
 
-// 바텀시트에서 가게 선택 - 상세 페이지로 이동
+// 바텀시트에서 가게 선택
 const handleStoreSelect = (store) => {
   if (store) {
-    const storeId = store.storeId || store.id
-    router.push({
-      name: 'store-detail',
-      params: { storeId },
-      query: {
-        name: store.name,
-        lat: store.lat || store.latitude,
-        lng: store.lng || store.longitude,
-        address: store.address,
-        category: store.category
+    const lat = store.lat || store.latitude
+    const lng = store.lng || store.longitude
+    setFocusedLocation(lat, lng)
+
+    forceSheetState.value = 'half'
+    setTimeout(() => {
+      forceSheetState.value = null
+    }, 100)
+
+    showStorePopup(store)
+  }
+}
+
+// 검색 실행
+const handleSearch = async (searchParams) => {
+  if (!map.value) return
+
+  isSearching.value = true
+  showSearchButton.value = false
+
+  try {
+    let lat, lng, radius
+    const isKeywordSearch = searchParams.searchType !== 'category'
+
+    // 카테고리 검색일 때는 저장된 searchLocation 사용
+    if (searchParams.searchType === 'category' && searchLocation.value) {
+      lat = searchLocation.value.lat
+      lng = searchLocation.value.lng
+      radius = searchLocation.value.radius
+    } else if (searchParams.isGlobalSearch) {
+      // 전국 검색
+      if (userLocation.value) {
+        lat = userLocation.value.lat
+        lng = userLocation.value.lng
+      } else {
+        const center = map.value.getCenter()
+        lat = center.lat()
+        lng = center.lng()
       }
+      radius = 50000
+
+      // 키워드 검색 시 위치 저장
+      if (isKeywordSearch) {
+        searchLocation.value = { lat, lng, radius }
+      }
+    } else {
+      // 지도 영역 검색
+      const center = map.value.getCenter()
+      lat = center.lat()
+      lng = center.lng()
+      radius = getRadiusFromBounds()
+
+      // 키워드 검색 시 위치 저장
+      if (isKeywordSearch) {
+        searchLocation.value = { lat, lng, radius }
+      }
+    }
+
+    const storeList = await fetchStores(lat, lng, radius, {
+      keyword: searchParams.keyword,
+      categories: searchParams.categories
     })
+
+    renderMarkers(storeList, false)
+
+    searchKeyword.value = searchParams.keyword || ''
+    searchCategories.value = typeof searchParams.categories === 'string' ? searchParams.categories.split(',') : []
+    isGlobalSearch.value = searchParams.isGlobalSearch
+
+    lastSearchCenter.value = { lat, lng }
+
+    forceSheetState.value = 'full'
+    setTimeout(() => {
+      forceSheetState.value = null
+    }, 100)
+
+    if (storeList.length === 0) {
+      toast.info('검색 결과가 없습니다.')
+    }
+  } finally {
+    isSearching.value = false
   }
 }
 
 // 바텀시트 상태 변경
 const handleSheetStateChange = (state) => {
-  sheetState.value = state
+  setSheetState(state)
+
+  if (state === 'full') {
+    closePopup()
+  }
 }
 
 // 이 지역 검색
@@ -322,35 +373,27 @@ const handleSearchThisArea = async () => {
   try {
     const center = map.value.getCenter()
     const radius = getRadiusFromBounds()
+    const lat = center.lat()
+    const lng = center.lng()
 
-    const storeList = await fetchStores(center.lat(), center.lng(), radius)
+    // 검색 위치 저장
+    searchLocation.value = { lat, lng, radius }
+
+    // 검색어/카테고리 초기화 (이 지역 검색은 새 검색)
+    searchKeyword.value = ''
+    searchCategories.value = []
+
+    const storeList = await fetchStores(lat, lng, radius)
     renderMarkers(storeList, false)
 
-    // 마지막 검색 위치 저장
-    lastSearchCenter.value = { lat: center.lat(), lng: center.lng() }
+    lastSearchCenter.value = { lat, lng }
 
     if (storeList.length === 0) {
       toast.info('이 지역에 등록된 카페가 없습니다.')
-    } else {
-      toast.success(`${storeList.length}개의 카페를 찾았습니다.`)
     }
   } finally {
     isSearching.value = false
   }
-}
-
-// 확대
-const handleZoomIn = () => {
-  if (!map.value) return
-  const currentZoom = map.value.getZoom()
-  map.value.setZoom(currentZoom + 1)
-}
-
-// 축소
-const handleZoomOut = () => {
-  if (!map.value) return
-  const currentZoom = map.value.getZoom()
-  map.value.setZoom(currentZoom - 1)
 }
 
 // 내 위치로 이동
@@ -363,9 +406,10 @@ const handleMyLocation = async () => {
     await requestLocation()
 
     if (location.value && map.value) {
-      map.value.setCenter(new naver.maps.LatLng(location.value.lat, location.value.lng))
-      // 배율은 변경하지 않음
+      panToWithOffset(location.value.lat, location.value.lng, { offsetRatio: 0.3 })
       updateMyLocationMarker(location.value.lat, location.value.lng)
+      userLocation.value = { lat: location.value.lat, lng: location.value.lng }
+      setFocusedLocation(location.value.lat, location.value.lng)
       showSearchButton.value = true
     }
   } catch {
@@ -375,7 +419,7 @@ const handleMyLocation = async () => {
   }
 }
 
-// 지도 이동 시 "이 지역 검색" 버튼 표시 여부 확인
+// 지도 이동 시 검색 버튼 표시 여부
 const checkShowSearchButton = () => {
   if (!map.value || !lastSearchCenter.value) {
     showSearchButton.value = true
@@ -388,79 +432,91 @@ const checkShowSearchButton = () => {
     center.lat(), center.lng()
   )
 
-  // 100m 이상 이동했으면 버튼 표시
   showSearchButton.value = distance > 100
 }
 
-// 🗺️ 지도 초기화
+// 지도 초기화
 onMounted(async () => {
   try {
-    const defaultCenter = {lat: 37.5665, lng: 126.978}
+    const defaultCenter = { lat: 37.5665, lng: 126.978 }
 
     await initMap(mapContainer.value, {
       center: defaultCenter,
       zoom: 15,
     })
 
-    // SavedView에서 선택된 폴더 정보 확인 (Pinia store에서)
     const hasSelectedFolder = savedStore.selectedFolder && savedStore.selectedFolderCafes.length > 0
 
     if (hasSelectedFolder) {
-      // 저장된 폴더의 카페를 지도에 표시
       renderMarkers(savedStore.selectedFolderCafes, true)
-
-      // 사용 후 store 초기화 (다음 방문 시 기본 지도 표시)
       savedStore.clearSelectedFolder()
     } else {
       let centerLat = defaultCenter.lat
       let centerLng = defaultCenter.lng
 
-      // 🗺️ 현재 위치 요청 (실패해도 지도는 표시)
       try {
         await requestLocation()
-        // 현재 위치로 지도 이동
         if (location.value && map.value) {
           centerLat = location.value.lat
           centerLng = location.value.lng
-          map.value.setCenter(new naver.maps.LatLng(centerLat, centerLng))
-          // 내 위치 마커 표시
+          panToWithOffset(centerLat, centerLng, { offsetRatio: 0.3 })
           updateMyLocationMarker(centerLat, centerLng)
+          userLocation.value = { lat: centerLat, lng: centerLng }
+          setFocusedLocation(centerLat, centerLng)
         }
       } catch {
-        // 위치 권한 거부 또는 타임아웃 - 기본 위치 사용
-        console.warn('[지도] 현재 위치를 가져올 수 없어 기본 위치를 사용합니다.')
+        logger.warn('현재 위치를 가져올 수 없어 기본 위치를 사용합니다.')
       }
 
-      // 초기 검색
       const radius = getRadiusFromBounds()
       const storeList = await fetchStores(centerLat, centerLng, radius)
       renderMarkers(storeList, false)
 
-      // 마지막 검색 위치 저장
       lastSearchCenter.value = { lat: centerLat, lng: centerLng }
+      // 초기 검색 위치 저장
+      searchLocation.value = { lat: centerLat, lng: centerLng, radius }
     }
 
-    // 지도 이동 완료 시 "이 지역 검색" 버튼 표시 여부 확인
     if (map.value) {
       naver.maps.Event.addListener(map.value, 'idle', () => {
         checkShowSearchButton()
+        updatePopupPosition()
       })
+
+      naver.maps.Event.addListener(map.value, 'zoom_changed', () => {
+        throttledUpdatePopupPosition()
+        updateMarkerSizes()
+      })
+      naver.maps.Event.addListener(map.value, 'center_changed', throttledUpdatePopupPosition)
+      naver.maps.Event.addListener(map.value, 'drag', () => {
+        throttledUpdatePopupPosition()
+        clearFocusedLocation()
+      })
+      naver.maps.Event.addListener(map.value, 'zooming', throttledUpdatePopupPosition)
+
+      naver.maps.Event.addListener(map.value, 'click', closePopup)
     }
   } catch (error) {
-    console.error('[MapView] 초기화 실패:', error)
+    logger.error('초기화 실패', error)
     toast.error('지도를 불러오는데 실패했습니다.')
   } finally {
     isLoading.value = false
   }
 })
+
+// 컴포넌트 언마운트 시 정리
+onUnmounted(() => {
+  cleanupPopup()
+  cleanupMarkers()
+})
 </script>
 
 <style scoped>
-/* Floating 알림 버튼 - BaseHeader와 동일한 위치 및 크기 */
+/* Floating 알림 버튼 */
 .floating-notification-button {
   position: absolute;
-  top: 0.5rem;
-  right: 1.25rem;
+  top: 0.75rem;
+  right: 1rem;
   z-index: 100;
   width: 2.5rem;
   height: 2.5rem;
@@ -551,7 +607,7 @@ onMounted(async () => {
   background-color: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 0.625rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 200ms ease;
   color: var(--color-neutral-700);
@@ -575,8 +631,8 @@ onMounted(async () => {
 /* 모바일에서 Safe Area 대응 */
 @media (max-width: 640px) {
   .floating-notification-button {
-    top: max(0.5rem, env(safe-area-inset-top));
-    right: max(1.25rem, env(safe-area-inset-right));
+    top: max(0.75rem, env(safe-area-inset-top));
+    right: max(1rem, env(safe-area-inset-right));
   }
 
   .search-area-button {

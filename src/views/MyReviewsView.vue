@@ -1,6 +1,6 @@
 <template>
   <div class="my-reviews-view h-full flex flex-col bg-background">
-    <BaseHeader title="내 리뷰" showBackButton />
+    <BaseHeader title="내 리뷰" show-back-button />
 
     <div class="flex-1 overflow-y-auto px-4 py-6">
       <!-- Loading State -->

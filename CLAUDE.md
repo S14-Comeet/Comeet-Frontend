@@ -48,11 +48,11 @@ src/
 │   ├── map/        # Map-specific components (MapControls, MapPlaceInfo, MapPlaceDetail, etc.)
 │   ├── saved/      # Saved cafes feature components
 │   └── review/     # Review feature components
-├── composables/    # Vue composables (useGeolocation, useNaverMap)
+├── composables/    # Vue composables (useGeolocation, useNaverMap, useMapMarkers, useMapPopup, useMapControls)
 ├── constants/      # App-wide constants (STORAGE_KEYS, etc.)
 ├── router/         # Vue Router configuration with auth guards
 ├── store/          # Pinia stores (auth, saved, notification, flavor, etc.)
-├── utils/          # Utility functions (storage, logger, toast, geolocation)
+├── utils/          # Utility functions (storage, logger, toast, geolocation, geo)
 ├── views/          # Page components (MapView, LoginView, ProfileView, MenuView, ReviewWriteView, etc.)
 ├── App.vue         # Root component with responsive layout shell
 ├── config.js       # App configuration (reads from .env)
@@ -100,6 +100,8 @@ src/
 **API Layer**:
 - Centralized axios instance in `src/api/axios.js` with `baseURL` from config
 - Credentials included (`withCredentials: true`) for cookie-based refresh tokens
+- 30-second request timeout with network error handling (timeout/offline detection)
+- Token refresh queue with max 10 pending requests to prevent memory leaks
 - Domain-specific API clients in `src/api/` (e.g., `auth.js`, `cafe.js`)
 - Error handling: Non-401 errors trigger toast notifications via `showApiError()`
 
@@ -134,9 +136,29 @@ src/
 - IMPORTANT: Colors 400 and 950 also defined in `:root` as workaround for Tailwind v4 bug
 
 **Naver Maps Integration**:
-- `src/composables/useNaverMap.js` provides map initialization and marker management
+- `src/composables/useNaverMap.js` provides map initialization and basic marker management
 - Global Naver Maps script loaded via `index.html` with client ID from env
 - `waitForNaverMaps()` helper polls for `window.naver.maps` availability before initialization
+- Map-related composables are modular and inject dependencies:
+  - `useMapMarkers(map, markers, clearMarkers, addMarker)`: Marker rendering with zoom-based scaling, my-location marker
+  - `useMapPopup(map)`: Popup positioning with RAF-throttled updates during map events
+  - `useMapControls(map)`: Zoom controls with visual center pivot, bottom sheet offset handling
+
+**Map Search Logic**:
+- `searchLocation` ref stores the search coordinates separately from map center
+- Keyword search / "이 지역 검색": Updates `searchLocation` to current map center
+- Category filter: Uses existing `searchLocation` without updating (preserves search area)
+- `searchType` parameter distinguishes search intent: `'keyword'` vs `'category'`
+
+**Geolocation**:
+- `src/composables/useGeolocation.js` provides location access with comprehensive error handling
+- Supports options: `showToast` (default: true), `timeout` (default: 10000ms), `maximumAge` (default: 60000ms)
+- Returns `location` (with lat, lng, accuracy, timestamp), `isLoading`, `error`, `requestLocation()`, `clearLocation()`
+
+**Geo Utilities** (`src/utils/geo.js`):
+- `calculateDistance(lat1, lng1, lat2, lng2)`: Haversine formula distance in meters
+- `formatDistance(meters)`: Human-readable format (e.g., "500m", "1.2km")
+- `isValidCoordinate(lat, lng)`: Validates coordinate ranges
 
 ## Configuration Notes
 

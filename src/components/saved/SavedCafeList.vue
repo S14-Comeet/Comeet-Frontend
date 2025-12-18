@@ -4,9 +4,9 @@
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
         <button
-          @click="$emit('back')"
           class="p-2 hover:bg-primary-50 rounded-full transition-colors"
           aria-label="뒤로 가기"
+          @click="$emit('back')"
         >
           <BaseIcon name="chevron-left" :size="24" color="var(--color-primary)" />
         </button>

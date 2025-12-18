@@ -2,9 +2,9 @@
   <div class="flex flex-col gap-2">
     <!-- 내 위치 버튼 -->
     <button
-        @click="$emit('request-location')"
         class="bg-white rounded-full p-3 shadow-lg hover:shadow-xl transition"
         title="내 위치로 이동"
+        @click="$emit('request-location')"
     >
       <svg class="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 20 20">
         <path

@@ -13,9 +13,9 @@
       >
         <!-- 닫기 버튼 -->
         <button
-            @click="$emit('close')"
             class="absolute top-4 right-4 text-textSecondary hover:text-primary hover:bg-primary-50 rounded-full p-1 transition-all"
             aria-label="장소 상세 닫기"
+            @click="$emit('close')"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -66,7 +66,10 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { createLogger } from '@/utils/logger'
 import BaseButton from '@/components/common/BaseButton.vue'
+
+const logger = createLogger('MapPlaceDetail')
 
 const props = defineProps({
   place: Object,
@@ -81,7 +84,7 @@ const goToReview = () => {
   const id = props.place.storeId || props.place.id
   
   if (!id) {
-    console.warn('Store ID not found in place object:', props.place)
+    logger.warn('Store ID not found in place object', props.place)
     return
   }
 
