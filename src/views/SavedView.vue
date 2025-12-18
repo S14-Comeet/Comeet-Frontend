@@ -5,8 +5,8 @@
       <BaseIcon name="user-line" :size="64" class="text-textSecondary mb-6" />
       <p class="text-textSecondary text-base mb-6">저장 목록을 확인하려면 로그인해주세요</p>
       <button
-        @click="goToLogin"
         class="px-6 py-3 bg-primary text-white rounded-lg text-base font-medium hover:bg-primary-700 transition-colors"
+        @click="goToLogin"
       >
         로그인하기
       </button>

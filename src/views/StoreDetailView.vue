@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col min-h-full bg-background">
     <!-- Header -->
-    <BaseHeader showBackButton :title="store?.name || '가게 정보'" />
+    <BaseHeader show-back-button :title="store?.name || '가게 정보'" />
 
     <!-- Loading State -->
     <div v-if="isLoading" class="flex-1 flex items-center justify-center">
@@ -50,9 +50,9 @@
             <h1 class="text-2xl font-bold text-textPrimary">{{ store.name }}</h1>
           </div>
           <button
-            @click="toggleBookmark"
             class="bookmark-btn"
             :class="{ 'is-bookmarked': isBookmarked }"
+            @click="toggleBookmark"
           >
             <BaseIcon :name="isBookmarked ? 'bookmark-fill' : 'bookmark-line'" :size="24" />
           </button>
@@ -100,7 +100,7 @@
           </div>
 
           <!-- Map Button -->
-          <button @click="showOnMap" class="detail-item map-button">
+          <button class="detail-item map-button" @click="showOnMap">
             <BaseIcon name="map-marker" :size="20" class="text-primary" />
             <div class="detail-content">
               <span class="detail-label">위치</span>
@@ -143,12 +143,12 @@
           <div class="flex items-center gap-2">
             <button
               v-if="reviews.length > 3"
-              @click="showAllReviews = !showAllReviews"
               class="text-primary text-sm font-medium"
+              @click="showAllReviews = !showAllReviews"
             >
               {{ showAllReviews ? '접기' : '전체 보기' }}
             </button>
-            <button @click="goToReview" class="review-write-btn">
+            <button class="review-write-btn" @click="goToReview">
               <BaseIcon name="pencil" :size="14" />
               <span>작성하기</span>
             </button>
@@ -331,7 +331,7 @@ const copyAddress = async () => {
   try {
     await navigator.clipboard.writeText(store.value.address)
     showSuccess('주소가 복사되었습니다')
-  } catch (e) {
+  } catch {
     showError('주소 복사에 실패했습니다')
   }
 }

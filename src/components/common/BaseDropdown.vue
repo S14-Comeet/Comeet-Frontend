@@ -13,14 +13,14 @@
         'flex items-center justify-between pl-5 pr-3 py-2 rounded-xl w-full',
         dropdownClasses
       ]"
-        @click="toggleDropdown"
-        @keydown="handleKeyDown"
-        @focus="isFocused = true"
-        @blur="isFocused = false"
         :aria-expanded="isOpen"
         :aria-controls="listboxId"
         aria-haspopup="listbox"
         :disabled="disabled"
+        @click="toggleDropdown"
+        @keydown="handleKeyDown"
+        @focus="isFocused = true"
+        @blur="isFocused = false"
     >
       <!-- Label -->
       <span

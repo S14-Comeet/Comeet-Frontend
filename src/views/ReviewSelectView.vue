@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col h-full bg-white">
-    <BaseHeader showBackButton />
+    <BaseHeader show-back-button />
 
     <div class="flex-1 overflow-y-auto">
       <div class="px-5 py-6">
@@ -163,7 +163,7 @@ const fetchMenus = async () => {
         image_url: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=400&fit=crop'
       }
     ]
-  } catch (e) {
+  } catch {
     showError('메뉴 목록을 불러오지 못했습니다.')
   } finally {
     isLoadingMenus.value = false

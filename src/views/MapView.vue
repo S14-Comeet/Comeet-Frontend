@@ -17,9 +17,9 @@
     <!-- Floating 알림 아이콘 (우측 상단) - 로그인 상태일 때만 표시 -->
     <button
         v-if="isAuthenticated"
-        @click="handleNotificationClick"
         class="floating-notification-button"
         aria-label="알림"
+        @click="handleNotificationClick"
     >
       <BaseIcon name="notice" :size="24" color="var(--color-neutral-900)"/>
       <span
@@ -31,9 +31,9 @@
     <!-- 이 지역 검색 버튼 (상단 중앙) -->
     <button
         v-if="showSearchButton"
-        @click="handleSearchThisArea"
         class="search-area-button"
         :disabled="isSearching"
+        @click="handleSearchThisArea"
     >
       <BaseIcon v-if="isSearching" name="spinner" :size="16" class="animate-spin" />
       <BaseIcon v-else name="search" :size="16" />
@@ -42,15 +42,15 @@
 
     <!-- 지도 컨트롤 버튼들 (우측) -->
     <div class="map-controls" :style="controlsBottomStyle">
-      <button @click="handleZoomIn" class="control-button" aria-label="확대">
+      <button class="control-button" aria-label="확대" @click="handleZoomIn">
         <BaseIcon name="plus" :size="20" />
       </button>
-      <button @click="handleZoomOut" class="control-button" aria-label="축소">
+      <button class="control-button" aria-label="축소" @click="handleZoomOut">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M5 12H19" stroke-linecap="round" />
         </svg>
       </button>
-      <button @click="handleMyLocation" class="control-button" aria-label="내 위치" :disabled="isLocating">
+      <button class="control-button" aria-label="내 위치" :disabled="isLocating" @click="handleMyLocation">
         <BaseIcon v-if="isLocating" name="spinner" :size="20" class="animate-spin" />
         <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="3" />
@@ -156,8 +156,6 @@ const {
 } = useMapPopup(map)
 
 const {
-  focusedLocation,
-  sheetState,
   controlsBottomStyle,
   getRadiusFromBounds,
   panToWithOffset,

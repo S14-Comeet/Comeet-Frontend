@@ -13,15 +13,15 @@
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-xl font-bold text-textPrimary">즐겨찾기 목록 추가</h2>
           <button
-            @click="handleClose"
             class="text-textSecondary hover:text-primary hover:bg-primary-50 rounded-full p-1 transition-all"
+            @click="handleClose"
           >
             <BaseIcon name="x" :size="24" />
           </button>
         </div>
 
         <!-- 폼 -->
-        <form @submit.prevent="handleSubmit" class="space-y-4">
+        <form class="space-y-4" @submit.prevent="handleSubmit">
           <!-- 아이콘 선택 -->
           <div>
             <label class="block text-sm font-medium text-textPrimary mb-2">
@@ -32,13 +32,13 @@
                 v-for="icon in availableIcons"
                 :key="icon"
                 type="button"
-                @click="formData.icon = icon"
                 :class="[
                   'p-3 rounded-lg border-2 transition-all flex items-center justify-center',
                   formData.icon === icon
                     ? 'border-primary bg-primary-50'
                     : 'border-border hover:border-primary-300 hover:bg-primary-25'
                 ]"
+                @click="formData.icon = icon"
               >
                 <BaseIcon
                   :name="icon"
@@ -81,8 +81,8 @@
               type="button"
               variant="secondary"
               size="medium"
-              @click="handleClose"
               class="flex-1"
+              @click="handleClose"
             >
               취소
             </BaseButton>

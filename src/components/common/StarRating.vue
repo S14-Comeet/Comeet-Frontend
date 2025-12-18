@@ -51,7 +51,7 @@ const updateRating = (value) => {
   emit('update:modelValue', value)
 }
 
-const getIconName = (index) => {
+const getIconName = (_index) => {
   // Assuming 'star-fill' and 'star-line' or similar exist in BaseIcon/assets. 
   // Checking file list... assets/icons has bookmark, home, map, user. 
   // I might need to check if star icon exists or use a fallback. 

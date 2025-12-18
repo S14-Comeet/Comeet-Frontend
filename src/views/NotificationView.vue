@@ -6,15 +6,15 @@
         <div class="flex gap-2">
           <button
             v-if="notifications.length > 0"
-            @click="handleMarkAllAsRead"
             class="text-sm text-primary hover:text-primary-700 font-medium transition-colors"
+            @click="handleMarkAllAsRead"
           >
             모두 읽음
           </button>
           <button
             v-if="notifications.length > 0"
-            @click="showDeleteAllModal = true"
             class="text-sm text-textSecondary hover:text-error font-medium transition-colors"
+            @click="showDeleteAllModal = true"
           >
             모두 지우기
           </button>
@@ -30,8 +30,8 @@
           <div
             v-for="notification in unreadNotifications"
             :key="notification.id"
-            @click="handleNotificationClick(notification)"
             class="notification-item unread"
+            @click="handleNotificationClick(notification)"
           >
             <div class="notification-icon">
               <BaseIcon
@@ -49,9 +49,9 @@
               <span class="notification-time">{{ formatTime(notification.createdAt) }}</span>
             </div>
             <button
-              @click.stop="handleDeleteNotification(notification.id)"
               class="delete-button"
               aria-label="삭제"
+              @click.stop="handleDeleteNotification(notification.id)"
             >
               <BaseIcon name="x" :size="20" color="var(--color-textSecondary)" />
             </button>
@@ -66,8 +66,8 @@
           <div
             v-for="notification in readNotifications"
             :key="notification.id"
-            @click="handleNotificationClick(notification)"
             class="notification-item read"
+            @click="handleNotificationClick(notification)"
           >
             <div class="notification-icon">
               <BaseIcon
@@ -82,9 +82,9 @@
               <span class="notification-time">{{ formatTime(notification.createdAt) }}</span>
             </div>
             <button
-              @click.stop="handleDeleteNotification(notification.id)"
               class="delete-button"
               aria-label="삭제"
+              @click.stop="handleDeleteNotification(notification.id)"
             >
               <BaseIcon name="x" :size="20" color="var(--color-textSecondary)" />
             </button>

@@ -10,10 +10,10 @@
     <!-- 드래그 핸들 -->
     <div
       class="sheet-handle"
-      @click="toggleSheet"
       role="button"
       tabindex="0"
       aria-label="시트 크기 조절"
+      @click="toggleSheet"
       @keydown.enter="toggleSheet"
       @keydown.space.prevent="toggleSheet"
     >
@@ -37,19 +37,19 @@
           />
           <button
             v-if="keyword"
-            @click="clearKeyword"
             class="clear-button"
             type="button"
             aria-label="검색어 지우기"
+            @click="clearKeyword"
           >
             <BaseIcon name="x" :size="14" />
           </button>
           <!-- 지도/전국 토글 버튼 (인풋 안쪽) -->
           <button
-            @click.stop="toggleGlobalSearch"
             :class="['search-scope-toggle', isGlobalSearch && 'active']"
             :title="isGlobalSearch ? '지도 영역 검색' : '전국 검색'"
             type="button"
+            @click.stop="toggleGlobalSearch"
           >
             <BaseIcon :name="isGlobalSearch ? 'globe' : 'mapPin'" :size="14" />
           </button>
@@ -62,8 +62,8 @@
           <button
             v-for="category in categories"
             :key="category"
-            @click="toggleCategory(category)"
             :class="['category-chip', selectedCategories.includes(category) && 'selected']"
+            @click="toggleCategory(category)"
           >
             {{ category }}
           </button>
@@ -80,8 +80,8 @@
         </div>
         <button
           v-if="sheetState !== 'collapsed'"
-          @click="collapseSheet"
           class="collapse-button"
+          @click="collapseSheet"
         >
           <BaseIcon name="chevron-down" :size="18" />
         </button>
@@ -106,8 +106,8 @@
       </div>
 
       <StoreCard
-        v-else
         v-for="store in stores"
+        v-else
         :key="store.storeId || store.id"
         :store="store"
         variant="compact"

@@ -16,13 +16,13 @@
         <button
           v-for="level in roastLevels"
           :key="level.value"
-          @click="form.roastLevel = level.value"
           class="roast-btn"
           :class="{ 'active': form.roastLevel === level.value }"
           :style="{
             '--roast-color': level.color,
             backgroundColor: form.roastLevel === level.value ? level.color : 'transparent'
           }"
+          @click="form.roastLevel = level.value"
         >
           <span class="roast-dot" :style="{ backgroundColor: level.color }"></span>
           {{ level.label }}
@@ -101,12 +101,12 @@
             <input
               type="range"
               :value="form[score.key] || 0"
-              @input="form[score.key] = parseFloat($event.target.value)"
               min="0"
               max="15"
               step="0.25"
               class="score-slider"
               :style="{ '--fill-percent': `${((form[score.key] || 0) / 15) * 100}%` }"
+              @input="form[score.key] = parseFloat($event.target.value)"
             />
           </div>
         </div>

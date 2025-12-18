@@ -31,16 +31,16 @@
           <BaseButton
             variant="secondary"
             size="medium"
-            @click="handleCancel"
             class="flex-1"
+            @click="handleCancel"
           >
             {{ cancelText }}
           </BaseButton>
           <BaseButton
             :variant="confirmVariant"
             size="medium"
-            @click="handleConfirm"
             class="flex-1"
+            @click="handleConfirm"
           >
             {{ confirmText }}
           </BaseButton>

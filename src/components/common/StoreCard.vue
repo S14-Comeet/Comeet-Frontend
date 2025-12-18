@@ -74,9 +74,9 @@
         <slot name="actions">
           <button
             v-if="showDeleteButton"
-            @click="handleDelete"
             class="action-btn delete-btn"
             :aria-label="`${store.name} 삭제`"
+            @click="handleDelete"
           >
             <BaseIcon name="x" :size="20" />
           </button>
