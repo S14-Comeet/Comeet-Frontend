@@ -336,7 +336,7 @@ const handleSearch = async (searchParams) => {
     renderMarkers(storeList, false)
 
     searchKeyword.value = searchParams.keyword || ''
-    searchCategories.value = searchParams.categories ? searchParams.categories.split(',') : []
+    searchCategories.value = typeof searchParams.categories === 'string' ? searchParams.categories.split(',') : []
     isGlobalSearch.value = searchParams.isGlobalSearch
 
     lastSearchCenter.value = { lat, lng }
