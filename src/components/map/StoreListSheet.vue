@@ -216,7 +216,7 @@ const handleSearchFocus = () => {
   }
 }
 
-// 카테고리 토글
+// 카테고리 토글 및 즉시 검색
 const toggleCategory = (category) => {
   const index = selectedCategories.value.indexOf(category)
   if (index === -1) {
@@ -224,6 +224,16 @@ const toggleCategory = (category) => {
   } else {
     selectedCategories.value.splice(index, 1)
   }
+
+  // 카테고리 변경 시 즉시 검색 (위치 업데이트 없이)
+  emit('search', {
+    keyword: keyword.value.trim(),
+    categories: selectedCategories.value.length > 0
+      ? selectedCategories.value.join(',')
+      : undefined,
+    isGlobalSearch: isGlobalSearch.value,
+    searchType: 'category' // 카테고리 검색 구분
+  })
 }
 
 // 전역 검색 토글
@@ -244,14 +254,15 @@ const clearAllFilters = () => {
   handleSearch()
 }
 
-// 검색 실행
+// 검색 실행 (키워드 검색 - 위치 업데이트 필요)
 const handleSearch = () => {
   emit('search', {
     keyword: keyword.value.trim(),
     categories: selectedCategories.value.length > 0
       ? selectedCategories.value.join(',')
       : undefined,
-    isGlobalSearch: isGlobalSearch.value
+    isGlobalSearch: isGlobalSearch.value,
+    searchType: 'keyword' // 키워드 검색 구분
   })
 }
 
@@ -632,10 +643,19 @@ watch(
 .store-list {
   flex: 1;
   overflow: hidden;
+  padding: 0 0.875rem;
 }
 
 .store-list.scrollable {
   overflow-y: auto;
+  /* 4rem(네비게이션 바) + 1rem(여유 공간) */
+  padding-bottom: 5rem;
+}
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .store-list.scrollable {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
 }
 
 /* 빈 상태 */
