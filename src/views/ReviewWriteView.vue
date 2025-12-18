@@ -132,6 +132,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { createLogger } from '@/utils/logger'
 import BaseHeader from '@/components/common/BaseHeader.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
@@ -139,6 +140,8 @@ import TastingWheel from '@/components/review/TastingWheel.vue'
 import CuppingNoteForm from '@/components/review/CuppingNoteForm.vue'
 import { createReview, createCuppingNote } from '@/api/review'
 import { showSuccess, showError } from '@/utils/toast'
+
+const logger = createLogger('ReviewWriteView')
 
 const route = useRoute()
 const router = useRouter()
@@ -228,7 +231,7 @@ const handleSubmit = async () => {
       try {
         await createCuppingNote(reviewResponse.data.reviewId, cuppingNote.value)
       } catch (cuppingError) {
-        console.warn('Failed to save cupping note:', cuppingError)
+        logger.warn('Failed to save cupping note', cuppingError)
         // Don't fail the whole review if cupping note fails
       }
     }
@@ -237,7 +240,7 @@ const handleSubmit = async () => {
     router.push({ name: 'map' })
   } catch (error) {
     showError('리뷰 등록에 실패했습니다.')
-    console.error(error)
+    logger.error('리뷰 등록 실패', error)
   } finally {
     isSubmitting.value = false
   }

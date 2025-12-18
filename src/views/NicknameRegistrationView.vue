@@ -196,9 +196,11 @@ import { checkNickname, registerUser } from '@/api/auth';
 import { useAuthStore } from '@/store/auth';
 import { DEFAULTS, VALIDATION } from '@/constants';
 import { showSuccess } from '@/utils/toast';
+import { createLogger } from '@/utils/logger';
 import BaseInput from '@/components/common/BaseInput.vue';
 import BaseButton from '@/components/common/BaseButton.vue';
 
+const logger = createLogger('NicknameRegistrationView');
 const router = useRouter();
 const authStore = useAuthStore();
 
@@ -272,7 +274,7 @@ const validateNickname = async () => {
         helperMessage.value = '이미 사용 중인 닉네임입니다';
       }
     } catch (error) {
-      console.error('닉네임 중복 확인 실패:', error);
+      logger.error('닉네임 중복 확인 실패', error);
       validationState.value = 'error';
       helperMessage.value = '중복 확인에 실패했습니다. 다시 시도해 주세요.';
     }

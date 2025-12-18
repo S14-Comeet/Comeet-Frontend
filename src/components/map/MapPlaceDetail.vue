@@ -66,7 +66,10 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { createLogger } from '@/utils/logger'
 import BaseButton from '@/components/common/BaseButton.vue'
+
+const logger = createLogger('MapPlaceDetail')
 
 const props = defineProps({
   place: Object,
@@ -81,7 +84,7 @@ const goToReview = () => {
   const id = props.place.storeId || props.place.id
   
   if (!id) {
-    console.warn('Store ID not found in place object:', props.place)
+    logger.warn('Store ID not found in place object', props.place)
     return
   }
 

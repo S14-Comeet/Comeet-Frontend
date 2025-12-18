@@ -96,9 +96,12 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
+import { createLogger } from '@/utils/logger'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseNavigationBar from '@/components/common/BaseNavigationBar.vue'
+
+const logger = createLogger('ProfileView')
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -139,7 +142,7 @@ const handleLogout = async () => {
     // 로그인 페이지로 이동
     router.push('/login')
   } catch (error) {
-    console.error('[ProfileView] 로그아웃 실패:', error)
+    logger.error('로그아웃 실패', error)
     // 에러가 발생해도 로그인 페이지로 이동 (로컬 상태는 이미 초기화됨)
     router.push('/login')
   } finally {

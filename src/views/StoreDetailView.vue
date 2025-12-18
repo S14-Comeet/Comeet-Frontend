@@ -209,12 +209,15 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { createLogger } from '@/utils/logger'
 import BaseHeader from '@/components/common/BaseHeader.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseChip from '@/components/common/BaseChip.vue'
 import { getStoreById, getStoreReviews } from '@/api/cafe'
 import { showSuccess, showError } from '@/utils/toast'
+
+const logger = createLogger('StoreDetailView')
 
 const route = useRoute()
 const router = useRouter()
@@ -298,7 +301,7 @@ const fetchStoreDetail = async () => {
     // Fetch reviews
     fetchReviews()
   } catch (e) {
-    console.error('Failed to fetch store detail:', e)
+    logger.error('Failed to fetch store detail', e)
     error.value = e.response?.data?.message || '가게 정보를 불러오는데 실패했습니다'
   } finally {
     isLoading.value = false
@@ -315,7 +318,7 @@ const fetchReviews = async () => {
     const data = response?.data ?? response
     reviews.value = Array.isArray(data) ? data : []
   } catch (e) {
-    console.error('Failed to fetch reviews:', e)
+    logger.error('Failed to fetch reviews', e)
     reviews.value = []
   } finally {
     isLoadingReviews.value = false
