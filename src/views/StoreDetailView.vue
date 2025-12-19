@@ -1,8 +1,5 @@
 <template>
   <div class="flex flex-col min-h-full bg-background">
-    <!-- Header -->
-    <BaseHeader show-back-button :title="store?.name || '가게 정보'" />
-
     <!-- Loading State -->
     <div v-if="isLoading" class="flex-1 flex items-center justify-center">
       <BaseIcon name="spinner" :size="32" class="text-primary animate-spin" />
@@ -263,7 +260,6 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { createLogger } from '@/utils/logger'
-import BaseHeader from '@/components/common/BaseHeader.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseChip from '@/components/common/BaseChip.vue'

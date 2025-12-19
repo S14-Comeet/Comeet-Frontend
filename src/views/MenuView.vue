@@ -1,7 +1,5 @@
 <template>
   <div class="menu-view">
-    <BaseHeader show-back-button :title="storeName || '메뉴'" />
-
     <!-- Loading State -->
     <div v-if="isLoading" class="loading-state">
       <BaseIcon name="spinner" :size="32" class="text-primary animate-spin" />
@@ -23,21 +21,13 @@
 
     <!-- Menu List -->
     <template v-else>
-      <MenuList :menus="menuData" @select-menu="handleMenuSelect" />
+      <MenuList :menus="menuData" />
 
       <!-- Review Button Section -->
       <div class="review-button-section">
         <ReviewButton @click="goToReview" />
       </div>
     </template>
-
-    <!-- Menu Detail Modal -->
-    <MenuDetailModal
-      v-if="selectedMenu"
-      :menu="selectedMenu"
-      :is-loading="isLoadingDetail"
-      @close="selectedMenu = null"
-    />
   </div>
 </template>
 
@@ -46,12 +36,10 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { createLogger } from '@/utils/logger'
 import MenuList from '@/components/MenuList.vue'
-import MenuDetailModal from '@/components/MenuDetailModal.vue'
 import ReviewButton from '@/components/review/ReviewButton.vue'
-import BaseHeader from '@/components/common/BaseHeader.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
-import { getMenusByStoreId, getMenuById } from '@/api/menu'
+import { getMenusByStoreId } from '@/api/menu'
 
 const logger = createLogger('MenuView')
 const route = useRoute()
@@ -63,8 +51,6 @@ const storeName = computed(() => route.query.name || '')
 const menuData = ref([])
 const isLoading = ref(true)
 const error = ref(null)
-const selectedMenu = ref(null)
-const isLoadingDetail = ref(false)
 
 const fetchMenus = async () => {
   if (!storeId.value) {
@@ -79,7 +65,6 @@ const fetchMenus = async () => {
   try {
     const response = await getMenusByStoreId(storeId.value, { page: 1, size: 50 })
     const data = response?.data ?? response
-    // 페이지네이션 응답 처리: content 필드 또는 배열 직접 반환
     const menus = data?.content ?? (Array.isArray(data) ? data : [])
     menuData.value = menus
     logger.info(`Loaded ${menuData.value.length} menus for store ${storeId.value}`)
@@ -88,21 +73,6 @@ const fetchMenus = async () => {
     error.value = e.response?.data?.message || '메뉴를 불러오는데 실패했습니다'
   } finally {
     isLoading.value = false
-  }
-}
-
-const handleMenuSelect = async (menu) => {
-  isLoadingDetail.value = true
-  selectedMenu.value = menu
-
-  try {
-    const response = await getMenuById(menu.id)
-    const detailData = response?.data ?? response
-    selectedMenu.value = { ...menu, ...detailData }
-  } catch (e) {
-    logger.error('Failed to fetch menu detail', e)
-  } finally {
-    isLoadingDetail.value = false
   }
 }
 
