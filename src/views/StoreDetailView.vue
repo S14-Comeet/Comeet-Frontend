@@ -136,6 +136,59 @@
         </div>
       </div>
 
+      <!-- Menu Section -->
+      <div class="menu-section">
+        <div class="section-header">
+          <h2 class="section-title">메뉴 {{ menus.length }}개</h2>
+          <div class="flex items-center gap-2">
+            <button
+              v-if="menus.length > 3"
+              class="text-primary text-sm font-medium"
+              @click="showAllMenus = !showAllMenus"
+            >
+              {{ showAllMenus ? '접기' : '전체 보기' }}
+            </button>
+            <button class="menu-more-btn" @click="goToMenu">
+              <span>메뉴 보기</span>
+              <BaseIcon name="chevron-right" :size="14" />
+            </button>
+          </div>
+        </div>
+
+        <div v-if="isLoadingMenus" class="py-8 text-center">
+          <BaseIcon name="spinner" :size="24" class="text-primary animate-spin" />
+        </div>
+
+        <div v-else-if="menus.length === 0" class="empty-menus">
+          <p class="text-textSecondary text-sm">등록된 메뉴가 없습니다</p>
+        </div>
+
+        <div v-else class="menu-list">
+          <div
+            v-for="menu in displayedMenus"
+            :key="menu.id"
+            class="menu-card"
+            @click="goToMenu"
+          >
+            <div class="menu-image-wrapper">
+              <img
+                v-if="menu.imageUrl || menu.image_url"
+                :src="menu.imageUrl || menu.image_url"
+                :alt="menu.name"
+                class="menu-image"
+              />
+              <div v-else class="menu-image-placeholder">
+                <BaseIcon name="coffee" :size="24" class="text-primary-300" />
+              </div>
+            </div>
+            <div class="menu-info">
+              <h4 class="menu-name">{{ menu.name }}</h4>
+              <p class="menu-price">{{ formatPrice(menu.price) }}원</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Reviews Section -->
       <div class="reviews-section">
         <div class="section-header">
@@ -215,6 +268,7 @@ import BaseButton from '@/components/common/BaseButton.vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseChip from '@/components/common/BaseChip.vue'
 import { getStoreById, getStoreReviews } from '@/api/cafe'
+import { getMenusByStoreId } from '@/api/menu'
 import { showSuccess, showError } from '@/utils/toast'
 
 const logger = createLogger('StoreDetailView')
@@ -225,12 +279,15 @@ const router = useRouter()
 const storeId = computed(() => route.params.storeId)
 const store = ref(null)
 const reviews = ref([])
+const menus = ref([])
 const isLoading = ref(true)
 const isLoadingReviews = ref(false)
+const isLoadingMenus = ref(false)
 const error = ref(null)
 const imageError = ref(false)
 const isBookmarked = ref(false)
 const showAllReviews = ref(false)
+const showAllMenus = ref(false)
 
 const hasValidThumbnail = computed(() => {
   return store.value?.thumbnailUrl &&
@@ -243,6 +300,13 @@ const displayedReviews = computed(() => {
     return reviews.value
   }
   return reviews.value.slice(0, 3)
+})
+
+const displayedMenus = computed(() => {
+  if (showAllMenus.value) {
+    return menus.value
+  }
+  return menus.value.slice(0, 3)
 })
 
 const formatRating = (rating) => {
@@ -298,8 +362,9 @@ const fetchStoreDetail = async () => {
 
     store.value = storeData
 
-    // Fetch reviews
+    // Fetch reviews and menus
     fetchReviews()
+    fetchMenus()
   } catch (e) {
     logger.error('Failed to fetch store detail', e)
     error.value = e.response?.data?.message || '가게 정보를 불러오는데 실패했습니다'
@@ -322,6 +387,23 @@ const fetchReviews = async () => {
     reviews.value = []
   } finally {
     isLoadingReviews.value = false
+  }
+}
+
+const fetchMenus = async () => {
+  if (!storeId.value) return
+
+  isLoadingMenus.value = true
+  try {
+    const response = await getMenusByStoreId(storeId.value, { page: 1, size: 10 })
+    const data = response?.data ?? response
+    // 페이지네이션 응답 처리: content 필드 또는 배열 직접 반환
+    menus.value = data?.content ?? (Array.isArray(data) ? data : [])
+  } catch (e) {
+    logger.error('Failed to fetch menus', e)
+    menus.value = []
+  } finally {
+    isLoadingMenus.value = false
   }
 }
 
@@ -369,6 +451,18 @@ const goToReview = () => {
       lng: store.value?.longitude
     }
   })
+}
+
+const goToMenu = () => {
+  router.push({
+    name: 'menu',
+    params: { storeId: storeId.value },
+    query: { name: store.value?.name }
+  })
+}
+
+const formatPrice = (price) => {
+  return price?.toLocaleString('ko-KR') || '0'
 }
 
 onMounted(() => {
@@ -479,7 +573,105 @@ onMounted(() => {
 .detail-section {
   padding: 1.25rem;
   background: white;
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Menu Section */
+.menu-section {
+  padding: 1.25rem;
+  background: white;
   border-bottom: 8px solid var(--color-neutral-100);
+}
+
+.menu-more-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  background-color: var(--color-primary-50);
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 1rem;
+  transition: background-color 0.2s;
+}
+
+.menu-more-btn:hover {
+  background-color: var(--color-primary-100);
+}
+
+.empty-menus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.menu-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background-color: var(--color-neutral-50);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.menu-card:hover {
+  background-color: var(--color-primary-50);
+}
+
+.menu-image-wrapper {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: var(--color-primary-100);
+}
+
+.menu-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.menu-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-primary-50);
+}
+
+.menu-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.menu-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-textPrimary);
+  margin: 0 0 0.25rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.menu-price {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-primary);
+  margin: 0;
 }
 
 .section-title {
