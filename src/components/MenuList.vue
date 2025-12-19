@@ -86,10 +86,11 @@
       </transition>
     </div>
 
-    <!-- 원두 상세 바텀시트 -->
-    <transition name="sheet">
-      <div v-if="selectedBean" class="bean-sheet-overlay" @click="closeBeanDetail">
-        <div class="bean-sheet" @click.stop>
+    <!-- 원두 상세 바텀시트 (Teleport to body) -->
+    <Teleport to="body">
+      <transition name="sheet">
+        <div v-if="selectedBean" class="bean-sheet-overlay" @click="closeBeanDetail">
+          <div class="bean-sheet" @click.stop>
           <!-- 핸들 -->
           <div class="sheet-handle"></div>
 
@@ -101,7 +102,7 @@
           <!-- 원두 상세 정보 -->
           <template v-else-if="beanDetail">
             <div class="sheet-header">
-              <h3 class="sheet-title">{{ beanDetail.name }}</h3>
+              <h3 class="sheet-title">{{ selectedBean.name }}</h3>
               <button class="sheet-close" @click="closeBeanDetail">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M18 6L6 18M6 6l12 12"></path>
@@ -110,44 +111,46 @@
             </div>
 
             <div class="sheet-content">
-              <!-- 로스터리 -->
-              <div v-if="beanDetail.roasteryName" class="sheet-row">
-                <span class="row-label">로스터리</span>
-                <span class="row-value">{{ beanDetail.roasteryName }}</span>
+              <!-- 원산지 (국가 + 농장) -->
+              <div v-if="beanDetail.country || beanDetail.farm" class="sheet-row">
+                <span class="row-label">원산지</span>
+                <span class="row-value">
+                  {{ beanDetail.country }}{{ beanDetail.farm ? ` · ${beanDetail.farm}` : '' }}
+                </span>
               </div>
 
-              <!-- 원산지 -->
-              <div v-if="beanDetail.origin" class="sheet-row">
-                <span class="row-label">원산지</span>
-                <span class="row-value">{{ beanDetail.origin }}</span>
+              <!-- 품종 -->
+              <div v-if="beanDetail.variety" class="sheet-row">
+                <span class="row-label">품종</span>
+                <span class="row-value">{{ beanDetail.variety }}</span>
               </div>
 
               <!-- 프로세스 -->
-              <div v-if="beanDetail.process" class="sheet-row">
+              <div v-if="beanDetail.processingMethod" class="sheet-row">
                 <span class="row-label">프로세스</span>
-                <span class="row-value">{{ beanDetail.process }}</span>
+                <span class="row-value">{{ beanDetail.processingMethod }}</span>
               </div>
 
               <!-- 로스팅 레벨 -->
-              <div v-if="beanDetail.roastLevel" class="sheet-row">
+              <div v-if="beanDetail.roastingLevel" class="sheet-row">
                 <span class="row-label">로스팅</span>
-                <span class="row-value">{{ beanDetail.roastLevel }}</span>
+                <span class="row-value">{{ formatRoastLevel(beanDetail.roastingLevel) }}</span>
               </div>
 
               <!-- 향미 노트 -->
-              <div v-if="beanDetail.flavorNotes?.length > 0" class="sheet-section">
+              <div class="sheet-section">
                 <span class="section-label">향미 노트</span>
-                <div class="flavor-tags">
-                  <span v-for="flavor in beanDetail.flavorNotes" :key="flavor" class="flavor-tag">
-                    {{ flavor }}
+                <div v-if="beanDetail.flavors?.length > 0" class="flavor-tags">
+                  <span
+                    v-for="flavor in beanDetail.flavors"
+                    :key="flavor.flavorId"
+                    class="flavor-tag"
+                    :style="{ backgroundColor: flavor.colorHex + '20', color: flavor.colorHex }"
+                  >
+                    {{ flavor.code }}
                   </span>
                 </div>
-              </div>
-
-              <!-- 설명 -->
-              <div v-if="beanDetail.description" class="sheet-section">
-                <span class="section-label">설명</span>
-                <p class="section-text">{{ beanDetail.description }}</p>
+                <p v-else class="empty-text">등록된 향미 정보가 없습니다</p>
               </div>
             </div>
           </template>
@@ -156,9 +159,10 @@
           <div v-else class="sheet-error">
             <p>원두 정보를 불러올 수 없습니다</p>
           </div>
+          </div>
         </div>
-      </div>
-    </transition>
+      </transition>
+    </Teleport>
   </div>
 </template>
 
@@ -189,6 +193,17 @@ const loadingBeanDetail = ref(false)
 
 const formatPrice = (price) => {
   return price?.toLocaleString('ko-KR') || '0'
+}
+
+const formatRoastLevel = (level) => {
+  const levels = {
+    LIGHT: '라이트',
+    MEDIUM_LIGHT: '미디엄 라이트',
+    MEDIUM: '미디엄',
+    MEDIUM_DARK: '미디엄 다크',
+    DARK: '다크'
+  }
+  return levels[level] || level
 }
 
 const getMenuBeans = (menuId) => {
@@ -248,6 +263,7 @@ const closeBeanDetail = () => {
 </script>
 
 <style scoped>
+/* 일반 스타일 */
 .menu-list {
   display: flex;
   flex-direction: column;
@@ -467,7 +483,29 @@ const closeBeanDetail = () => {
   max-height: 200px;
 }
 
-/* 바텀시트 */
+@media (max-width: 640px) {
+  .menu-item {
+    gap: 0.75rem;
+    padding: 0.875rem;
+  }
+
+  .menu-image-wrapper {
+    width: 76px;
+    height: 76px;
+  }
+
+  .menu-name {
+    font-size: 0.95rem;
+  }
+
+  .menu-price {
+    font-size: 0.95rem;
+  }
+}
+</style>
+
+<!-- Teleport된 바텀시트는 scoped CSS가 적용되지 않으므로 별도 블록 -->
+<style>
 .bean-sheet-overlay {
   position: fixed;
   inset: 0;
@@ -481,17 +519,17 @@ const closeBeanDetail = () => {
 .bean-sheet {
   width: 100%;
   max-width: 448px;
-  max-height: 70vh;
+  max-height: 85vh;
   background: white;
   border-radius: 20px 20px 0 0;
   overflow-y: auto;
-  padding: 0.5rem 1.25rem 2rem;
+  padding: 0.5rem 1.25rem calc(2rem + env(safe-area-inset-bottom));
 }
 
 .sheet-handle {
   width: 36px;
   height: 4px;
-  background-color: var(--color-neutral-300);
+  background-color: #d1d5db;
   border-radius: 2px;
   margin: 0.5rem auto 1rem;
 }
@@ -513,7 +551,7 @@ const closeBeanDetail = () => {
 .sheet-title {
   font-size: 1.125rem;
   font-weight: 700;
-  color: var(--color-textPrimary);
+  color: #1f2937;
   margin: 0;
 }
 
@@ -525,14 +563,14 @@ const closeBeanDetail = () => {
   justify-content: center;
   background: none;
   border: none;
-  color: var(--color-textSecondary);
+  color: #6b7280;
   cursor: pointer;
   border-radius: 50%;
   transition: background-color 0.15s;
 }
 
 .sheet-close:hover {
-  background-color: var(--color-neutral-100);
+  background-color: #f3f4f6;
 }
 
 .sheet-content {
@@ -546,18 +584,18 @@ const closeBeanDetail = () => {
   justify-content: space-between;
   align-items: center;
   padding: 0.625rem 0;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .row-label {
   font-size: 0.875rem;
-  color: var(--color-textSecondary);
+  color: #6b7280;
 }
 
 .row-value {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--color-textPrimary);
+  color: #1f2937;
 }
 
 .sheet-section {
@@ -568,15 +606,8 @@ const closeBeanDetail = () => {
   display: block;
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--color-textSecondary);
+  color: #6b7280;
   margin-bottom: 0.5rem;
-}
-
-.section-text {
-  font-size: 0.875rem;
-  color: var(--color-textPrimary);
-  line-height: 1.5;
-  margin: 0;
 }
 
 .flavor-tags {
@@ -587,17 +618,23 @@ const closeBeanDetail = () => {
 
 .flavor-tag {
   padding: 0.35rem 0.625rem;
-  background-color: var(--color-accent-50, #fff8e1);
-  color: var(--color-accent-700, #f57c00);
+  background-color: #f5f0eb;
+  color: #846148;
   border-radius: 9999px;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
+}
+
+.empty-text {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6b7280;
 }
 
 .sheet-error {
   padding: 2rem;
   text-align: center;
-  color: var(--color-textSecondary);
+  color: #6b7280;
 }
 
 /* 바텀시트 애니메이션 */
@@ -614,25 +651,5 @@ const closeBeanDetail = () => {
 .sheet-enter-from .bean-sheet,
 .sheet-leave-to .bean-sheet {
   transform: translateY(100%);
-}
-
-@media (max-width: 640px) {
-  .menu-item {
-    gap: 0.75rem;
-    padding: 0.875rem;
-  }
-
-  .menu-image-wrapper {
-    width: 76px;
-    height: 76px;
-  }
-
-  .menu-name {
-    font-size: 0.95rem;
-  }
-
-  .menu-price {
-    font-size: 0.95rem;
-  }
 }
 </style>
