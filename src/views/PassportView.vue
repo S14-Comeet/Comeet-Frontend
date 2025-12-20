@@ -70,9 +70,8 @@ onMounted(() => {
 
 <style scoped>
 .passport-view {
-  min-height: 100vh;
   background-color: var(--color-background);
-  padding: 1rem;
+  padding: var(--page-padding);
 }
 
 .passport-header {

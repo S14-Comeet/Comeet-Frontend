@@ -109,7 +109,6 @@ onMounted(() => {
 
 <style scoped>
 .passport-detail-view {
-  min-height: 100vh;
   background-color: var(--color-background);
 }
 

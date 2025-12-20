@@ -95,3 +95,125 @@ a {
     color: inherit;
     text-decoration: none;
 }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * 2025 Responsive Design System
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Mobile-First Approach with Content-Driven Breakpoints
+ * Based on 2025 Best Practices
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+:root {
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     * Responsive Spacing Variables (Default: Small Mobile 320px)
+     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --space-xs: 0.25rem;   /* 4px */
+    --space-sm: 0.5rem;    /* 8px */
+    --space-md: 0.75rem;   /* 12px */
+    --space-lg: 1rem;      /* 16px */
+    --space-xl: 1.25rem;   /* 20px */
+    --space-2xl: 1.5rem;   /* 24px */
+    --space-3xl: 2rem;     /* 32px */
+    
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     * Responsive Typography Variables (Mobile-First Base)
+     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --text-xs: 0.625rem;   /* 10px */
+    --text-sm: 0.6875rem;  /* 11px */
+    --text-base: 0.8125rem;/* 13px */
+    --text-lg: 0.9375rem;  /* 15px */
+    --text-xl: 1.125rem;   /* 18px */
+    --text-2xl: 1.375rem;  /* 22px */
+    --text-3xl: 1.5rem;    /* 24px */
+    
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     * Page Layout Variables
+     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --page-padding: 1rem;
+    --card-padding: 0.75rem;
+    --card-radius: 12px;
+    --gap-sm: 0.5rem;
+    --gap-md: 0.75rem;
+    --gap-lg: 1rem;
+    
+    /* Navigation Bar Height */
+    --nav-height: 4rem;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Breakpoint: 375px+ (Standard Mobile - iPhone SE, etc.)
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@media (min-width: 375px) {
+    :root {
+        --text-sm: 0.75rem;    /* 12px */
+        --text-base: 0.875rem; /* 14px */
+        --text-lg: 1rem;       /* 16px */
+        --text-xl: 1.25rem;    /* 20px */
+        --text-2xl: 1.5rem;    /* 24px */
+        
+        --card-padding: 1rem;
+        --card-radius: 14px;
+    }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Breakpoint: 400px+ (Large Mobile - iPhone 14Pro, etc.)
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@media (min-width: 400px) {
+    :root {
+        --page-padding: 1.25rem;
+        --card-padding: 1.125rem;
+        --card-radius: 16px;
+        --gap-lg: 1.25rem;
+    }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Utility Classes for Responsive Design
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Touch-Friendly Interactive Elements (min 44x44px) */
+.touch-target {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+/* Safe Bottom Padding for Navigation */
+.safe-bottom {
+    padding-bottom: calc(var(--nav-height) + 1rem);
+}
+
+/* Responsive Card */
+.responsive-card {
+    padding: var(--card-padding);
+    border-radius: var(--card-radius);
+}
+
+/* Responsive Page Container */
+.responsive-page {
+    padding: var(--page-padding);
+    padding-bottom: calc(var(--nav-height) + 1rem);
+}
+
+/* Responsive Text */
+.text-responsive-sm { font-size: var(--text-sm); }
+.text-responsive-base { font-size: var(--text-base); }
+.text-responsive-lg { font-size: var(--text-lg); }
+.text-responsive-xl { font-size: var(--text-xl); }
+.text-responsive-2xl { font-size: var(--text-2xl); }
+
+/* Truncate Text with Ellipsis */
+.truncate-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Multi-line Truncate (2 lines) */
+.truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
