@@ -1,43 +1,27 @@
 <template>
-  <nav class="absolute bottom-0 left-0 right-0 bg-white shadow-nav z-[9999]">
+  <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-nav z-[9999]">
     <div class="max-w-screen-sm mx-auto px-4 pb-safe">
       <div class="flex items-center justify-around h-16 border-t border-border">
         <!-- 지도 -->
-        <router-link
-          to="/map"
-          class="nav-item"
-          :class="{ 'nav-item-active': isActive('/map') }"
-        >
+        <router-link to="/map" class="nav-item" :class="{ 'nav-item-active': isActive('/map') }">
           <component :is="getIcon('map')" class="nav-icon" />
           <span class="nav-label">지도</span>
         </router-link>
 
         <!-- 여권 -->
-        <router-link
-          to="/passport"
-          class="nav-item"
-          :class="{ 'nav-item-active': isActive('/passport') }"
-        >
+        <router-link to="/passport" class="nav-item" :class="{ 'nav-item-active': isActive('/passport') }">
           <component :is="getIcon('passport')" class="nav-icon" />
           <span class="nav-label">여권</span>
         </router-link>
 
         <!-- 저장 -->
-        <router-link
-          to="/saved"
-          class="nav-item"
-          :class="{ 'nav-item-active': isActive('/saved') }"
-        >
+        <router-link to="/saved" class="nav-item" :class="{ 'nav-item-active': isActive('/saved') }">
           <component :is="getIcon('bookmark')" class="nav-icon" />
           <span class="nav-label">저장</span>
         </router-link>
 
         <!-- 마이 -->
-        <router-link
-          to="/profile"
-          class="nav-item"
-          :class="{ 'nav-item-active': isActive('/profile') }"
-        >
+        <router-link to="/profile" class="nav-item" :class="{ 'nav-item-active': isActive('/profile') }">
           <component :is="getIcon('user')" class="nav-icon" />
           <span class="nav-label">마이</span>
         </router-link>
@@ -114,7 +98,8 @@ const getIcon = (type) => {
 /* 활성 상태 */
 .nav-item-active {
   color: var(--color-primary);
-  background-color: rgba(132, 97, 72, 0.08); /* Primary 600 8% opacity */
+  background-color: rgba(132, 97, 72, 0.08);
+  /* Primary 600 8% opacity */
 }
 
 .nav-item-active .nav-icon {
@@ -128,8 +113,9 @@ const getIcon = (type) => {
 /* 호버 상태 (데스크톱) */
 @media (hover: hover) {
   .nav-item:hover {
-        color: var(--color-primary);
-    background-color: rgba(164, 121, 91, 0.06); /* Primary 500 6% opacity */
+    color: var(--color-primary);
+    background-color: rgba(164, 121, 91, 0.06);
+    /* Primary 500 6% opacity */
   }
 
   .nav-item:hover .nav-icon {
@@ -139,7 +125,8 @@ const getIcon = (type) => {
 
 /* 상단 그림자 (네비게이션바) */
 nav {
-  box-shadow: 0 -2px 8px rgba(99, 73, 54, 0.08); /* Primary 700 8% opacity */
+  box-shadow: 0 -2px 8px rgba(99, 73, 54, 0.08);
+  /* Primary 700 8% opacity */
   backdrop-filter: blur(8px);
   background-color: rgba(255, 255, 255, 0.95);
 }
