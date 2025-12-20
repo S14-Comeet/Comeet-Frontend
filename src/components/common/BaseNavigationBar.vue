@@ -2,16 +2,6 @@
   <nav class="absolute bottom-0 left-0 right-0 bg-white shadow-nav z-[9999]">
     <div class="max-w-screen-sm mx-auto px-4 pb-safe">
       <div class="flex items-center justify-around h-16 border-t border-border">
-        <!-- 홈 -->
-        <router-link
-          to="/"
-          class="nav-item"
-          :class="{ 'nav-item-active': isActive('/') }"
-        >
-          <component :is="getIcon('home')" class="nav-icon" />
-          <span class="nav-label">홈</span>
-        </router-link>
-
         <!-- 지도 -->
         <router-link
           to="/map"
@@ -20,6 +10,16 @@
         >
           <component :is="getIcon('map')" class="nav-icon" />
           <span class="nav-label">지도</span>
+        </router-link>
+
+        <!-- 여권 -->
+        <router-link
+          to="/passport"
+          class="nav-item"
+          :class="{ 'nav-item-active': isActive('/passport') }"
+        >
+          <component :is="getIcon('passport')" class="nav-icon" />
+          <span class="nav-label">여권</span>
         </router-link>
 
         <!-- 저장 -->
@@ -50,10 +50,10 @@
 import { useRoute } from 'vue-router'
 
 // SVG 아이콘 임포트
-import HomeLineIcon from '@/assets/icons/home-line.svg?component'
-import HomeFillIcon from '@/assets/icons/home-fill.svg?component'
 import MapLineIcon from '@/assets/icons/map-line.svg?component'
 import MapFillIcon from '@/assets/icons/map-fill.svg?component'
+import PassportLineIcon from '@/assets/icons/passport-line.svg?component'
+import PassportFillIcon from '@/assets/icons/passport-fill.svg?component'
 import BookmarkLineIcon from '@/assets/icons/bookmark-line.svg?component'
 import BookmarkFillIcon from '@/assets/icons/bookmark-fill.svg?component'
 import UserLineIcon from '@/assets/icons/user-line.svg?component'
@@ -64,9 +64,6 @@ const route = useRoute()
  * 현재 라우트가 활성 상태인지 확인
  */
 const isActive = (path) => {
-  if (path === '/') {
-    return route.path === '/' || route.path === '/home'
-  }
   return route.path.startsWith(path)
 }
 
@@ -75,8 +72,8 @@ const isActive = (path) => {
  */
 const getIcon = (type) => {
   const icons = {
-    home: isActive('/') ? HomeFillIcon : HomeLineIcon,
     map: isActive('/map') ? MapFillIcon : MapLineIcon,
+    passport: isActive('/passport') ? PassportFillIcon : PassportLineIcon,
     bookmark: isActive('/saved') ? BookmarkFillIcon : BookmarkLineIcon,
     user: UserLineIcon, // user는 fill 버전이 없으므로 항상 line
   }
