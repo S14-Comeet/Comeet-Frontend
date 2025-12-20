@@ -81,6 +81,17 @@ const routes = [
     path: '/store/:storeId',
     name: 'store-detail',
     component: () => import('@/views/StoreDetailView.vue')
+  },
+  // 커피여권 라우트
+  {
+    path: '/passport',
+    name: 'passport',
+    component: () => import('@/views/PassportView.vue')
+  },
+  {
+    path: '/passport/:passportId',
+    name: 'passport-detail',
+    component: () => import('@/views/PassportDetailView.vue')
   }
 ];
 
@@ -90,7 +101,7 @@ const router = createRouter({
 });
 
 /** 공개 페이지 목록 (인증 불필요) */
-const PUBLIC_PAGES = new Set(['/login', '/oauth/callback', '/test-components', '/map', '/saved']);
+const PUBLIC_PAGES = new Set(['/login', '/oauth/callback', '/test-components', '/map', '/saved', '/passport']);
 
 /** 동적 경로 패턴 체크 함수 */
 const PUBLIC_PATH_PATTERNS = [
