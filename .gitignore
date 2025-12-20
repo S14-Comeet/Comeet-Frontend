@@ -351,6 +351,16 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Development/AI tool folders
 .bmad
+.bmad.zip
 .serena
-.docs
+.cursor
+docs/
+.idea/
+
+# AI/Tool generated files
+CLAUDE.md
+commits.txt
+.git-commit-message.txt
+nul

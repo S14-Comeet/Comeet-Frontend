@@ -23,19 +23,19 @@
             </div>
 
             <div class="coffee-info">
-              <div class="origin-chip">
-                <span class="origin-flag">🌍</span>
-                <span class="origin-name">{{ record.beanOrigin }}</span>
+              <div class="info-chip origin">
+                <BaseIcon name="globe" :size="14" color="var(--color-primary-600)" />
+                <span class="info-text">{{ record.beanOrigin }}</span>
               </div>
-              <div class="menu-chip">
-                <span class="menu-icon">☕</span>
-                <span class="menu-name">{{ record.menuName }}</span>
+              <div class="info-chip menu">
+                <BaseIcon name="coffee" :size="14" color="var(--color-primary-600)" />
+                <span class="info-text">{{ record.menuName }}</span>
               </div>
             </div>
           </div>
 
           <div class="card-arrow">
-            <span>→</span>
+            <BaseIcon name="chevron-right" :size="16" color="var(--color-primary-500)" />
           </div>
         </div>
       </div>
@@ -44,6 +44,8 @@
 </template>
 
 <script setup>
+import BaseIcon from '@/components/common/BaseIcon.vue'
+
 defineProps({
   groupedRecords: {
     type: Object,
@@ -135,7 +137,7 @@ const handleItemClick = (record) => {
 
 .date-weekday {
   font-size: 0.75rem;
-  color: var(--color-textSecondary);
+  color: var(--color-primary-600);
   padding: 0.125rem 0.375rem;
   background-color: var(--color-primary-50);
   border-radius: 4px;
@@ -155,18 +157,22 @@ const handleItemClick = (record) => {
   display: flex;
   align-items: center;
   background: white;
-  border-radius: 16px;
-  padding: 1rem;
+  border-radius: 14px;
+  padding: 0.875rem 1rem;
   cursor: pointer;
   transition: all 0.25s ease;
-  box-shadow: 0 2px 8px rgba(99, 73, 54, 0.06);
-  border: 1px solid transparent;
+  box-shadow: 0 2px 8px rgba(132, 97, 72, 0.06);
+  border: 1px solid var(--color-primary-100);
 }
 
 .timeline-card:hover {
   transform: translateX(4px);
-  box-shadow: 0 4px 16px rgba(99, 73, 54, 0.1);
-  border-color: var(--color-primary-200);
+  box-shadow: 0 4px 16px rgba(132, 97, 72, 0.12);
+  border-color: var(--color-primary-300);
+}
+
+.timeline-card:active {
+  transform: scale(0.98);
 }
 
 .card-content {
@@ -175,21 +181,21 @@ const handleItemClick = (record) => {
 }
 
 .store-info {
-  margin-bottom: 0.625rem;
+  margin-bottom: 0.5rem;
 }
 
 .store-name {
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: 700;
-  color: var(--color-primary-700);
-  margin: 0 0 0.25rem 0;
+  color: var(--color-primary-800);
+  margin: 0 0 0.125rem 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .store-address {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   color: var(--color-textSecondary);
   margin: 0;
   white-space: nowrap;
@@ -200,49 +206,41 @@ const handleItemClick = (record) => {
 .coffee-info {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.375rem;
 }
 
-.origin-chip,
-.menu-chip {
+.info-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 8px;
-  font-size: 0.75rem;
+  padding: 0.1875rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.6875rem;
 }
 
-.origin-chip {
-  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-  color: #1565c0;
+.info-chip.origin {
+  background-color: var(--color-primary-50);
+  border: 1px solid var(--color-primary-200);
 }
 
-.menu-chip {
-  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-  color: #e65100;
+.info-chip.menu {
+  background-color: var(--color-primary-50);
+  border: 1px solid var(--color-primary-200);
 }
 
-.origin-flag,
-.menu-icon {
-  font-size: 0.875rem;
-}
-
-.origin-name,
-.menu-name {
+.info-text {
   font-weight: 500;
+  color: var(--color-primary-700);
 }
 
 .card-arrow {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--color-primary-50);
-  border-radius: 10px;
-  color: var(--color-primary-600);
-  font-size: 1rem;
+  border-radius: 8px;
   margin-left: 0.75rem;
   transition: all 0.2s;
   flex-shrink: 0;

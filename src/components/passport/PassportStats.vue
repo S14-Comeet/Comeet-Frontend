@@ -4,32 +4,32 @@
     <div class="main-stats-card">
       <div class="stats-grid">
         <div class="stat-item">
-          <div class="stat-icon-wrapper coffee">
-            <BaseIcon name="coffee" :size="24" color="var(--color-primary-600)" />
+          <div class="stat-icon-wrapper">
+            <BaseIcon name="coffee" :size="22" color="var(--color-primary-600)" />
           </div>
           <div class="stat-content">
             <span class="stat-value">{{ info.totalCoffeeCount }}</span>
-            <span class="stat-label">잔의 커피</span>
+            <span class="stat-label">잔</span>
           </div>
         </div>
 
         <div class="stat-item">
-          <div class="stat-icon-wrapper store">
-            <BaseIcon name="map-marker" :size="24" color="#43a047" />
+          <div class="stat-icon-wrapper">
+            <BaseIcon name="map-marker" :size="22" color="var(--color-primary-600)" />
           </div>
           <div class="stat-content">
             <span class="stat-value">{{ info.totalStoreCount }}</span>
-            <span class="stat-label">곳 방문</span>
+            <span class="stat-label">곳</span>
           </div>
         </div>
 
         <div class="stat-item">
-          <div class="stat-icon-wrapper bean">
-            <BaseIcon name="globe" :size="24" color="#1976d2" />
+          <div class="stat-icon-wrapper">
+            <BaseIcon name="globe" :size="22" color="var(--color-primary-600)" />
           </div>
           <div class="stat-content">
             <span class="stat-value">{{ info.totalBeanCount }}</span>
-            <span class="stat-label">가지 원두</span>
+            <span class="stat-label">원두</span>
           </div>
         </div>
       </div>
@@ -38,43 +38,39 @@
     <!-- 하이라이트 카드 -->
     <div class="highlight-cards">
       <!-- 주요 원산지 -->
-      <div class="highlight-card origin">
+      <div class="highlight-card">
         <div class="highlight-header">
-          <BaseIcon name="star-fill" :size="16" color="#f9a825" />
-          <span class="highlight-label">이번 달 최다</span>
+          <BaseIcon name="star-fill" :size="14" color="var(--color-primary-500)" />
+          <span class="highlight-label">최다 원산지</span>
         </div>
         <div class="highlight-value">{{ info.topOrigin || '없음' }}</div>
-        <div class="highlight-sublabel">주요 원산지</div>
       </div>
 
       <!-- 주요 로스터리 -->
-      <div class="highlight-card roastery">
+      <div class="highlight-card">
         <div class="highlight-header">
-          <BaseIcon name="bookmark-fill" :size="16" color="var(--color-primary-500)" />
+          <BaseIcon name="bookmark-fill" :size="14" color="var(--color-primary-500)" />
           <span class="highlight-label">단골 카페</span>
         </div>
         <div class="highlight-value small">{{ info.topRoastery || '없음' }}</div>
-        <div class="highlight-sublabel">가장 많이 방문</div>
       </div>
     </div>
 
-    <!-- 원산지 여정 (있을 경우) -->
+    <!-- 원산지 여정 (간결 버전) -->
     <div v-if="info.originSequence?.length" class="journey-card">
       <div class="journey-header">
-        <BaseIcon name="mapPin" :size="18" color="var(--color-primary-600)" />
-        <span class="journey-title">이번 달 커피 여정</span>
-      </div>
-      <div class="journey-route">
-        <span v-for="(origin, idx) in info.originSequence" :key="idx" class="route-stop">
-          <span class="stop-name">{{ origin }}</span>
-          <span v-if="idx < info.originSequence.length - 1" class="route-line">
-            <span class="route-dot"></span>
-            <span class="route-dash"></span>
-          </span>
+        <BaseIcon name="mapPin" :size="16" color="var(--color-primary-600)" />
+        <span class="journey-title">커피 여정</span>
+        <span v-if="info.totalOriginDistance" class="journey-distance">
+          {{ formatDistance(info.totalOriginDistance) }}km
         </span>
       </div>
-      <div v-if="info.totalOriginDistance" class="journey-distance">
-        총 {{ formatDistance(info.totalOriginDistance) }} km 여정
+      <div class="journey-route">
+        <template v-for="(origin, idx) in info.originSequence" :key="idx">
+          <span class="stop-badge">{{ origin }}</span>
+          <BaseIcon v-if="idx < info.originSequence.length - 1" name="chevron-right" :size="12"
+            color="var(--color-primary-400)" />
+        </template>
       </div>
     </div>
   </div>
@@ -83,7 +79,7 @@
 <script setup>
 import BaseIcon from '@/components/common/BaseIcon.vue'
 
-const props = defineProps({
+defineProps({
   info: {
     type: Object,
     required: true
@@ -97,7 +93,7 @@ const formatDistance = (distance) => {
 
 <style scoped>
 .passport-stats {
-  padding: 1.25rem;
+  padding: var(--space-lg) var(--page-padding);
   margin-top: -40px;
   position: relative;
   z-index: 10;
@@ -106,10 +102,10 @@ const formatDistance = (distance) => {
 /* 메인 통계 카드 */
 .main-stats-card {
   background: white;
-  border-radius: 20px;
-  padding: 1.25rem;
-  box-shadow: 0 8px 24px rgba(99, 73, 54, 0.1);
-  margin-bottom: 1rem;
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 4px 16px rgba(132, 97, 72, 0.1);
+  margin-bottom: 0.75rem;
 }
 
 .stats-grid {
@@ -121,28 +117,18 @@ const formatDistance = (distance) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.375rem;
 }
 
 .stat-icon-wrapper {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.stat-icon-wrapper.coffee {
-  background: linear-gradient(135deg, #f8e9d9 0%, #f0dcc7 100%);
-}
-
-.stat-icon-wrapper.store {
-  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-}
-
-.stat-icon-wrapper.bean {
-  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  background: var(--color-primary-50);
+  border: 1px solid var(--color-primary-100);
 }
 
 .stat-content {
@@ -152,100 +138,88 @@ const formatDistance = (distance) => {
 }
 
 .stat-value {
-  font-size: 1.5rem;
-  font-weight: 800;
+  font-size: 1.375rem;
+  font-weight: 700;
   color: var(--color-primary-700);
   line-height: 1.2;
 }
 
 .stat-label {
-  font-size: 0.75rem;
-  color: var(--color-textSecondary);
+  font-size: 0.6875rem;
+  color: var(--color-primary-500);
 }
 
 /* 하이라이트 카드 */
 .highlight-cards {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  gap: 0.625rem;
+  margin-bottom: 0.75rem;
 }
 
 .highlight-card {
   background: white;
-  border-radius: 16px;
-  padding: 1rem;
-  box-shadow: 0 4px 12px rgba(99, 73, 54, 0.06);
-  position: relative;
-  overflow: hidden;
-}
-
-.highlight-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-}
-
-.highlight-card.origin::before {
-  background: linear-gradient(90deg, #FFD700, #FFA500);
-}
-
-.highlight-card.roastery::before {
-  background: linear-gradient(90deg, var(--color-primary-400), var(--color-primary-600));
+  border-radius: 12px;
+  padding: 0.75rem;
+  box-shadow: 0 2px 8px rgba(132, 97, 72, 0.06);
+  border: 1px solid var(--color-primary-100);
 }
 
 .highlight-header {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
-  margin-bottom: 0.5rem;
+  gap: 0.25rem;
+  margin-bottom: 0.25rem;
 }
 
 .highlight-label {
-  font-size: 0.6875rem;
-  color: var(--color-textSecondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-size: 0.625rem;
+  color: var(--color-primary-500);
+  font-weight: 500;
 }
 
 .highlight-value {
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--color-primary-700);
-  margin-bottom: 0.125rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .highlight-value.small {
-  font-size: 1rem;
-}
-
-.highlight-sublabel {
-  font-size: 0.6875rem;
-  color: var(--color-textSecondary);
+  font-size: 0.875rem;
 }
 
 /* 여정 카드 */
 .journey-card {
-  background: linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-primary-100) 100%);
-  border-radius: 16px;
-  padding: 1rem;
+  background: var(--color-primary-50);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
   border: 1px solid var(--color-primary-200);
 }
 
 .journey-header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  gap: 0.375rem;
+  margin-bottom: 0.5rem;
 }
 
 .journey-title {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--color-primary-700);
+  flex: 1;
+}
+
+.journey-distance {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--color-primary-500);
+  background: white;
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
 }
 
 .journey-route {
@@ -255,45 +229,86 @@ const formatDistance = (distance) => {
   gap: 0.25rem;
 }
 
-.route-stop {
-  display: flex;
-  align-items: center;
-}
-
-.stop-name {
+.stop-badge {
   background: white;
-  padding: 0.25rem 0.625rem;
-  border-radius: 8px;
-  font-size: 0.8125rem;
-  font-weight: 500;
+  padding: 0.1875rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 600;
   color: var(--color-primary-700);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--color-primary-200);
 }
 
-.route-line {
-  display: flex;
-  align-items: center;
-  margin: 0 0.25rem;
+.stop-more {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--color-primary-500);
+  padding: 0.1875rem 0.375rem;
 }
 
-.route-dot {
-  width: 4px;
-  height: 4px;
-  background-color: var(--color-primary-400);
-  border-radius: 50%;
+/* 반응형: 작은 화면 (360px 이하) */
+@media (max-width: 360px) {
+  .passport-stats {
+    padding: 0.875rem 1rem;
+  }
+
+  .main-stats-card {
+    padding: 0.875rem;
+  }
+
+  .stat-icon-wrapper {
+    width: 40px;
+    height: 40px;
+  }
+
+  .stat-value {
+    font-size: 1.25rem;
+  }
+
+  /* 하이라이트 카드 1열로 변경 */
+  .highlight-cards {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .highlight-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.625rem 0.75rem;
+  }
+
+  .highlight-header {
+    margin-bottom: 0;
+  }
+
+  .highlight-value {
+    font-size: 0.9375rem;
+    margin-left: auto;
+  }
+
+  .highlight-value.small {
+    font-size: 0.875rem;
+  }
+
+  .stop-badge {
+    padding: 0.125rem 0.375rem;
+    font-size: 0.625rem;
+  }
 }
 
-.route-dash {
-  width: 12px;
-  height: 2px;
-  background-color: var(--color-primary-300);
-  margin-left: 2px;
-}
+/* 반응형: 중간 화면 (361px - 400px) */
+@media (min-width: 361px) and (max-width: 400px) {
+  .stat-value {
+    font-size: 1.25rem;
+  }
 
-.journey-distance {
-  margin-top: 0.75rem;
-  font-size: 0.75rem;
-  color: var(--color-primary-600);
-  text-align: right;
+  .highlight-value {
+    font-size: 0.9375rem;
+  }
+
+  .highlight-value.small {
+    font-size: 0.8125rem;
+  }
 }
 </style>
