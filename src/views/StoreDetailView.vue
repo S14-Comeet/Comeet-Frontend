@@ -40,7 +40,7 @@
               <BaseChip
                 v-if="store.category"
                 :label="store.category"
-                variant="accent"
+                variant="primary"
               />
               <span v-if="store.isClosed" class="closed-badge">영업종료</span>
             </div>

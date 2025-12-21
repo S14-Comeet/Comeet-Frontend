@@ -9,7 +9,7 @@
       <!-- 메뉴 기본 정보 -->
       <div
         class="menu-item shadow-sm cursor-pointer hover:shadow"
-        @click="toggleExpand(menu)"
+        @click="selectMenu(menu)"
       >
         <div class="menu-image-wrapper">
           <img
@@ -183,6 +183,8 @@ defineProps({
   }
 })
 
+const emit = defineEmits(['select-menu'])
+
 const expandedMenuId = ref(null)
 const loadingMenuId = ref(null)
 const menuBeans = ref({}) // { menuId: [{ id, name }, ...] }
@@ -208,6 +210,10 @@ const formatRoastLevel = (level) => {
 
 const getMenuBeans = (menuId) => {
   return menuBeans.value[menuId] || []
+}
+
+const selectMenu = (menu) => {
+  emit('select-menu', menu)
 }
 
 const toggleExpand = async (menu) => {
