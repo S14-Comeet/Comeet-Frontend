@@ -1,7 +1,7 @@
 <template>
   <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-nav z-[9999]">
-    <div class="max-w-screen-sm mx-auto px-4 pb-safe">
-      <div class="flex items-center justify-around h-16 border-t border-border">
+    <div class="w-full px-4 pb-safe">
+      <div class="flex items-center justify-around h-16">
         <!-- 지도 -->
         <router-link to="/map" class="nav-item" :class="{ 'nav-item-active': isActive('/map') }">
           <component :is="getIcon('map')" class="nav-icon" />
