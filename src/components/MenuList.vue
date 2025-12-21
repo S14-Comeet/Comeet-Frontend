@@ -27,20 +27,19 @@
           <p v-if="menu.description" class="menu-description">{{ menu.description }}</p>
           <div class="menu-footer">
             <p class="menu-price">{{ formatPrice(menu.price) }}원</p>
-            <button class="bean-toggle-btn" @click.stop="toggleExpand(menu)">
-              <BaseIcon name="coffee" :size="14" />
-              <span>원두</span>
+            <button class="bean-info-btn" @click.stop="toggleExpand(menu)">
+              <span>원두 정보</span>
               <svg
                 class="toggle-icon"
                 :class="{ rotated: expandedMenuId === menu.id }"
-                width="14"
-                height="14"
+                width="12"
+                height="12"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2.5"
               >
-                <polyline points="6 9 12 15 18 9"></polyline>
+                <polyline points="9 18 15 12 9 6"></polyline>
               </svg>
             </button>
           </div>
@@ -362,23 +361,22 @@ const closeBeanDetail = () => {
   margin: 0;
 }
 
-.bean-toggle-btn {
+.bean-info-btn {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  padding: 0.35rem 0.6rem;
-  background-color: var(--color-primary-50);
-  color: var(--color-primary-700);
+  padding: 0;
+  background: none;
+  color: var(--color-textSecondary);
   border: none;
-  border-radius: 9999px;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: color 0.2s;
 }
 
-.bean-toggle-btn:hover {
-  background-color: var(--color-primary-100);
+.bean-info-btn:hover {
+  color: var(--color-primary);
 }
 
 .toggle-icon {
@@ -386,7 +384,7 @@ const closeBeanDetail = () => {
 }
 
 .toggle-icon.rotated {
-  transform: rotate(180deg);
+  transform: rotate(90deg);
 }
 
 /* 확장 영역 */
