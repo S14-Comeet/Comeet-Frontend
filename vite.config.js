@@ -13,7 +13,14 @@ export default defineConfig({
     ],
     server: {
         port: 5173,
-        open: true
+        open: true,
+        proxy: {
+            '/kakao-api': {
+                target: 'https://dapi.kakao.com',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/kakao-api/, '')
+            }
+        }
     },
     resolve: {
         alias: {

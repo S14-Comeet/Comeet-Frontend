@@ -42,6 +42,13 @@ export const map = {
 }
 
 /**
+ * 카카오 API 설정
+ */
+export const kakao = {
+  restApiKey: import.meta.env.VITE_KAKAO_REST_API_KEY,
+}
+
+/**
  * 앱 설정
  */
 export const app = {
@@ -54,5 +61,6 @@ export default {
   api,
   oauth,
   map,
+  kakao,
   app,
 }
