@@ -1,43 +1,27 @@
 <template>
-  <nav class="absolute bottom-0 left-0 right-0 bg-white shadow-nav z-[9999]">
-    <div class="max-w-screen-sm mx-auto px-4 pb-safe">
-      <div class="flex items-center justify-around h-16 border-t border-border">
-        <!-- 홈 -->
-        <router-link
-          to="/"
-          class="nav-item"
-          :class="{ 'nav-item-active': isActive('/') }"
-        >
-          <component :is="getIcon('home')" class="nav-icon" />
-          <span class="nav-label">홈</span>
-        </router-link>
-
+  <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-nav z-[9999]">
+    <div class="w-full px-4 pb-safe">
+      <div class="flex items-center justify-around h-16">
         <!-- 지도 -->
-        <router-link
-          to="/map"
-          class="nav-item"
-          :class="{ 'nav-item-active': isActive('/map') }"
-        >
+        <router-link to="/map" class="nav-item" :class="{ 'nav-item-active': isActive('/map') }">
           <component :is="getIcon('map')" class="nav-icon" />
           <span class="nav-label">지도</span>
         </router-link>
 
+        <!-- 여권 -->
+        <router-link to="/passport" class="nav-item" :class="{ 'nav-item-active': isActive('/passport') }">
+          <component :is="getIcon('passport')" class="nav-icon" />
+          <span class="nav-label">여권</span>
+        </router-link>
+
         <!-- 저장 -->
-        <router-link
-          to="/saved"
-          class="nav-item"
-          :class="{ 'nav-item-active': isActive('/saved') }"
-        >
+        <router-link to="/saved" class="nav-item" :class="{ 'nav-item-active': isActive('/saved') }">
           <component :is="getIcon('bookmark')" class="nav-icon" />
           <span class="nav-label">저장</span>
         </router-link>
 
         <!-- 마이 -->
-        <router-link
-          to="/profile"
-          class="nav-item"
-          :class="{ 'nav-item-active': isActive('/profile') }"
-        >
+        <router-link to="/profile" class="nav-item" :class="{ 'nav-item-active': isActive('/profile') }">
           <component :is="getIcon('user')" class="nav-icon" />
           <span class="nav-label">마이</span>
         </router-link>
@@ -50,10 +34,10 @@
 import { useRoute } from 'vue-router'
 
 // SVG 아이콘 임포트
-import HomeLineIcon from '@/assets/icons/home-line.svg?component'
-import HomeFillIcon from '@/assets/icons/home-fill.svg?component'
 import MapLineIcon from '@/assets/icons/map-line.svg?component'
 import MapFillIcon from '@/assets/icons/map-fill.svg?component'
+import PassportLineIcon from '@/assets/icons/passport-line.svg?component'
+import PassportFillIcon from '@/assets/icons/passport-fill.svg?component'
 import BookmarkLineIcon from '@/assets/icons/bookmark-line.svg?component'
 import BookmarkFillIcon from '@/assets/icons/bookmark-fill.svg?component'
 import UserLineIcon from '@/assets/icons/user-line.svg?component'
@@ -64,9 +48,6 @@ const route = useRoute()
  * 현재 라우트가 활성 상태인지 확인
  */
 const isActive = (path) => {
-  if (path === '/') {
-    return route.path === '/' || route.path === '/home'
-  }
   return route.path.startsWith(path)
 }
 
@@ -75,8 +56,8 @@ const isActive = (path) => {
  */
 const getIcon = (type) => {
   const icons = {
-    home: isActive('/') ? HomeFillIcon : HomeLineIcon,
     map: isActive('/map') ? MapFillIcon : MapLineIcon,
+    passport: isActive('/passport') ? PassportFillIcon : PassportLineIcon,
     bookmark: isActive('/saved') ? BookmarkFillIcon : BookmarkLineIcon,
     user: UserLineIcon, // user는 fill 버전이 없으므로 항상 line
   }
@@ -117,7 +98,8 @@ const getIcon = (type) => {
 /* 활성 상태 */
 .nav-item-active {
   color: var(--color-primary);
-  background-color: rgba(132, 97, 72, 0.08); /* Primary 600 8% opacity */
+  background-color: rgba(132, 97, 72, 0.08);
+  /* Primary 600 8% opacity */
 }
 
 .nav-item-active .nav-icon {
@@ -131,8 +113,9 @@ const getIcon = (type) => {
 /* 호버 상태 (데스크톱) */
 @media (hover: hover) {
   .nav-item:hover {
-        color: var(--color-primary);
-    background-color: rgba(164, 121, 91, 0.06); /* Primary 500 6% opacity */
+    color: var(--color-primary);
+    background-color: rgba(164, 121, 91, 0.06);
+    /* Primary 500 6% opacity */
   }
 
   .nav-item:hover .nav-icon {
@@ -142,7 +125,8 @@ const getIcon = (type) => {
 
 /* 상단 그림자 (네비게이션바) */
 nav {
-  box-shadow: 0 -2px 8px rgba(99, 73, 54, 0.08); /* Primary 700 8% opacity */
+  box-shadow: 0 -2px 8px rgba(99, 73, 54, 0.08);
+  /* Primary 700 8% opacity */
   backdrop-filter: blur(8px);
   background-color: rgba(255, 255, 255, 0.95);
 }

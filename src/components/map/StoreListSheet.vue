@@ -1,99 +1,36 @@
 <template>
-  <div
-    class="store-list-sheet"
-    :class="sheetStateClass"
-    :style="sheetStyle"
-    @touchstart="handleTouchStart"
-    @touchmove="handleTouchMove"
-    @touchend="handleTouchEnd"
-  >
+  <div class="store-list-sheet" :class="sheetStateClass" :style="sheetStyle" @touchstart="handleTouchStart"
+    @touchmove="handleTouchMove" @touchend="handleTouchEnd">
     <!-- 드래그 핸들 -->
-    <div
-      class="sheet-handle"
-      role="button"
-      tabindex="0"
-      aria-label="시트 크기 조절"
-      @click="toggleSheet"
-      @keydown.enter="toggleSheet"
-      @keydown.space.prevent="toggleSheet"
-    >
+    <div class="sheet-handle" role="button" tabindex="0" aria-label="시트 크기 조절" @click="toggleSheet"
+      @keydown.enter="toggleSheet" @keydown.space.prevent="toggleSheet">
       <div class="handle-bar"></div>
     </div>
 
-    <!-- 검색 영역 -->
-    <div class="search-section">
-      <!-- 검색 입력창 -->
-      <div class="search-input-row">
-        <div class="search-input-wrapper">
-          <BaseIcon name="search" :size="18" class="search-icon" />
-          <input
-            ref="searchInput"
-            v-model="keyword"
-            type="text"
-            placeholder="카페명 또는 주소 검색"
-            class="search-input"
-            @keydown.enter="handleSearch"
-            @focus="handleSearchFocus"
-          />
-          <button
-            v-if="keyword"
-            class="clear-button"
-            type="button"
-            aria-label="검색어 지우기"
-            @click="clearKeyword"
-          >
-            <BaseIcon name="x" :size="14" />
-          </button>
-          <!-- 지도/전국 토글 버튼 (인풋 안쪽) -->
-          <button
-            :class="['search-scope-toggle', isGlobalSearch && 'active']"
-            :title="isGlobalSearch ? '지도 영역 검색' : '전국 검색'"
-            type="button"
-            @click.stop="toggleGlobalSearch"
-          >
-            <BaseIcon :name="isGlobalSearch ? 'globe' : 'mapPin'" :size="14" />
-          </button>
-        </div>
-      </div>
-
-      <!-- 카테고리 필터 (확장 시에만 표시) -->
-      <div v-if="sheetState !== 'collapsed'" class="filter-row">
-        <div class="category-chips">
-          <button
-            v-for="category in categories"
-            :key="category"
-            :class="['category-chip', selectedCategories.includes(category) && 'selected']"
-            @click="toggleCategory(category)"
-          >
-            {{ category }}
-          </button>
-        </div>
-      </div>
-
-      <!-- 결과 헤더 -->
-      <div class="results-header">
-        <div class="results-info">
-          <span class="results-count">{{ stores.length }}개의 카페</span>
-          <span v-if="hasActiveFilters" class="filter-badge" @click="clearAllFilters">
-            필터 초기화
-          </span>
-        </div>
-        <button
-          v-if="sheetState !== 'collapsed'"
-          class="collapse-button"
-          @click="collapseSheet"
-        >
-          <BaseIcon name="chevron-down" :size="18" />
-        </button>
-      </div>
+    <!-- 카테고리 필터 -->
+    <div class="category-filter-row">
+      <button v-for="category in categories" :key="category"
+        :class="['category-chip', selectedCategories.includes(category) && 'selected']"
+        @click="toggleCategory(category)">
+        {{ category }}
+      </button>
     </div>
 
-    <!-- 가게 리스트 -->
-    <div
-      ref="listContainer"
-      class="store-list"
-      :class="{ 'scrollable': sheetState !== 'collapsed' }"
-    >
+    <!-- 결과 헤더 -->
+    <div class="results-header">
+      <div class="results-info">
+        <span class="results-count">{{ stores.length }}개의 카페</span>
+        <span v-if="hasActiveFilters" class="filter-badge" @click="clearAllFilters">
+          필터 초기화
+        </span>
+      </div>
+      <button v-if="sheetState !== 'collapsed'" class="collapse-button" @click="collapseSheet">
+        <BaseIcon name="chevron-down" :size="18" />
+      </button>
+    </div>
+
+    <!-- 가게 리스트 (확장 시에만 표시) -->
+    <div v-if="sheetState !== 'collapsed'" ref="listContainer" class="store-list scrollable">
       <div v-if="stores.length === 0 && !isSearching" class="empty-state">
         <BaseIcon name="coffee" :size="40" class="empty-icon" />
         <p class="empty-title">검색 결과가 없습니다</p>
@@ -105,14 +42,8 @@
         <p>검색 중...</p>
       </div>
 
-      <StoreCard
-        v-for="store in stores"
-        v-else
-        :key="store.storeId || store.id"
-        :store="store"
-        variant="compact"
-        @click="handleStoreClick"
-      />
+      <StoreCard v-for="store in stores" v-else :key="store.storeId || store.id" :store="store" variant="compact"
+        @click="handleStoreClick" />
     </div>
   </div>
 </template>
@@ -149,7 +80,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['select-store', 'state-change', 'search'])
+const emit = defineEmits(['select-store', 'state-change', 'search', 'search-area'])
 
 // 카테고리 목록
 const categories = ['핸드드립', '라떼', '콜드브루', '에스프레소', '아메리카노']
@@ -161,7 +92,7 @@ const isGlobalSearch = ref(props.initialGlobalSearch)
 const searchInput = ref(null)
 
 // 시트 상태
-const sheetState = ref('collapsed')
+const sheetState = ref('half')
 const listContainer = ref(null)
 
 // 드래그 관련
@@ -281,6 +212,12 @@ const toggleSheet = () => {
 // 시트 접기
 const collapseSheet = () => {
   sheetState.value = 'collapsed'
+  emit('state-change', sheetState.value)
+}
+
+// 시트 확장 (collapsed → half)
+const expandSheet = () => {
+  sheetState.value = 'half'
   emit('state-change', sheetState.value)
 }
 
@@ -411,8 +348,7 @@ watch(
   transition: height 0.25s cubic-bezier(0.32, 0.72, 0, 1);
   display: flex;
   flex-direction: column;
-  max-width: 448px;
-  margin: 0 auto;
+  width: 100%;
   will-change: height;
 }
 
@@ -421,7 +357,9 @@ watch(
 }
 
 .store-list-sheet.state-collapsed {
-  height: 100px;
+  height: auto;
+  border-radius: 1rem 1rem 0 0;
+  margin-bottom: env(safe-area-inset-bottom, 0);
 }
 
 .store-list-sheet.state-half {
@@ -452,10 +390,131 @@ watch(
   border-radius: 9999px;
 }
 
-/* 검색 영역 */
+/* 이 지역 검색 버튼 행 */
+.search-area-row {
+  padding: 0 var(--page-padding, 1rem);
+  margin-bottom: 0.5rem;
+}
+
+.search-area-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.625rem 1rem;
+  background-color: var(--color-primary-600);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(132, 97, 72, 0.25);
+  transition: all 200ms ease;
+}
+
+.search-area-btn:hover:not(:disabled) {
+  background-color: var(--color-primary-700);
+}
+
+.search-area-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.search-area-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* 카테고리 필터 행 (유동적 너비) */
+.category-filter-row {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 var(--page-padding, 1rem);
+  margin-bottom: 0.75rem;
+}
+
+.category-filter-row .category-chip {
+  flex: 1;
+  padding: 0.5rem 0.25rem;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-neutral-700);
+  text-align: center;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.category-filter-row .category-chip:hover {
+  border-color: var(--color-primary-300);
+  background: var(--color-primary-50);
+}
+
+.category-filter-row .category-chip.selected {
+  background: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+  color: white;
+}
+
+/* 결과 헤더 (반응형 패딩) */
+.results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem var(--page-padding, 1rem);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.results-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.results-count {
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: 600;
+  color: var(--color-neutral-800);
+}
+
+.filter-badge {
+  font-size: 0.6875rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--color-primary-100);
+  color: var(--color-primary-700);
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-badge:hover {
+  background: var(--color-primary-200);
+}
+
+.collapse-button {
+  padding: 0.375rem;
+  border-radius: 0.5rem;
+  color: var(--color-textSecondary);
+  transition: all 0.2s;
+}
+
+.collapse-button:hover {
+  background-color: var(--color-primary-50);
+  color: var(--color-primary-600);
+}
+
+/* 검색 영역 (사용 안 함 - 상단으로 이동됨) */
 .search-section {
   padding: 0 0.875rem;
   flex-shrink: 0;
+}
+
+/* Collapsed 모드에서 검색 영역 스타일 */
+.search-section.collapsed-mode {
+  padding: 0.75rem;
 }
 
 /* 검색 입력 행 */
@@ -544,6 +603,39 @@ watch(
   background: var(--color-accent);
   border-color: var(--color-accent);
   color: white;
+}
+
+/* 확장 버튼 */
+.expand-button {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-primary-600);
+  border: none;
+  border-radius: 0.75rem;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(132, 97, 72, 0.25);
+}
+
+.expand-button:hover {
+  background: var(--color-primary-700);
+  box-shadow: 0 4px 12px rgba(132, 97, 72, 0.35);
+}
+
+.expand-button:active {
+  transform: scale(0.97);
+}
+
+.expand-count {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
 }
 
 /* 필터 행 */
@@ -693,6 +785,7 @@ watch(
 
 /* Safe Area */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
+
   .store-list-sheet.state-half,
   .store-list-sheet.state-full {
     padding-bottom: env(safe-area-inset-bottom);
