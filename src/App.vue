@@ -30,7 +30,7 @@ const router = useRouter();
 const notificationStore = useNotificationStore();
 
 // 헤더를 숨길 페이지 목록
-const pagesWithoutHeader = new Set(['login', 'nickname', 'map', 'my-reviews', 'review-write', 'review-select', 'store-detail']);
+const pagesWithoutHeader = new Set(['login', 'nickname', 'map', 'review-write', 'review-select']);
 
 // 네비게이션 바를 숨길 페이지 목록 (로그인, 닉네임, 설문, 리뷰 작성)
 const pagesWithoutNavigation = new Set(['login', 'nickname', 'survey', 'review-write', 'review-select']);
@@ -49,9 +49,8 @@ const isFullScreenPage = computed(() => {
 });
 
 // 뒤로가기 버튼을 표시할 페이지 목록
-const showBackButton = computed(() => {
-  return route.name === 'notifications';
-});
+const pagesWithBackButton = new Set(['notifications', 'menu', 'store-detail', 'my-reviews']);
+const showBackButton = computed(() => pagesWithBackButton.has(route.name));
 
 // 읽지 않은 알림이 있는지
 const hasUnreadNotifications = computed(() => notificationStore.hasUnread);

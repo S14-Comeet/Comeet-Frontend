@@ -192,7 +192,7 @@ const handleCategoryClick = (categoryName) => {
 
 // Composables
 const { location, requestLocation } = useGeolocation()
-const { map, markers, initMap, addMarker, clearMarkers } = useNaverMap()
+const { map, markers, initMap, clearMarkers } = useNaverMap()
 
 // Map composables (map이 초기화된 후 사용)
 const {
@@ -200,7 +200,7 @@ const {
   updateMarkerSizes,
   renderMarkers: renderMarkersBase,
   cleanup: cleanupMarkers
-} = useMapMarkers(map, markers, clearMarkers, addMarker)
+} = useMapMarkers(map, markers, clearMarkers)
 
 const {
   popupStore,
@@ -296,7 +296,7 @@ const showStorePopup = (store) => {
   const lat = store.lat || store.latitude
   const lng = store.lng || store.longitude
 
-  panToWithOffset(lat, lng, { offsetRatio: 0.25 })
+  panToWithOffset(lat, lng, { offsetRatio: 0.35 })
 
   setTimeout(() => {
     popupStore.value = store

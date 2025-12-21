@@ -58,7 +58,7 @@ const routes = [
     component: () => import('@/views/OAuthCallbackView.vue')
   },
   {
-    path: '/menu',
+    path: '/menu/:storeId',
     name: 'menu',
     component: () => import('@/views/MenuView.vue')
   },
@@ -105,7 +105,8 @@ const PUBLIC_PAGES = new Set(['/login', '/oauth/callback', '/test-components', '
 
 /** 동적 경로 패턴 체크 함수 */
 const PUBLIC_PATH_PATTERNS = [
-  /^\/store\/\d+$/  // /store/:storeId
+  /^\/store\/\d+$/,  // /store/:storeId
+  /^\/menu\/\d+$/    // /menu/:storeId
 ];
 
 /**

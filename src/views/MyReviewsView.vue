@@ -1,7 +1,5 @@
 <template>
   <div class="my-reviews-view h-full flex flex-col bg-background">
-    <BaseHeader title="내 리뷰" show-back-button />
-
     <div class="flex-1 overflow-y-auto px-4 py-6">
       <!-- Loading State -->
       <div v-if="isLoading && reviews.length === 0" class="flex justify-center items-center py-20">
@@ -59,7 +57,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import BaseHeader from '@/components/common/BaseHeader.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import ReviewCard from '@/components/review/ReviewCard.vue'

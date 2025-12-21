@@ -1,98 +1,114 @@
 <template>
   <div class="menu-view">
-    <div class="header-section">
-      <h1 class="page-title">메뉴</h1>
+    <!-- Loading State -->
+    <div v-if="isLoading" class="loading-state">
+      <BaseIcon name="spinner" :size="32" class="text-primary animate-spin" />
     </div>
 
-    <MenuList :menus="menuData" />
-
-    <!-- Review Button Section -->
-    <div class="review-button-section">
-      <ReviewButton @click="goToReview" />
+    <!-- Error State -->
+    <div v-else-if="error" class="error-state">
+      <BaseIcon name="x" :size="48" class="text-error mb-4" />
+      <p class="text-textPrimary font-medium mb-2">메뉴를 불러올 수 없습니다</p>
+      <p class="text-textSecondary text-sm mb-4">{{ error }}</p>
+      <BaseButton label="다시 시도" variant="primary" @click="fetchMenus" />
     </div>
+
+    <!-- Empty State -->
+    <div v-else-if="menuData.length === 0" class="empty-state">
+      <BaseIcon name="coffee" :size="48" class="text-primary-300 mb-4" />
+      <p class="text-textSecondary">등록된 메뉴가 없습니다</p>
+    </div>
+
+    <!-- Menu List -->
+    <template v-else>
+      <MenuList :menus="menuData" />
+
+      <!-- Review Button Section -->
+      <div class="review-button-section">
+        <ReviewButton @click="goToReview" />
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { createLogger } from '@/utils/logger'
 import MenuList from '@/components/MenuList.vue'
 import ReviewButton from '@/components/review/ReviewButton.vue'
+import BaseButton from '@/components/common/BaseButton.vue'
+import BaseIcon from '@/components/common/BaseIcon.vue'
+import { getMenusByStoreId } from '@/api/menu'
 
+const logger = createLogger('MenuView')
+const route = useRoute()
 const router = useRouter()
 
-// Mock 데이터 - 추후 API 연결 시 제거 예정
-const menuData = ref([
-  {
-    id: 1,
-    store_id: 1,
-    name: '바리스타 set',
-    price: 12000,
-    description: '에스프레소, 스몰사이즈 라떼, 필터커피\n총 세 잔의 커피가 제공됩니다.',
-    category: ['대표', '세트메뉴'],
-    image_url: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=400&fit=crop'
-  },
-  {
-    id: 2,
-    store_id: 1,
-    name: '녹 아이스 커피 (ICED)',
-    price: 7000,
-    description: '바닐라아이스크림이\n 들어가는 \n아이스크림 \n라떼',
-    category: ['대표', '아이스'],
-    image_url: 'https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?w=400&h=400&fit=crop'
-  },
-  {
-    id: 3,
-    store_id: 1,
-    name: '몽블랑 MONT BLANC',
-    price: 6000,
-    description: '오렌지 제스트와 넛맥향이 은은한 크림을 드브뤼',
-    category: ['대표', '디저트'],
-    image_url: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&h=400&fit=crop'
-  },
-  {
-    id: 4,
-    store_id: 1,
-    name: '녹밀크 NOOK Milk',
-    price: 6000,
-    description: '논카페인 캐모마일 밀크티',
-    category: ['대표', '논카페인'],
-    image_url: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=400&fit=crop'
+const storeId = computed(() => route.params.storeId)
+const storeName = computed(() => route.query.name || '')
+
+const menuData = ref([])
+const isLoading = ref(true)
+const error = ref(null)
+
+const fetchMenus = async () => {
+  if (!storeId.value) {
+    error.value = '가게 ID가 없습니다'
+    isLoading.value = false
+    return
   }
-])
+
+  isLoading.value = true
+  error.value = null
+
+  try {
+    const response = await getMenusByStoreId(storeId.value, { page: 1, size: 50 })
+    const data = response?.data ?? response
+    const menus = data?.content ?? (Array.isArray(data) ? data : [])
+    menuData.value = menus
+    logger.info(`Loaded ${menuData.value.length} menus for store ${storeId.value}`)
+  } catch (e) {
+    logger.error('Failed to fetch menus', e)
+    error.value = e.response?.data?.message || '메뉴를 불러오는데 실패했습니다'
+  } finally {
+    isLoading.value = false
+  }
+}
 
 const goToReview = () => {
-  // Use store_id from first item or default to 1
-  const storeId = menuData.value.length > 0 ? menuData.value[0].store_id : 1
-
   router.push({
     name: 'review-select',
     query: {
-      storeId: storeId,
-      name: '커핏 강남점' // Mock name, ideally fetched or passed
+      storeId: storeId.value,
+      name: storeName.value
     }
   })
 }
+
+onMounted(() => {
+  fetchMenus()
+})
 </script>
 
 <style scoped>
 .menu-view {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-  padding-bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background-color: var(--color-background);
 }
 
-.header-section {
-  margin-bottom: 1.5rem;
-  padding: 0 1rem;
-}
-
-.page-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--color-primary-950);
-  margin: 0;
+.loading-state,
+.error-state,
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
 }
 
 .review-button-section {
@@ -106,20 +122,6 @@ const goToReview = () => {
 }
 
 @media (max-width: 640px) {
-  .menu-view {
-    padding: 1rem 0.5rem;
-    padding-bottom: 140px;
-  }
-
-  .header-section {
-    padding: 0 0.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .page-title {
-    font-size: 1.5rem;
-  }
-
   .review-button-section {
     bottom: calc(64px + env(safe-area-inset-bottom) + 16px);
     padding: 0 1rem;
