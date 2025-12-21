@@ -61,15 +61,20 @@
           @item-click="handleTimelineItemClick" />
       </section>
     </template>
+
+    <!-- 타임라인 지도 모드 -->
+    <TimelineMapMode v-if="isMapMode" :records="passportStore.sortedRecords" :initial-index="mapModeIndex"
+      :month="passportStore.currentPassport?.month" @close="closeMapMode" @index-change="handleMapIndexChange" />
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePassportStore } from '@/store/passport'
 import PassportStats from '@/components/passport/PassportStats.vue'
 import PassportTimeline from '@/components/passport/PassportTimeline.vue'
+import TimelineMapMode from '@/components/passport/TimelineMapMode.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -81,6 +86,10 @@ const monthLabel = computed(() => {
   const month = passportStore.currentPassport?.month
   return month ? `${month}월` : ''
 })
+
+// 지도 모드 상태
+const isMapMode = ref(false)
+const mapModeIndex = ref(0)
 
 const loadPassportDetail = async () => {
   try {
@@ -98,8 +107,22 @@ const goToMap = () => {
   router.push('/map')
 }
 
+// 타임라인 아이템 클릭 → 지도 모드 진입
 const handleTimelineItemClick = (record) => {
-  router.push(`/store/${record.storeId}`)
+  // sortedRecords에서 해당 record의 인덱스 찾기
+  const index = passportStore.sortedRecords.findIndex(r => r.visitId === record.visitId)
+  mapModeIndex.value = index >= 0 ? index : 0
+  isMapMode.value = true
+}
+
+// 지도 모드 닫기
+const closeMapMode = () => {
+  isMapMode.value = false
+}
+
+// 지도 모드 인덱스 변경
+const handleMapIndexChange = (index) => {
+  mapModeIndex.value = index
 }
 
 onMounted(() => {
