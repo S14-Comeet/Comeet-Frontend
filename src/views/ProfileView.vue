@@ -17,10 +17,21 @@
             <p class="text-textPrimary text-lg font-bold">{{ authStore.userNickname }}</p>
             <p class="text-textSecondary text-sm">{{ authStore.userEmail }}</p>
             <p class="text-xs text-primary mt-1">
-              {{ authStore.userRole === 'OWNER' ? '가맹점주' : '일반 사용자' }}
+              {{ authStore.isOwner ? '가맹점주' : '일반 사용자' }}
             </p>
           </div>
         </div>
+      </div>
+
+      <!-- 점주 전용 메뉴 -->
+      <div v-if="authStore.isOwner" class="bg-white rounded-lg shadow-sm mb-4">
+        <button
+          class="w-full flex items-center justify-between p-4 hover:bg-primary-50 transition-colors"
+          @click="goToOwnerStores"
+        >
+          <span class="text-textPrimary font-medium">내 가게 관리</span>
+          <span class="text-textSecondary">›</span>
+        </button>
       </div>
 
       <!-- 메뉴 목록 -->
@@ -129,6 +140,13 @@ const cancelLogout = () => {
  */
 const goToMyReviews = () => {
   router.push('/my-reviews')
+}
+
+/**
+ * 내 가게 관리 페이지로 이동 (점주 전용)
+ */
+const goToOwnerStores = () => {
+  router.push('/owner/stores')
 }
 
 /**
