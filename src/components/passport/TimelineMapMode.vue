@@ -45,6 +45,7 @@ import BaseIcon from '@/components/common/BaseIcon.vue'
 import TimelineRecordCard from '@/components/passport/TimelineRecordCard.vue'
 import MapPlaceDetail from '@/components/map/MapPlaceDetail.vue'
 import MarkerPopup from '@/components/map/MarkerPopup.vue'
+import { useMapPopup } from '@/composables/useMapPopup'
 
 const props = defineProps({
     records: {
@@ -71,19 +72,17 @@ const marker = ref(null)
 const polylines = ref([])
 const currentIndex = ref(props.initialIndex)
 const showDetailSheet = ref(false)
-const showMarkerPopup = ref(false)
-const popupPosition = ref({ x: 0, y: 0 })
 
-// MarkerPopup용 데이터 변환
-const popupStore = computed(() => {
-    if (!showMarkerPopup.value || !currentRecord.value) return null
-    return {
-        storeId: currentRecord.value.storeId,
-        name: currentRecord.value.storeName,
-        address: currentRecord.value.storeAddress,
-        category: '카페'
-    }
-})
+// useMapPopup composable 사용
+const {
+    popupStore,
+    popupPosition,
+    updatePopupPosition,
+    throttledUpdatePopupPosition,
+    showPopupOnly,
+    closePopup,
+    cleanup: cleanupPopup
+} = useMapPopup(map)
 
 // 현재 기록
 const currentRecord = computed(() => props.records[currentIndex.value])
@@ -182,6 +181,12 @@ const initMap = async () => {
             scaleControl: false
         })
 
+        // 지도 이동/확대 시 팝업 위치 업데이트
+        window.naver.maps.Event.addListener(map.value, 'idle', updatePopupPosition)
+        window.naver.maps.Event.addListener(map.value, 'zoom_changed', throttledUpdatePopupPosition)
+        window.naver.maps.Event.addListener(map.value, 'drag', throttledUpdatePopupPosition)
+        window.naver.maps.Event.addListener(map.value, 'center_changed', throttledUpdatePopupPosition)
+
         // 모든 경로 그리기
         drawAllPaths()
 
@@ -239,26 +244,22 @@ const createMarker = () => {
 
         // 마커 클릭 이벤트
         window.naver.maps.Event.addListener(marker.value, 'click', () => {
-            showMarkerPopup.value = !showMarkerPopup.value
-            updatePopupPosition()
+            // 팝업이 열려있으면 닫기, 아니면 열기
+            if (popupStore.value) {
+                closePopup()
+            } else {
+                // 현재 기록을 store 형식으로 변환하여 팝업 표시
+                const storeData = {
+                    storeId: currentRecord.value.storeId,
+                    name: currentRecord.value.storeName,
+                    address: currentRecord.value.storeAddress,
+                    category: '카페',
+                    latitude: currentRecord.value.latitude,
+                    longitude: currentRecord.value.longitude
+                }
+                showPopupOnly(storeData)
+            }
         })
-    }
-}
-
-// 팝업 위치 업데이트
-const updatePopupPosition = () => {
-    if (!map.value || !currentRecord.value) return
-
-    const projection = map.value.getProjection()
-    const position = new window.naver.maps.LatLng(
-        currentRecord.value.latitude,
-        currentRecord.value.longitude
-    )
-    const point = projection.fromCoordToOffset(position)
-
-    popupPosition.value = {
-        x: point.x,
-        y: point.y
     }
 }
 
