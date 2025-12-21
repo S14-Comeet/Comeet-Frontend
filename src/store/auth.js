@@ -35,8 +35,8 @@ export const useAuthStore = defineStore('auth', {
     userProfileImage: (state) => state.user?.profileImageUrl || null,
     /** 사용자 Role */
     userRole: (state) => state.user?.role || null,
-    /** 점주(OWNER) 여부 */
-    isOwner: (state) => state.user?.role === 'OWNER',
+    /** 점주(MANAGER) 여부 */
+    isOwner: (state) => state.user?.role === 'MANAGER',
     /** 서비스 등록 완료 여부 */
     isRegistered: (state) => state.user?.role && state.user.role !== 'GUEST',
     /** 닉네임 등록 여부 */

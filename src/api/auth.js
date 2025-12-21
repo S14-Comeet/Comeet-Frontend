@@ -32,7 +32,7 @@ export const checkNickname = async (nickname) => {
  * POST /user/register
  * @param {Object} userData - 사용자 정보
  * @param {string} userData.nickname - 닉네임 (1~12자, 한글/영문만 허용)
- * @param {string} userData.role - 역할 ('USER' | 'OWNER')
+ * @param {string} userData.role - 역할 ('USER' | 'MANAGER')
  * @returns {Promise<Object>} 등록된 사용자 정보
  */
 export const registerUser = async (userData) => {
