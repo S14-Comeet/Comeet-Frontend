@@ -2,7 +2,8 @@
   <div class="passport-card" :class="{ 'unavailable': !passport.isAvailable }" @click="handleClick">
     <!-- 커버 이미지 영역 -->
     <div class="card-cover">
-      <img v-if="passport.coverImageUrl" :src="passport.coverImageUrl" :alt="`${passport.month}월 커피 여정`"
+      <img
+v-if="passport.coverImageUrl" :src="passport.coverImageUrl" :alt="`${passport.month}월 커피 여정`"
         class="cover-image" />
       <div v-else class="cover-placeholder">
         <div class="placeholder-map">
