@@ -170,11 +170,12 @@ src/
   - Store CRUD: List my stores, create/edit/delete stores
   - Menu CRUD: Manage menus for each store
   - Bean linking: Connect/disconnect beans to menu items
-- API endpoints (see `OWNER_API_GUIDE.md` for details):
+- API endpoints:
   - `GET /stores/my` - My stores list
   - `POST/PUT/DELETE /stores` - Store CRUD
   - `POST /stores/{storeId}/menus`, `PUT/DELETE /menus/{menuId}` - Menu CRUD
   - `POST/DELETE /menus/{menuId}/beans` - Bean linking
+  - `GET /beans/roastery/{roasteryId}`, `POST /beans` - Bean management
 
 ## Configuration Notes
 
@@ -209,3 +210,10 @@ import { getItem, setItem, removeItem } from '@/utils/storage'
 **Mobile-First Responsive Design**: The app uses a mobile-first approach with a 448px max-width container on desktop. Full-screen pages (like map) should use `isFullScreenPage` computed property in `App.vue`.
 
 **Component Naming**: Base reusable components use `Base*` prefix (BaseButton, BaseHeader). Feature-specific components don't use prefix (MapControls, SavedCafeList).
+
+**Constants** (`src/constants/index.js`): Contains shared enums and lookup data:
+- `MENU_CATEGORIES`: Menu/store category options (HAND_DRIP, ESPRESSO, etc.)
+- `BEAN_COUNTRIES`: Coffee bean origin countries with coordinates and regions
+- `BEAN_VARIETY_GROUPS`, `BEAN_PROCESSING_METHOD_GROUPS`: Grouped dropdown options
+- `ROASTING_LEVELS`: Light/Medium/Dark roasting levels
+- `VALIDATION`: Nickname and other input validation rules
