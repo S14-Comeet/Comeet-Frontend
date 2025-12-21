@@ -4,87 +4,71 @@
     <div ref="mapContainer" class="w-full h-full"></div>
 
     <!-- 로딩 오버레이 -->
-    <div
-        v-if="isLoading"
-        class="absolute inset-0 bg-black/20 flex items-center justify-center z-20"
-    >
+    <div v-if="isLoading" class="absolute inset-0 bg-black/20 flex items-center justify-center z-20">
       <div class="bg-white rounded-lg p-6 shadow-lg">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
         <p class="mt-4 text-textSecondary">지도 로딩 중...</p>
       </div>
     </div>
 
+    <!-- 상단 검색 영역 (네이버/카카오 스타일) -->
+    <div class="top-search-area">
+      <div class="top-search-bar">
+        <BaseIcon name="search" :size="18" class="search-icon" />
+        <input type="text" :value="searchKeyword" placeholder="카페명 또는 주소 검색" class="search-input"
+          @input="searchKeyword = $event.target.value" @keydown.enter="handleTopSearch"
+          @focus="handleSearchInputFocus" />
+        <button v-if="searchKeyword" class="clear-btn" @click="searchKeyword = ''">
+          <BaseIcon name="x" :size="14" />
+        </button>
+      </div>
+    </div>
+
     <!-- Floating 알림 아이콘 (우측 상단) - 로그인 상태일 때만 표시 -->
-    <button
-        v-if="isAuthenticated"
-        class="floating-notification-button"
-        aria-label="알림"
-        @click="handleNotificationClick"
-    >
-      <BaseIcon name="notice" :size="24" color="var(--color-neutral-900)"/>
-      <span
-          v-if="hasUnreadNotifications"
-          class="notification-badge"
-      ></span>
+    <button v-if="isAuthenticated" class="floating-notification-button" aria-label="알림"
+      @click="handleNotificationClick">
+      <BaseIcon name="notice" :size="24" color="var(--color-neutral-900)" />
+      <span v-if="hasUnreadNotifications" class="notification-badge"></span>
     </button>
 
     <!-- 이 지역 검색 버튼 (상단 중앙) -->
-    <button
-        v-if="showSearchButton"
-        class="search-area-button"
-        :disabled="isSearching"
-        @click="handleSearchThisArea"
-    >
+    <button v-if="showSearchButton" class="search-area-button" :disabled="isSearching" @click="handleSearchThisArea">
       <BaseIcon v-if="isSearching" name="spinner" :size="16" class="animate-spin" />
       <BaseIcon v-else name="search" :size="16" />
       <span>{{ isSearching ? '검색 중...' : '이 지역 검색' }}</span>
     </button>
 
-    <!-- 지도 컨트롤 버튼들 (우측) -->
-    <div class="map-controls" :style="controlsBottomStyle">
+    <!-- 지도 컨트롤 버튼들 (우측 - full 상태에서 숨김) -->
+    <div v-if="currentSheetState !== 'full'" class="map-controls" :style="controlsBottomStyle">
       <button class="control-button" aria-label="확대" @click="handleZoomIn">
         <BaseIcon name="plus" :size="20" />
       </button>
       <button class="control-button" aria-label="축소" @click="handleZoomOut">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M5 12H19" stroke-linecap="round" />
-        </svg>
+        <BaseIcon name="minus" :size="20" />
       </button>
       <button class="control-button" aria-label="내 위치" :disabled="isLocating" @click="handleMyLocation">
         <BaseIcon v-if="isLocating" name="spinner" :size="20" class="animate-spin" />
-        <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="3" />
-          <path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke-linecap="round" />
-        </svg>
+        <BaseIcon v-else name="target" :size="20" />
       </button>
     </div>
 
+    <!-- 목록보기 버튼 (하단 중앙 - collapsed 상태일 때만 표시) -->
+    <button v-if="currentSheetState === 'collapsed'" class="list-view-button" :style="controlsBottomStyle"
+      @click="expandBottomSheet">
+      <BaseIcon name="list" :size="16" />
+      <span>목록보기</span>
+    </button>
+
     <!-- 통합 검색 + 가게 리스트 바텀시트 -->
-    <StoreListSheet
-        :stores="stores"
-        :is-searching="isSearching"
-        :initial-keyword="searchKeyword"
-        :initial-categories="searchCategories"
-        :initial-global-search="isGlobalSearch"
-        :force-state="forceSheetState"
-        @select-store="handleStoreSelect"
-        @state-change="handleSheetStateChange"
-        @search="handleSearch"
-    />
+    <StoreListSheet :stores="stores" :is-searching="isSearching" :initial-keyword="searchKeyword"
+      :initial-categories="searchCategories" :initial-global-search="isGlobalSearch" :force-state="forceSheetState"
+      @select-store="handleStoreSelect" @state-change="handleSheetStateChange" @search="handleSearch"
+      @search-area="handleSearchThisArea" />
 
     <!-- 마커 클릭 시 팝업 (마커 위치에 표시) -->
-    <MarkerPopup
-        :store="popupStore"
-        :position="popupPosition"
-        @close="closePopup"
-        @detail="handlePopupDetail"
-    />
+    <MarkerPopup :store="popupStore" :position="popupPosition" @close="closePopup" @detail="handlePopupDetail" />
 
-    <MapPlaceDetail
-        v-if="detailPlace"
-        :place="detailPlace"
-        @close="detailPlace = null"
-    />
+    <MapPlaceDetail v-if="detailPlace" :place="detailPlace" @close="detailPlace = null" />
   </div>
 </template>
 
@@ -126,12 +110,85 @@ const stores = ref([])
 const userLocation = ref(null)
 const lastSearchCenter = ref(null)
 const forceSheetState = ref(null)
+const currentSheetState = ref('half')
+
+// 시트 상태 변경 핸들러
+const handleSheetStateChange = (state) => {
+  currentSheetState.value = state
+  setSheetState(state)
+
+  if (state === 'full') {
+    closePopup()
+  }
+}
+
+// 바텀시트 확장
+const expandBottomSheet = () => {
+  forceSheetState.value = 'half'
+  setTimeout(() => {
+    forceSheetState.value = null
+  }, 100)
+}
 
 // 검색 관련 상태
 const isGlobalSearch = ref(false)
 const searchKeyword = ref('')
 const searchCategories = ref([])
 const searchLocation = ref(null) // 검색용 위치 (키워드/"이 지역" 검색 시에만 업데이트)
+
+// 상단 검색 관련 (네이버/카카오 스타일)
+const selectedTopCategory = ref(null)
+const topCategories = [
+  { name: '카페', icon: '☕' },
+  { name: '디저트', icon: '🍰' },
+  { name: '브런치', icon: '🥐' },
+  { name: '스터디', icon: '📚' },
+]
+
+// 상단 검색 핸들러
+const handleTopSearch = () => {
+  if (!map.value || !searchKeyword.value.trim()) return
+
+  const center = map.value.getCenter()
+  const radius = getRadiusFromBounds()
+
+  handleSearch({
+    keyword: searchKeyword.value.trim(),
+    categories: selectedTopCategory.value || undefined,
+    isGlobalSearch: false,
+    searchType: 'keyword'
+  })
+}
+
+// 상단 검색 입력 포커스 핸들러
+const handleSearchInputFocus = () => {
+  // 시트를 half 상태로 확장
+  forceSheetState.value = 'half'
+  setTimeout(() => {
+    forceSheetState.value = null
+  }, 100)
+}
+
+// 카테고리 클릭 핸들러
+const handleCategoryClick = (categoryName) => {
+  if (selectedTopCategory.value === categoryName) {
+    selectedTopCategory.value = null
+  } else {
+    selectedTopCategory.value = categoryName
+  }
+
+  // 카테고리 선택 시 바로 검색
+  if (!map.value) return
+  const center = map.value.getCenter()
+  const radius = getRadiusFromBounds()
+
+  handleSearch({
+    keyword: searchKeyword.value.trim(),
+    categories: selectedTopCategory.value || undefined,
+    isGlobalSearch: false,
+    searchType: 'category'
+  })
+}
 
 // Composables
 const { location, requestLocation } = useGeolocation()
@@ -354,15 +411,6 @@ const handleSearch = async (searchParams) => {
   }
 }
 
-// 바텀시트 상태 변경
-const handleSheetStateChange = (state) => {
-  setSheetState(state)
-
-  if (state === 'full') {
-    closePopup()
-  }
-}
-
 // 이 지역 검색
 const handleSearchThisArea = async () => {
   if (!map.value || isSearching.value) return
@@ -552,13 +600,14 @@ onUnmounted(() => {
   border: 2px solid rgba(255, 255, 255, 0.9);
 }
 
-/* 이 지역 검색 버튼 */
+/* 이 지역 검색 버튼 (검색바 아래 플로팅) */
 .search-area-button {
   position: absolute;
-  top: 0.75rem;
+  /* 검색 영역 높이(약 4.25rem) + 간격(0.5rem) = 4.75rem */
+  top: 4.75rem;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 100;
+  z-index: 50;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -636,11 +685,141 @@ onUnmounted(() => {
   }
 
   .search-area-button {
-    top: max(0.75rem, env(safe-area-inset-top));
+    /* 검색바 높이(4.25rem) + safe-area + 간격 */
+    top: calc(max(0.75rem, env(safe-area-inset-top)) + 4rem);
   }
 
   .map-controls {
     right: max(1rem, env(safe-area-inset-right));
   }
+}
+
+/* 상단 검색 영역 (네이버/카카오 스타일) */
+.top-search-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 0.75rem;
+  padding-top: max(0.75rem, env(safe-area-inset-top));
+}
+
+.top-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+  height: 2.75rem;
+  background: white;
+  border-radius: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+}
+
+.top-search-bar .search-icon {
+  flex-shrink: 0;
+  color: var(--color-textSecondary);
+}
+
+.top-search-bar .search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 0.9375rem;
+  color: var(--color-neutral-900);
+  outline: none;
+}
+
+.top-search-bar .search-input::placeholder {
+  color: var(--color-neutral-400);
+}
+
+.top-search-bar .clear-btn {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-neutral-300);
+  color: white;
+}
+
+/* 카테고리 칩 행 */
+.category-chips-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 0.25rem;
+}
+
+.category-chips-row::-webkit-scrollbar {
+  display: none;
+}
+
+.category-chips-row .category-chip {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.875rem;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-neutral-700);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s;
+}
+
+.category-chips-row .category-chip:hover {
+  border-color: var(--color-primary-300);
+  background: var(--color-primary-50);
+}
+
+.category-chips-row .category-chip.selected {
+  background: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+  color: white;
+}
+
+.category-chips-row .chip-icon {
+  font-size: 0.875rem;
+}
+
+/* 목록보기 버튼 (하단 중앙 플로팅) */
+.list-view-button {
+  position: absolute;
+  /* bottom은 :style="controlsBottomStyle"로 동적 적용 */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 35;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background-color: white;
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-neutral-800);
+  transition: all 200ms ease;
+}
+
+.list-view-button:hover {
+  background-color: var(--color-primary-50);
+  border-color: var(--color-primary-300);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.list-view-button:active {
+  transform: translateX(-50%) scale(0.97);
 }
 </style>
