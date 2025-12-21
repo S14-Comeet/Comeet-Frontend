@@ -8,7 +8,7 @@
 
     <div v-if="passportStore.isLoading" class="loading-container">
       <div class="loading-list">
-        <div v-for="n in 6" :key="n" class="skeleton-card"></div>
+        <div v-for="n in 6" :key="n" class="skeleton-card skeleton"></div>
       </div>
     </div>
 
@@ -102,20 +102,7 @@ onMounted(() => {
 
 .skeleton-card {
   height: 200px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
   border-radius: 16px;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-
-  100% {
-    background-position: 200% 0;
-  }
 }
 
 /* 에러 상태 */

@@ -25,9 +25,9 @@
 
     <!-- 로딩 상태 -->
     <div v-if="passportStore.isLoading" class="loading-container">
-      <div class="skeleton-stats"></div>
+      <div class="skeleton-stats skeleton"></div>
       <div class="skeleton-timeline">
-        <div v-for="n in 3" :key="n" class="skeleton-item"></div>
+        <div v-for="n in 3" :key="n" class="skeleton-item skeleton"></div>
       </div>
     </div>
 
@@ -278,9 +278,6 @@ onMounted(() => {
 
 .skeleton-stats {
   height: 120px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
   border-radius: 16px;
   margin-bottom: 1.5rem;
 }
@@ -293,20 +290,7 @@ onMounted(() => {
 
 .skeleton-item {
   height: 90px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
   border-radius: 12px;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-
-  100% {
-    background-position: 200% 0;
-  }
 }
 
 /* 에러 상태 */
