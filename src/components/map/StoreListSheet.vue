@@ -1,18 +1,23 @@
 <template>
-  <div class="store-list-sheet" :class="sheetStateClass" :style="sheetStyle" @touchstart="handleTouchStart"
+  <div
+class="store-list-sheet" :class="sheetStateClass" :style="sheetStyle" @touchstart="handleTouchStart"
     @touchmove="handleTouchMove" @touchend="handleTouchEnd">
     <!-- 드래그 핸들 -->
-    <div class="sheet-handle" role="button" tabindex="0" aria-label="시트 크기 조절" @click="toggleSheet"
+    <div
+class="sheet-handle" role="button" tabindex="0" aria-label="시트 크기 조절" @click="toggleSheet"
       @keydown.enter="toggleSheet" @keydown.space.prevent="toggleSheet">
       <div class="handle-bar"></div>
     </div>
 
     <!-- 카테고리 필터 -->
     <div class="category-filter-row">
-      <button v-for="category in categories" :key="category"
-        :class="['category-chip', selectedCategories.includes(category) && 'selected']"
-        @click="toggleCategory(category)">
-        {{ category }}
+      <button
+        v-for="cat in MENU_CATEGORIES"
+        :key="cat.value"
+        :class="['category-chip', selectedCategories.includes(cat.value) && 'selected']"
+        @click="toggleCategory(cat.value)"
+      >
+        {{ cat.label }}
       </button>
     </div>
 
@@ -42,7 +47,8 @@
         <p>검색 중...</p>
       </div>
 
-      <StoreCard v-for="store in stores" v-else :key="store.storeId || store.id" :store="store" variant="compact"
+      <StoreCard
+v-for="store in stores" v-else :key="store.storeId || store.id" :store="store" variant="compact"
         @click="handleStoreClick" />
     </div>
   </div>
@@ -50,6 +56,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { MENU_CATEGORIES } from '@/constants'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import StoreCard from '@/components/common/StoreCard.vue'
 
@@ -81,9 +88,6 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['select-store', 'state-change', 'search', 'search-area'])
-
-// 카테고리 목록
-const categories = ['핸드드립', '라떼', '콜드브루', '에스프레소', '아메리카노']
 
 // 검색 상태
 const keyword = ref(props.initialKeyword)
@@ -426,21 +430,21 @@ watch(
   cursor: not-allowed;
 }
 
-/* 카테고리 필터 행 (유동적 너비) */
+/* 카테고리 필터 행 (2줄 그리드) */
 .category-filter-row {
-  display: flex;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.375rem;
   padding: 0 var(--page-padding, 1rem);
   margin-bottom: 0.75rem;
 }
 
 .category-filter-row .category-chip {
-  flex: 1;
-  padding: 0.5rem 0.25rem;
+  padding: 0.4rem 0.25rem;
   background: white;
   border: 1px solid var(--color-border);
   border-radius: 0.5rem;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   color: var(--color-neutral-700);
   text-align: center;

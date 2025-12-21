@@ -8,7 +8,7 @@
     <template v-if="variant === 'compact'">
       <div class="store-info">
         <div class="store-name-row">
-          <span class="store-category-badge">{{ store.category || '카페' }}</span>
+          <span class="store-category-badge">{{ displayCategory }}</span>
           <h4 class="store-name">{{ store.name }}</h4>
           <span v-if="store.isClosed" class="closed-badge">영업종료</span>
         </div>
@@ -47,7 +47,7 @@
           <h3 class="store-name-detail">{{ store.name }}</h3>
           <BaseChip
             v-if="store.category"
-            :label="store.category"
+            :label="displayCategory"
             variant="primary"
             size="small"
           />
@@ -88,8 +88,14 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { MENU_CATEGORIES } from '@/constants'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseChip from '@/components/common/BaseChip.vue'
+
+// enum 값을 한글 라벨로 변환하는 맵
+const categoryLabelMap = Object.fromEntries(
+  MENU_CATEGORIES.map(cat => [cat.value, cat.label])
+)
 
 const props = defineProps({
   store: {
@@ -123,6 +129,16 @@ const hasValidThumbnail = computed(() => {
   return props.store.thumbnailUrl &&
          !props.store.thumbnailUrl.includes('example.com') &&
          !imageError.value
+})
+
+// 카테고리를 한글로 변환 (comma-separated enum -> 한글 라벨)
+const displayCategory = computed(() => {
+  if (!props.store.category) return '카페'
+
+  return props.store.category
+    .split(',')
+    .map(cat => categoryLabelMap[cat.trim()] || cat.trim())
+    .join(', ')
 })
 
 const formatRating = (rating) => {

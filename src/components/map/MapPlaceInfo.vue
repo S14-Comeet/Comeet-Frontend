@@ -10,9 +10,18 @@
 
       <!-- 카페 정보 -->
       <div class="flex items-start gap-3">
-          <span class="px-2 py-1 rounded-md text-xs font-medium bg-accent/10 text-accent">
+        <div class="flex flex-wrap gap-1">
+          <span
+            v-for="(cat, idx) in displayCategories"
+            :key="idx"
+            class="px-2 py-1 rounded-md text-xs font-medium bg-accent/10 text-accent"
+          >
+            {{ cat }}
+          </span>
+          <span v-if="!displayCategories.length" class="px-2 py-1 rounded-md text-xs font-medium bg-accent/10 text-accent">
             카페
           </span>
+        </div>
 
         <div class="flex-1">
           <h3 class="text-lg font-bold text-textPrimary">
@@ -44,11 +53,30 @@
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+import { MENU_CATEGORIES } from '@/constants'
+
+// enum 값을 한글 라벨로 변환하는 맵
+const categoryLabelMap = Object.fromEntries(
+  MENU_CATEGORIES.map(cat => [cat.value, cat.label])
+)
+
+const props = defineProps({
   place: Object,
 })
 
 defineEmits(['close', 'detail'])
+
+// 카테고리를 한글로 변환
+const displayCategories = computed(() => {
+  if (!props.place?.category) return []
+  return props.place.category
+    .split(',')
+    .map(c => c.trim())
+    .filter(c => c)
+    .map(c => categoryLabelMap[c] || c)
+    .slice(0, 3)
+})
 </script>
 
 <style scoped>

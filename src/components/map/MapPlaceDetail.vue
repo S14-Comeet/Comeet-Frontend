@@ -37,9 +37,18 @@
 
           <div>
             <p class="text-sm text-textSecondary">카테고리</p>
-            <span class="inline-block px-3 py-1 bg-accent/10 text-accent rounded-full text-sm font-medium">
+            <div class="flex flex-wrap gap-1 mt-1">
+              <span
+                v-for="(cat, idx) in displayCategories"
+                :key="idx"
+                class="inline-block px-3 py-1 bg-accent/10 text-accent rounded-full text-sm font-medium"
+              >
+                {{ cat }}
+              </span>
+              <span v-if="!displayCategories.length" class="inline-block px-3 py-1 bg-accent/10 text-accent rounded-full text-sm font-medium">
                 카페
               </span>
+            </div>
           </div>
 
           <div v-if="place.description">
@@ -65,14 +74,31 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { createLogger } from '@/utils/logger'
+import { MENU_CATEGORIES } from '@/constants'
 import BaseButton from '@/components/common/BaseButton.vue'
 
 const logger = createLogger('MapPlaceDetail')
 
+// enum 값을 한글 라벨로 변환하는 맵
+const categoryLabelMap = Object.fromEntries(
+  MENU_CATEGORIES.map(cat => [cat.value, cat.label])
+)
+
 const props = defineProps({
   place: Object,
+})
+
+// 카테고리를 한글로 변환
+const displayCategories = computed(() => {
+  if (!props.place?.category) return []
+  return props.place.category
+    .split(',')
+    .map(c => c.trim())
+    .filter(c => c)
+    .map(c => categoryLabelMap[c] || c)
 })
 
 const emit = defineEmits(['close'])

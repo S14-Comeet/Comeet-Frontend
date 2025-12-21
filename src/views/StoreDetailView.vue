@@ -36,10 +36,11 @@
       <div class="store-info-section">
         <div class="flex items-start justify-between gap-3">
           <div>
-            <div class="flex items-center gap-2 mb-1">
+            <div class="flex items-center gap-2 mb-1 flex-wrap">
               <BaseChip
-                v-if="store.category"
-                :label="store.category"
+                v-for="(cat, idx) in displayCategories"
+                :key="idx"
+                :label="cat"
                 variant="primary"
               />
               <span v-if="store.isClosed" class="closed-badge">영업종료</span>
@@ -260,6 +261,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { createLogger } from '@/utils/logger'
+import { MENU_CATEGORIES } from '@/constants'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseChip from '@/components/common/BaseChip.vue'
@@ -268,6 +270,11 @@ import { getMenusByStoreId } from '@/api/menu'
 import { showSuccess, showError } from '@/utils/toast'
 
 const logger = createLogger('StoreDetailView')
+
+// enum 값을 한글 라벨로 변환하는 맵
+const categoryLabelMap = Object.fromEntries(
+  MENU_CATEGORIES.map(cat => [cat.value, cat.label])
+)
 
 const route = useRoute()
 const router = useRouter()
@@ -289,6 +296,16 @@ const hasValidThumbnail = computed(() => {
   return store.value?.thumbnailUrl &&
          !store.value.thumbnailUrl.includes('example.com') &&
          !imageError.value
+})
+
+// 카테고리를 한글로 변환
+const displayCategories = computed(() => {
+  if (!store.value?.category) return []
+  return store.value.category
+    .split(',')
+    .map(c => c.trim())
+    .filter(c => c)
+    .map(c => categoryLabelMap[c] || c)
 })
 
 const displayedReviews = computed(() => {
