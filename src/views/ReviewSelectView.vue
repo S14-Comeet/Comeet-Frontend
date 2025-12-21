@@ -85,6 +85,7 @@ import BaseButton from '@/components/common/BaseButton.vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import MenuList from '@/components/MenuList.vue'
 import { verifyVisit } from '@/api/visit'
+import { getMenusByStoreId } from '@/api/menu'
 import { showSuccess, showError, showWarning } from '@/utils/toast'
 import { useGeolocation } from '@/composables/useGeolocation'
 
@@ -120,49 +121,11 @@ onMounted(async () => {
 const fetchMenus = async () => {
   isLoadingMenus.value = true
   try {
-    // TODO: 백엔드 API 구현 후 실제 API 호출로 변경
-    // menus.value = await getMenusByStoreId(storeId)
-
-    // Mock 데이터
-    await new Promise(r => setTimeout(r, 300)) // 로딩 시뮬레이션
-    menus.value = [
-      {
-        id: 1,
-        store_id: storeId,
-        name: '바리스타 set',
-        price: 12000,
-        description: '에스프레소, 스몰사이즈 라떼, 필터커피\n총 세 잔의 커피가 제공됩니다.',
-        category: ['대표', '세트메뉴'],
-        image_url: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=400&fit=crop'
-      },
-      {
-        id: 2,
-        store_id: storeId,
-        name: '녹 아이스 커피 (ICED)',
-        price: 7000,
-        description: '바닐라아이스크림이 들어가는 아이스크림 라떼',
-        category: ['대표', '아이스'],
-        image_url: 'https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?w=400&h=400&fit=crop'
-      },
-      {
-        id: 3,
-        store_id: storeId,
-        name: '몽블랑 MONT BLANC',
-        price: 6000,
-        description: '오렌지 제스트와 넛맥향이 은은한 크림을 드브뤼',
-        category: ['대표', '디저트'],
-        image_url: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&h=400&fit=crop'
-      },
-      {
-        id: 4,
-        store_id: storeId,
-        name: '녹밀크 NOOK Milk',
-        price: 6000,
-        description: '논카페인 캐모마일 밀크티',
-        category: ['대표', '논카페인'],
-        image_url: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=400&fit=crop'
-      }
-    ]
+    const response = await getMenusByStoreId(storeId, { page: 1, size: 50 })
+    const data = response?.data ?? response
+    // 페이지네이션 응답 처리: content 필드 또는 배열 직접 반환
+    menus.value = data?.content ?? (Array.isArray(data) ? data : [])
+    logger.info(`메뉴 ${menus.value.length}개 로드 완료`)
   } catch {
     showError('메뉴 목록을 불러오지 못했습니다.')
   } finally {
