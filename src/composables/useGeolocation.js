@@ -1,15 +1,15 @@
 import { ref } from 'vue'
 import { useToast } from 'vue-toastification'
-import { getLocationByIP } from '@/api/geolocation'
 import { createLogger } from '@/utils/logger'
 
 const logger = createLogger('useGeolocation')
 
-// 에러 메시지 정의
+// 에러 코드별 메시지 정의
 const ERROR_MESSAGES = {
-    API_KEY_MISSING: 'Naver API 키가 설정되지 않았습니다',
-    IP_FETCH_FAILED: '공인 IP 주소를 가져올 수 없습니다',
-    LOCATION_FAILED: 'IP 기반 위치 조회에 실패했습니다',
+    PERMISSION_DENIED: '위치 권한을 허용하면 주변 카페를 추천받을 수 있어요',
+    POSITION_UNAVAILABLE: '현재 위치 정보를 가져올 수 없습니다. 잠시 후 다시 시도해주세요',
+    TIMEOUT: '위치 정보 요청 시간이 초과되었습니다. 다시 시도해주세요',
+    NOT_SUPPORTED: '위치 서비스를 지원하지 않는 브라우저입니다',
     UNKNOWN: '위치 정보를 가져올 수 없습니다'
 }
 
@@ -20,45 +20,87 @@ export function useGeolocation() {
     const toast = useToast()
 
     /**
-     * 위치 정보 요청 (Naver Geolocation API - IP 기반)
+     * 에러 코드에 따른 메시지 반환
+     */
+    const getErrorMessage = (err) => {
+        if (!err || !err.code) return ERROR_MESSAGES.UNKNOWN
+
+        switch (err.code) {
+            case 1: // PERMISSION_DENIED
+                return ERROR_MESSAGES.PERMISSION_DENIED
+            case 2: // POSITION_UNAVAILABLE
+                return ERROR_MESSAGES.POSITION_UNAVAILABLE
+            case 3: // TIMEOUT
+                return ERROR_MESSAGES.TIMEOUT
+            default:
+                return ERROR_MESSAGES.UNKNOWN
+        }
+    }
+
+    /**
+     * 위치 정보 요청 (브라우저 Geolocation API)
      * @param {Object} options - 추가 옵션
      * @param {boolean} options.showToast - 에러 토스트 표시 여부 (기본: true)
+     * @param {number} options.timeout - 타임아웃 시간 (기본: 10000ms)
+     * @param {number} options.maximumAge - 캐시된 위치 최대 나이 (기본: 60000ms)
      */
-    const requestLocation = async (options = {}) => {
-        const { showToast = true } = options
+    const requestLocation = (options = {}) => {
+        const { showToast = true, timeout = 10000, maximumAge = 60000 } = options
 
-        isLoading.value = true
-        error.value = null
-
-        try {
-            logger.info('Requesting IP-based location from Naver Geolocation')
-
-            const result = await getLocationByIP()
-
-            location.value = result
-            isLoading.value = false
-            error.value = null
-
-            logger.info('Location retrieved successfully', {
-                lat: result.lat,
-                lng: result.lng,
-                region: `${result.r1} ${result.r2} ${result.r3}`
-            })
-
-            return result
-        } catch (err) {
-            isLoading.value = false
-            const errorMsg = err.message || ERROR_MESSAGES.UNKNOWN
-            error.value = errorMsg
-
-            logger.error('Failed to get location', err)
-
-            if (showToast) {
-                toast.error(errorMsg)
+        return new Promise((resolve, reject) => {
+            if (!navigator.geolocation) {
+                const errorMsg = ERROR_MESSAGES.NOT_SUPPORTED
+                error.value = errorMsg
+                if (showToast) toast.error(errorMsg)
+                reject(new Error(errorMsg))
+                return
             }
 
-            throw err
-        }
+            isLoading.value = true
+            error.value = null
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    location.value = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                        accuracy: position.coords.accuracy,
+                        timestamp: position.timestamp
+                    }
+                    isLoading.value = false
+                    error.value = null
+
+                    logger.info('Location retrieved', {
+                        lat: location.value.lat,
+                        lng: location.value.lng,
+                        accuracy: location.value.accuracy
+                    })
+
+                    resolve(location.value)
+                },
+                (err) => {
+                    isLoading.value = false
+                    const errorMsg = getErrorMessage(err)
+                    error.value = errorMsg
+
+                    logger.warn('Geolocation failed', { code: err.code, message: err.message })
+
+                    if (showToast) {
+                        if (err.code === 1) {
+                            toast.warning(errorMsg)
+                        } else {
+                            toast.error(errorMsg)
+                        }
+                    }
+                    reject(err)
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout,
+                    maximumAge
+                }
+            )
+        })
     }
 
     /**
