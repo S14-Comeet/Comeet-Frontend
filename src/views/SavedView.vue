@@ -81,7 +81,14 @@ import AddFolderModal from '@/components/saved/AddFolderModal.vue'
 import EditFolderModal from '@/components/saved/EditFolderModal.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
-import { getFolders, getCafesByFolder } from '@/api/cafe'
+import {
+  getFolders,
+  getStoresByFolder,
+  createFolder,
+  updateFolder,
+  deleteFolder,
+  removeStoreFromFolder
+} from '@/api/bookmark'
 
 const logger = createLogger('SavedView')
 
@@ -117,8 +124,7 @@ const loadFolders = async () => {
 
   isLoadingFolders.value = true
   try {
-    const response = await getFolders()
-    folders.value = response.data
+    folders.value = await getFolders()
   } catch (error) {
     logger.error('폴더 목록 불러오기 실패', error)
     showError('폴더 목록을 불러오는데 실패했습니다.')
@@ -133,8 +139,8 @@ const handleSelectFolder = async (folder) => {
   isLoadingCafes.value = true
 
   try {
-    const response = await getCafesByFolder(folder.id)
-    cafes.value = response.data
+    const response = await getStoresByFolder(folder.id)
+    cafes.value = response.stores
   } catch (error) {
     logger.error('카페 목록 불러오기 실패', error)
     showError('카페 목록을 불러오는데 실패했습니다.')
@@ -169,20 +175,11 @@ const handleShowOnMap = () => {
 // 폴더 추가 핸들러
 const handleAddFolder = async (folderData) => {
   try {
-    // TODO: 실제 API 구현 시 백엔드로 전송
-    // const response = await api.post('/api/cafes/folders', folderData)
-
-    // Mock: 임시로 새 폴더를 로컬 배열에 추가
-    const currentDate = new Date().toISOString().split('T')[0]
-    const newFolder = {
-      id: folders.value.length + 1,
+    const newFolder = await createFolder({
       icon: folderData.icon,
       name: folderData.name,
-      description: folderData.description || '',
-      cafeCount: 0,
-      createdAt: currentDate,
-      lastAddedAt: currentDate
-    }
+      description: folderData.description || ''
+    })
 
     folders.value.unshift(newFolder)
     showAddFolderModal.value = false
@@ -202,18 +199,16 @@ const handleEditFolder = (folder) => {
 // 폴더 수정 핸들러
 const handleUpdateFolder = async (folderData) => {
   try {
-    // TODO: 실제 API 구현 시 백엔드로 전송
-    // const response = await api.put(`/api/cafes/folders/${editingFolder.value.id}`, folderData)
+    const updatedFolder = await updateFolder(editingFolder.value.id, {
+      icon: folderData.icon,
+      name: folderData.name,
+      description: folderData.description
+    })
 
-    // Mock: 로컬 배열에서 해당 폴더 찾아서 업데이트
+    // 로컬 배열에서 해당 폴더 업데이트
     const index = folders.value.findIndex(f => f.id === editingFolder.value.id)
     if (index !== -1) {
-      folders.value[index] = {
-        ...folders.value[index],
-        icon: folderData.icon,
-        name: folderData.name,
-        description: folderData.description
-      }
+      folders.value[index] = updatedFolder
     }
 
     showEditFolderModal.value = false
@@ -234,10 +229,8 @@ const handleDeleteFolder = (folder) => {
 // 폴더 삭제 확인
 const confirmDelete = async () => {
   try {
-    // TODO: 실제 API 구현 시 백엔드로 전송
-    // await api.delete(`/api/cafes/folders/${deletingFolder.value.id}`)
+    await deleteFolder(deletingFolder.value.id)
 
-    // Mock: 로컬 배열에서 해당 폴더 제거
     const folderName = deletingFolder.value.name
     folders.value = folders.value.filter(f => f.id !== deletingFolder.value.id)
 
@@ -252,16 +245,14 @@ const confirmDelete = async () => {
 // 카페 삭제 핸들러
 const handleDeleteCafe = async (cafe) => {
   try {
-    // TODO: 실제 API 구현 시 백엔드로 전송
-    // await api.delete(`/api/cafes/folders/${selectedFolder.value.id}/cafes/${cafe.storeId}`)
+    await removeStoreFromFolder(selectedFolder.value.id, cafe.storeId)
 
-    // Mock: 로컬 배열에서 해당 카페 제거
     cafes.value = cafes.value.filter(c => c.storeId !== cafe.storeId)
 
     // 폴더 목록에서도 카페 개수 업데이트
     const folder = folders.value.find(f => f.id === selectedFolder.value.id)
-    if (folder && folder.cafeCount > 0) {
-      folder.cafeCount -= 1
+    if (folder && folder.storeCount > 0) {
+      folder.storeCount -= 1
     }
   } catch (error) {
     logger.error('카페 삭제 실패', error)

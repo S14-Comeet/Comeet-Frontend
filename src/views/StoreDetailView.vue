@@ -254,6 +254,15 @@
       </div>
     </div>
 
+    <!-- 북마크 폴더 선택 모달 -->
+    <BookmarkFolderSelectModal
+      :is-open="showBookmarkModal"
+      :store-id="storeId"
+      :store-name="store?.name || ''"
+      :bookmarked-folder-ids="bookmarkedFolderIds"
+      @close="showBookmarkModal = false"
+      @update="handleBookmarkUpdate"
+    />
   </div>
 </template>
 
@@ -265,9 +274,12 @@ import { MENU_CATEGORIES } from '@/constants'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseChip from '@/components/common/BaseChip.vue'
+import BookmarkFolderSelectModal from '@/components/saved/BookmarkFolderSelectModal.vue'
 import { getStoreById, getStoreReviews } from '@/api/cafe'
 import { getMenusByStoreId } from '@/api/menu'
+import { getStoreBookmarkStatus } from '@/api/bookmark'
 import { showSuccess, showError } from '@/utils/toast'
+import { useAuthStore } from '@/store/auth'
 
 const logger = createLogger('StoreDetailView')
 
@@ -278,8 +290,10 @@ const categoryLabelMap = Object.fromEntries(
 
 const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
 
 const storeId = computed(() => route.params.storeId)
+const isAuthenticated = computed(() => authStore.isAuthenticated)
 const store = ref(null)
 const reviews = ref([])
 const menus = ref([])
@@ -289,6 +303,8 @@ const isLoadingMenus = ref(false)
 const error = ref(null)
 const imageError = ref(false)
 const isBookmarked = ref(false)
+const bookmarkedFolderIds = ref([])
+const showBookmarkModal = ref(false)
 const showAllReviews = ref(false)
 const showAllMenus = ref(false)
 
@@ -375,9 +391,10 @@ const fetchStoreDetail = async () => {
 
     store.value = storeData
 
-    // Fetch reviews and menus
+    // Fetch reviews, menus, and bookmark status
     fetchReviews()
     fetchMenus()
+    fetchBookmarkStatus()
   } catch (e) {
     logger.error('Failed to fetch store detail', e)
     error.value = e.response?.data?.message || '가게 정보를 불러오는데 실패했습니다'
@@ -431,14 +448,37 @@ const copyAddress = async () => {
   }
 }
 
-const toggleBookmark = () => {
-  isBookmarked.value = !isBookmarked.value
-  // TODO: 실제 북마크 API 연동
-  if (isBookmarked.value) {
-    showSuccess('저장 목록에 추가되었습니다')
-  } else {
-    showSuccess('저장 목록에서 제거되었습니다')
+// 북마크 상태 조회
+const fetchBookmarkStatus = async () => {
+  // 비로그인 사용자는 북마크 상태 조회하지 않음
+  if (!isAuthenticated.value || !storeId.value) return
+
+  try {
+    const status = await getStoreBookmarkStatus(storeId.value)
+    isBookmarked.value = status.isBookmarked
+    bookmarkedFolderIds.value = status.folders?.map(f => f.folderId) || []
+  } catch (error) {
+    logger.error('북마크 상태 조회 실패', error)
+    // 실패해도 UI에 영향 없이 기본값 유지
   }
+}
+
+// 북마크 버튼 클릭
+const toggleBookmark = () => {
+  if (!isAuthenticated.value) {
+    showError('로그인이 필요합니다')
+    router.push('/login')
+    return
+  }
+
+  // 폴더 선택 모달 열기
+  showBookmarkModal.value = true
+}
+
+// 북마크 상태 업데이트 핸들러
+const handleBookmarkUpdate = ({ folderIds, isBookmarked: newBookmarked }) => {
+  bookmarkedFolderIds.value = folderIds
+  isBookmarked.value = newBookmarked
 }
 
 const showOnMap = () => {

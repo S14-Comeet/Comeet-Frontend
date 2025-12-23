@@ -57,7 +57,7 @@
               {{ folder.description }}
             </p>
             <div class="flex items-center gap-2 text-xs text-textSecondary">
-              <span>카페 {{ folder.cafeCount }}개</span>
+              <span>카페 {{ folder.storeCount }}개</span>
               <span>•</span>
               <span>생성 {{ formatDate(folder.createdAt) }}</span>
               <span>•</span>
