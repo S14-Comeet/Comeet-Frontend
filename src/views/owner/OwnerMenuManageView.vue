@@ -121,11 +121,13 @@
 
           <!-- 원두 카드 목록 -->
           <div v-else class="space-y-3">
-            <OwnerBeanCard
+            <BeanCard
               v-for="bean in beans"
               :key="bean.id"
               :bean="bean"
               :linked-menu-count="getBeanLinkedMenuCount(bean.id)"
+              :show-actions="true"
+              @click="goToBeanDetail"
               @link-menus="handleLinkMenus"
               @delete="handleDeleteBean"
             />
@@ -252,12 +254,13 @@ import { useRoute, useRouter } from 'vue-router'
 import { getMenusByStoreId } from '@/api/menu'
 import { getStoreById } from '@/api/cafe'
 import { deleteMenu, getBeansByRoastery } from '@/api/owner'
+import { deleteBean } from '@/api/bean'
 import { createLogger } from '@/utils/logger'
 import { showSuccess, showError } from '@/utils/toast'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import OwnerMenuCard from '@/components/owner/OwnerMenuCard.vue'
-import OwnerBeanCard from '@/components/owner/OwnerBeanCard.vue'
+import BeanCard from '@/components/common/BeanCard.vue'
 import OwnerBeanSelector from '@/components/owner/OwnerBeanSelector.vue'
 import OwnerMenuLinkModal from '@/components/owner/OwnerMenuLinkModal.vue'
 
@@ -428,6 +431,16 @@ const handleEditMenu = (menu) => {
 }
 
 /**
+ * 원두 상세 페이지로 이동
+ */
+const goToBeanDetail = (bean) => {
+  const beanId = bean.beanId || bean.id
+  if (beanId) {
+    router.push(`/bean/${beanId}`)
+  }
+}
+
+/**
  * 메뉴 삭제 확인 모달 표시
  */
 const handleDeleteMenu = (menu) => {
@@ -536,12 +549,15 @@ const confirmBeanDelete = async () => {
 
   isDeletingBean.value = true
   try {
-    // TODO: 원두 삭제 API 호출 (현재 API에 없음)
-    // await deleteBean(deletingBean.value.id)
-    showError('원두 삭제 API가 구현되지 않았습니다')
+    const beanId = deletingBean.value.id || deletingBean.value.beanId
+    await deleteBean(beanId)
 
+    showSuccess('원두가 삭제되었습니다')
     showBeanDeleteModal.value = false
     deletingBean.value = null
+
+    // 목록 새로고침
+    await fetchBeans(beanCurrentPage.value)
   } catch (err) {
     logger.error('원두 삭제 실패', err)
     showError('원두 삭제에 실패했습니다')

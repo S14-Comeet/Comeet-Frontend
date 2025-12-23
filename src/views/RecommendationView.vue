@@ -177,10 +177,12 @@
 
         <!-- Bean List -->
         <div v-else-if="recommendationStore.beanRecommendations.length" class="space-y-3">
-          <BeanRecommendationCard
-            v-for="bean in recommendationStore.beanRecommendations"
+          <BeanCard
+            v-for="(bean, index) in recommendationStore.beanRecommendations"
             :key="bean.beanId"
             :bean="bean"
+            :rank="index + 1"
+            :reason="bean.reason"
             @click="goToBeanDetail"
           />
         </div>
@@ -202,7 +204,7 @@ import { useGeolocation } from '@/composables/useGeolocation'
 import BaseNavigationBar from '@/components/common/BaseNavigationBar.vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
-import BeanRecommendationCard from '@/components/recommendation/BeanRecommendationCard.vue'
+import BeanCard from '@/components/common/BeanCard.vue'
 import MenuRecommendationCard from '@/components/recommendation/MenuRecommendationCard.vue'
 import RecommendationSkeleton from '@/components/recommendation/RecommendationSkeleton.vue'
 
