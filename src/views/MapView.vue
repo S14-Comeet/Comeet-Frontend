@@ -84,7 +84,7 @@ import { useGeolocation } from '@/composables/useGeolocation'
 import { useMapMarkers } from '@/composables/useMapMarkers'
 import { useMapPopup } from '@/composables/useMapPopup'
 import { useMapControls } from '@/composables/useMapControls'
-import { useToast } from 'vue-toastification'
+import { showInfo, showError } from '@/utils/toast'
 import { useNotificationStore } from '@/store/notification'
 import { useAuthStore } from '@/store/auth'
 import { useSavedStore } from '@/store/saved'
@@ -99,7 +99,6 @@ import BaseIcon from '@/components/common/BaseIcon.vue'
 const logger = createLogger('MapView')
 const router = useRouter()
 const route = useRoute()
-const toast = useToast()
 const notificationStore = useNotificationStore()
 const authStore = useAuthStore()
 const savedStore = useSavedStore()
@@ -139,7 +138,7 @@ const expandBottomSheet = () => {
 }
 
 // 검색 관련 상태
-const isGlobalSearch = ref(false)
+const isGlobalSearch = ref(true)
 const searchKeyword = ref('')
 const searchCategories = ref([])
 const searchLocation = ref(null) // 검색용 위치 (키워드/"이 지역" 검색 시에만 업데이트)
@@ -376,7 +375,7 @@ const handleSearch = async (searchParams) => {
         lat = center.lat()
         lng = center.lng()
       }
-      radius = 50000
+      radius = 500000  // 500km - 전국 검색 범위
 
       // 키워드 검색 시 위치 저장
       if (isKeywordSearch) {
@@ -414,7 +413,7 @@ const handleSearch = async (searchParams) => {
     }, 100)
 
     if (storeList.length === 0) {
-      toast.info('검색 결과가 없습니다.')
+      showInfo('검색 결과가 없습니다.')
     }
   } finally {
     isSearching.value = false
@@ -447,7 +446,7 @@ const handleSearchThisArea = async () => {
     lastSearchCenter.value = { lat, lng }
 
     if (storeList.length === 0) {
-      toast.info('이 지역에 등록된 카페가 없습니다.')
+      showInfo('이 지역에 등록된 카페가 없습니다.')
     }
   } finally {
     isSearching.value = false
@@ -471,7 +470,7 @@ const handleMyLocation = async () => {
       showSearchButton.value = true
     }
   } catch {
-    toast.error('현재 위치를 가져올 수 없습니다.')
+    showError('현재 위치를 가져올 수 없습니다.')
   } finally {
     isLocating.value = false
   }
@@ -556,7 +555,7 @@ onMounted(async () => {
     }
   } catch (error) {
     logger.error('초기화 실패', error)
-    toast.error('지도를 불러오는데 실패했습니다.')
+    showError('지도를 불러오는데 실패했습니다.')
   } finally {
     isLoading.value = false
   }

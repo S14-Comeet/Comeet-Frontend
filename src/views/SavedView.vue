@@ -71,7 +71,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useToast } from 'vue-toastification'
+import { showInfo, showError, showSuccess } from '@/utils/toast'
 import { useSavedStore } from '@/store/saved'
 import { useAuthStore } from '@/store/auth'
 import { createLogger } from '@/utils/logger'
@@ -86,7 +86,6 @@ import { getFolders, getCafesByFolder } from '@/api/cafe'
 const logger = createLogger('SavedView')
 
 const router = useRouter()
-const toast = useToast()
 const savedStore = useSavedStore()
 const authStore = useAuthStore()
 
@@ -122,7 +121,7 @@ const loadFolders = async () => {
     folders.value = response.data
   } catch (error) {
     logger.error('폴더 목록 불러오기 실패', error)
-    toast.error('폴더 목록을 불러오는데 실패했습니다.')
+    showError('폴더 목록을 불러오는데 실패했습니다.')
   } finally {
     isLoadingFolders.value = false
   }
@@ -138,7 +137,7 @@ const handleSelectFolder = async (folder) => {
     cafes.value = response.data
   } catch (error) {
     logger.error('카페 목록 불러오기 실패', error)
-    toast.error('카페 목록을 불러오는데 실패했습니다.')
+    showError('카페 목록을 불러오는데 실패했습니다.')
     selectedFolder.value = null
   } finally {
     isLoadingCafes.value = false
@@ -155,7 +154,7 @@ const handleBack = () => {
 // TODO: 추후 카페 상세 페이지로 이동하도록 변경 예정 (알림 페이지와 유사한 방식)
 const handleSelectCafe = (cafe) => {
   logger.info('카페 선택', cafe)
-  toast.info('카페 상세 페이지는 추후 구현 예정입니다.')
+  showInfo('카페 상세 페이지는 추후 구현 예정입니다.')
 }
 
 // 지도에서 보기 핸들러
@@ -187,10 +186,10 @@ const handleAddFolder = async (folderData) => {
 
     folders.value.unshift(newFolder)
     showAddFolderModal.value = false
-    toast.success(`"${folderData.name}" 목록이 추가되었습니다.`)
+    showSuccess(`"${folderData.name}" 목록이 추가되었습니다.`)
   } catch (error) {
     logger.error('폴더 추가 실패', error)
-    toast.error('목록 추가에 실패했습니다.')
+    showError('목록 추가에 실패했습니다.')
   }
 }
 
@@ -219,10 +218,10 @@ const handleUpdateFolder = async (folderData) => {
 
     showEditFolderModal.value = false
     editingFolder.value = null
-    toast.success('목록이 수정되었습니다.')
+    showSuccess('목록이 수정되었습니다.')
   } catch (error) {
     logger.error('폴더 수정 실패', error)
-    toast.error('목록 수정에 실패했습니다.')
+    showError('목록 수정에 실패했습니다.')
   }
 }
 
@@ -243,10 +242,10 @@ const confirmDelete = async () => {
     folders.value = folders.value.filter(f => f.id !== deletingFolder.value.id)
 
     deletingFolder.value = null
-    toast.success(`"${folderName}" 목록이 삭제되었습니다.`)
+    showSuccess(`"${folderName}" 목록이 삭제되었습니다.`)
   } catch (error) {
     logger.error('폴더 삭제 실패', error)
-    toast.error('목록 삭제에 실패했습니다.')
+    showError('목록 삭제에 실패했습니다.')
   }
 }
 
@@ -266,7 +265,7 @@ const handleDeleteCafe = async (cafe) => {
     }
   } catch (error) {
     logger.error('카페 삭제 실패', error)
-    toast.error('카페 삭제에 실패했습니다.')
+    showError('카페 삭제에 실패했습니다.')
   }
 }
 
