@@ -8,6 +8,12 @@
           <span class="nav-label">지도</span>
         </router-link>
 
+        <!-- 추천 -->
+        <router-link to="/recommendation" class="nav-item" :class="{ 'nav-item-active': isActive('/recommendation') }">
+          <component :is="getIcon('sparkle')" class="nav-icon" />
+          <span class="nav-label">추천</span>
+        </router-link>
+
         <!-- 여권 -->
         <router-link to="/passport" class="nav-item" :class="{ 'nav-item-active': isActive('/passport') }">
           <component :is="getIcon('passport')" class="nav-icon" />
@@ -36,6 +42,8 @@ import { useRoute } from 'vue-router'
 // SVG 아이콘 임포트
 import MapLineIcon from '@/assets/icons/map-line.svg?component'
 import MapFillIcon from '@/assets/icons/map-fill.svg?component'
+import SparkleLineIcon from '@/assets/icons/sparkle-line.svg?component'
+import SparkleFillIcon from '@/assets/icons/sparkle-fill.svg?component'
 import PassportLineIcon from '@/assets/icons/passport-line.svg?component'
 import PassportFillIcon from '@/assets/icons/passport-fill.svg?component'
 import BookmarkLineIcon from '@/assets/icons/bookmark-line.svg?component'
@@ -57,6 +65,7 @@ const isActive = (path) => {
 const getIcon = (type) => {
   const icons = {
     map: isActive('/map') ? MapFillIcon : MapLineIcon,
+    sparkle: isActive('/recommendation') ? SparkleFillIcon : SparkleLineIcon,
     passport: isActive('/passport') ? PassportFillIcon : PassportLineIcon,
     bookmark: isActive('/saved') ? BookmarkFillIcon : BookmarkLineIcon,
     user: UserLineIcon, // user는 fill 버전이 없으므로 항상 line

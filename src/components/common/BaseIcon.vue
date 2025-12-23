@@ -244,6 +244,13 @@ cx="12" cy="12" r="10" :stroke="color" stroke-width="1.5" stroke-linecap="round"
         :stroke="color" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
     </template>
 
+    <!-- Fire (Flame) -->
+    <template v-else-if="name === 'fire'">
+      <path
+        d="M12 22C16.4183 22 20 18.4183 20 14C20 10.5 17.5 7.5 16 6C15.5 8 14 9 12 8C12 5 10 2 8 2C8 5 6 7 4 10C3.5 11 4 13 4 14C4 18.4183 7.58172 22 12 22Z"
+        :stroke="color" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    </template>
+
     <!-- Map Pin -->
     <template v-else-if="name === 'mapPin'">
       <path
@@ -256,6 +263,23 @@ cx="12" cy="12" r="10" :stroke="color" stroke-width="1.5" stroke-linecap="round"
       <path
 d="M3 6H21M3 12H21M3 18H21" :stroke="color" stroke-width="1.5" stroke-linecap="round"
         stroke-linejoin="round" />
+    </template>
+
+    <!-- Sparkle (추천/AI) -->
+    <template v-else-if="name === 'sparkle'">
+      <path
+        d="M12 2L13.09 8.26L19 6L14.74 10.91L21 12L14.74 13.09L19 18L13.09 15.74L12 22L10.91 15.74L5 18L9.26 13.09L3 12L9.26 10.91L5 6L10.91 8.26L12 2Z"
+        :stroke="color" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    </template>
+
+    <!-- Refresh (새로고침) -->
+    <template v-else-if="name === 'refresh'">
+      <path
+        d="M23 4V10H17M1 20V14H7"
+        :stroke="color" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path
+        d="M3.51 9C4.01717 7.56678 4.87913 6.28539 6.01547 5.27543C7.1518 4.26546 8.52547 3.55977 10.0083 3.22427C11.4911 2.88878 13.0348 2.93435 14.4952 3.35679C15.9556 3.77924 17.2853 4.56473 18.36 5.64L23 10M1 14L5.64 18.36C6.71475 19.4353 8.04437 20.2208 9.50481 20.6432C10.9652 21.0657 12.5089 21.1112 13.9917 20.7757C15.4745 20.4402 16.8482 19.7345 17.9845 18.7246C19.1209 17.7146 19.9828 16.4332 20.49 15"
+        :stroke="color" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
     </template>
 
     <!-- Minus (줌 축소) -->

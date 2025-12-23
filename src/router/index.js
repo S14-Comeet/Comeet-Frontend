@@ -88,6 +88,17 @@ const routes = [
     name: 'passport',
     component: () => import('@/views/PassportView.vue')
   },
+  // 추천 시스템 라우트
+  {
+    path: '/recommendation',
+    name: 'recommendation',
+    component: () => import('@/views/RecommendationView.vue')
+  },
+  {
+    path: '/bean/:beanId',
+    name: 'bean-detail',
+    component: () => import('@/views/BeanDetailView.vue')
+  },
   {
     path: '/passport/:passportId',
     name: 'passport-detail',
@@ -149,7 +160,8 @@ const PUBLIC_PAGES = new Set(['/login', '/oauth/callback', '/test-components', '
 /** 동적 경로 패턴 체크 함수 */
 const PUBLIC_PATH_PATTERNS = [
   /^\/store\/\d+$/,  // /store/:storeId
-  /^\/menu\/\d+$/    // /menu/:storeId
+  /^\/menu\/\d+$/,   // /menu/:storeId
+  /^\/bean\/\d+$/    // /bean/:beanId
 ];
 
 /**

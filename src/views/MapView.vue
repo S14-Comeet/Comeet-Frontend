@@ -166,11 +166,13 @@ const handleTopSearch = () => {
 
 // 상단 검색 입력 포커스 핸들러
 const handleSearchInputFocus = () => {
-  // 시트를 half 상태로 확장
-  forceSheetState.value = 'half'
-  setTimeout(() => {
-    forceSheetState.value = null
-  }, 100)
+  // collapsed 상태일 때만 half로 확장 (full 상태는 유지)
+  if (currentSheetState.value === 'collapsed') {
+    forceSheetState.value = 'half'
+    setTimeout(() => {
+      forceSheetState.value = null
+    }, 100)
+  }
 }
 
 // 카테고리 클릭 핸들러

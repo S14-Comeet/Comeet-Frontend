@@ -30,7 +30,7 @@ const router = useRouter();
 const notificationStore = useNotificationStore();
 
 // 헤더를 숨길 페이지 목록
-const pagesWithoutHeader = new Set(['login', 'nickname', 'map', 'review-write', 'review-select']);
+const pagesWithoutHeader = new Set(['login', 'nickname', 'map', 'review-write', 'review-select', 'recommendation', 'bean-detail']);
 
 // 네비게이션 바를 숨길 페이지 목록 (로그인, 닉네임, 설문, 리뷰 작성)
 const pagesWithoutNavigation = new Set(['login', 'nickname', 'survey', 'review-write', 'review-select']);
