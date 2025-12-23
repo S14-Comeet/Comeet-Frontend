@@ -320,5 +320,6 @@ export const uploadImage = async (file) => {
     }
   })
 
-  return response.data?.url || response.data
+  // API 응답: { success, data: { url }, error }
+  return response.data?.data?.url || response.data?.url || response.data
 }
