@@ -333,8 +333,8 @@ const handleSubmit = async () => {
     // 성공 Toast
     showSuccess(`환영합니다, ${nickname.value.trim()}님!`);
 
-    // 지도 페이지로 이동
-    router.push('/map');
+    // 취향 설정 페이지로 이동
+    router.push('/preference-onboarding');
   } catch (error) {
 
     const errorCode = error.response?.data?.error?.code;

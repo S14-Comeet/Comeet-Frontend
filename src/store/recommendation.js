@@ -6,6 +6,7 @@ import {
   getNearbyMenuRecommendations
 } from '@/api/recommendation'
 import { createLogger } from '@/utils/logger'
+import { safeStorage } from '@/utils/storage'
 
 const logger = createLogger('RecommendationStore')
 
@@ -21,9 +22,11 @@ export const useRecommendationStore = defineStore('recommendation', () => {
 
   const isLoadingBeans = ref(false)
   const isLoadingMenus = ref(false)
+  const isLoadingNearbyMenus = ref(false)
 
   const beanError = ref(null)
   const menuError = ref(null)
+  const nearbyMenuError = ref(null)
 
   // 근거리 검색 관련
   const radiusExpanded = ref(false)
@@ -88,8 +91,8 @@ export const useRecommendationStore = defineStore('recommendation', () => {
       }
     }
 
-    isLoadingMenus.value = true
-    menuError.value = null
+    isLoadingNearbyMenus.value = true
+    nearbyMenuError.value = null
 
     try {
       const data = await getNearbyMenuRecommendations(lat, lng, radiusKm)
@@ -110,10 +113,10 @@ export const useRecommendationStore = defineStore('recommendation', () => {
       }
     } catch (error) {
       logger.error('Failed to load nearby menu recommendations', error)
-      menuError.value = '메뉴 추천을 불러올 수 없습니다'
+      nearbyMenuError.value = '주변 메뉴 추천을 불러올 수 없습니다'
       throw error
     } finally {
-      isLoadingMenus.value = false
+      isLoadingNearbyMenus.value = false
     }
   }
 
@@ -133,6 +136,7 @@ export const useRecommendationStore = defineStore('recommendation', () => {
     hasFetchedNearbyMenus.value = false
     beanError.value = null
     menuError.value = null
+    nearbyMenuError.value = null
     radiusExpanded.value = false
     actualRadiusKm.value = 5
   }
@@ -147,8 +151,10 @@ export const useRecommendationStore = defineStore('recommendation', () => {
     hasFetchedNearbyMenus,
     isLoadingBeans,
     isLoadingMenus,
+    isLoadingNearbyMenus,
     beanError,
     menuError,
+    nearbyMenuError,
     radiusExpanded,
     actualRadiusKm,
 
@@ -158,5 +164,16 @@ export const useRecommendationStore = defineStore('recommendation', () => {
     fetchNearbyMenuRecommendations,
     fetchAllRecommendations,
     clearCache
+  }
+}, {
+  persist: {
+    key: 'comeet-recommendation',
+    storage: safeStorage,
+    paths: [
+      'beanRecommendations',
+      'menuRecommendations',
+      'hasFetchedBeans',
+      'hasFetchedMenus'
+    ]
   }
 })
