@@ -152,7 +152,7 @@ const isLoadingBean = ref(false)
 const isLoadingMenus = ref(false)
 const beanError = ref(null)
 const menuError = ref(null)
-const menuLocationMode = ref('global')
+const menuLocationMode = ref('nearby')
 const recommendationReason = ref(null)
 
 // Computed
