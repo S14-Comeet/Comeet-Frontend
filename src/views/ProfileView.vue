@@ -38,6 +38,13 @@
       <div class="bg-white rounded-lg shadow-sm">
         <button
           class="w-full flex items-center justify-between p-4 border-b border-primary-200 hover:bg-primary-50 transition-colors"
+          @click="goToMyPreference"
+        >
+          <span class="text-textPrimary">내 취향</span>
+          <span class="text-textSecondary">›</span>
+        </button>
+        <button
+          class="w-full flex items-center justify-between p-4 border-b border-primary-200 hover:bg-primary-50 transition-colors"
           @click="goToMyReviews"
         >
           <span class="text-textPrimary">내 리뷰</span>
@@ -133,6 +140,13 @@ const confirmLogout = () => {
  */
 const cancelLogout = () => {
   showLogoutModal.value = false
+}
+
+/**
+ * 내 취향 페이지로 이동
+ */
+const goToMyPreference = () => {
+  router.push('/my-preference')
 }
 
 /**
