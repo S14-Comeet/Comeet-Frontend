@@ -46,7 +46,6 @@ const route = useRoute()
 const router = useRouter()
 
 const storeId = computed(() => route.params.storeId)
-const storeName = computed(() => route.query.name || '')
 
 const menuData = ref([])
 const isLoading = ref(true)
@@ -78,11 +77,8 @@ const fetchMenus = async () => {
 
 const goToReview = () => {
   router.push({
-    name: 'review-select',
-    query: {
-      storeId: storeId.value,
-      name: storeName.value
-    }
+    name: 'store-detail',
+    params: { storeId: storeId.value }
   })
 }
 
