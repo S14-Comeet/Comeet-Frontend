@@ -31,6 +31,9 @@
           v-for="review in reviews"
           :key="review.reviewId"
           :review="review"
+          :store-name="storeNames[review.storeId] || ''"
+          :menu-name="menuNames[review.menuId] || ''"
+          :has-cupping-note="cuppingNoteStatus[review.reviewId] || false"
           @click="goToReviewDetail(review)"
         />
 
@@ -60,7 +63,9 @@ import { useRouter } from 'vue-router'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import ReviewCard from '@/components/review/ReviewCard.vue'
-import { getMyReviews } from '@/api/review'
+import { getMyReviews, checkCuppingNoteExists } from '@/api/review'
+import { getStoreById } from '@/api/cafe'
+import { getMenuById } from '@/api/menu'
 import { showError } from '@/utils/toast'
 import { createLogger } from '@/utils/logger'
 
@@ -72,6 +77,77 @@ const isLoading = ref(false)
 const currentPage = ref(1)
 const pageSize = ref(10)
 const hasMore = ref(true)
+const cuppingNoteStatus = ref({})
+const storeNames = ref({})  // storeId -> name 캐시
+const menuNames = ref({})   // menuId -> name 캐시
+
+/**
+ * 커핑 노트 존재 여부 확인 (병렬 처리)
+ */
+const checkCuppingNoteStatusForReviews = async (reviewList) => {
+  const checks = reviewList.map(async (review) => {
+    // 이미 확인한 리뷰는 스킵
+    if (cuppingNoteStatus.value[review.reviewId] !== undefined) {
+      return
+    }
+    try {
+      const exists = await checkCuppingNoteExists(review.reviewId)
+      cuppingNoteStatus.value[review.reviewId] = exists
+    } catch {
+      // 커핑노트 확인 실패는 무시 (없는 경우도 포함)
+      cuppingNoteStatus.value[review.reviewId] = false
+    }
+  })
+
+  await Promise.all(checks)
+}
+
+/**
+ * 가맹점명/메뉴명 조회 (병렬 처리, 캐싱)
+ */
+const fetchStoreAndMenuNames = async (reviewList) => {
+  const fetchPromises = []
+
+  // 고유한 storeId, menuId 추출
+  const uniqueStoreIds = [...new Set(reviewList.map(r => r.storeId).filter(Boolean))]
+  const uniqueMenuIds = [...new Set(reviewList.map(r => r.menuId).filter(Boolean))]
+
+  // 가맹점명 조회 (캐시에 없는 것만)
+  for (const storeId of uniqueStoreIds) {
+    if (storeNames.value[storeId] === undefined) {
+      fetchPromises.push(
+        getStoreById(storeId)
+          .then(response => {
+            // API 응답이 { data: { name: ... } } 형태로 래핑됨
+            const storeData = response?.data || response
+            storeNames.value[storeId] = storeData?.name || ''
+          })
+          .catch(() => {
+            storeNames.value[storeId] = ''
+          })
+      )
+    }
+  }
+
+  // 메뉴명 조회 (캐시에 없는 것만)
+  for (const menuId of uniqueMenuIds) {
+    if (menuNames.value[menuId] === undefined) {
+      fetchPromises.push(
+        getMenuById(menuId)
+          .then(response => {
+            // API 응답이 { data: { name: ... } } 형태로 래핑됨
+            const menuData = response?.data || response
+            menuNames.value[menuId] = menuData?.name || ''
+          })
+          .catch(() => {
+            menuNames.value[menuId] = ''
+          })
+      )
+    }
+  }
+
+  await Promise.all(fetchPromises)
+}
 
 /**
  * 리뷰 목록 불러오기
@@ -80,8 +156,6 @@ const fetchReviews = async (page = 1) => {
   isLoading.value = true
   try {
     const response = await getMyReviews({ page, size: pageSize.value })
-
-    logger.debug('Reviews fetched', response)
 
     // API 응답 구조에 따라 조정 필요
     const newReviews = response.data?.content || response.content || []
@@ -94,6 +168,12 @@ const fetchReviews = async (page = 1) => {
     }
 
     hasMore.value = currentPage.value < totalPages
+
+    // 커핑 노트 존재 여부, 가맹점명/메뉴명 조회 (병렬)
+    await Promise.all([
+      checkCuppingNoteStatusForReviews(newReviews),
+      fetchStoreAndMenuNames(newReviews)
+    ])
 
   } catch (error) {
     logger.error('Failed to fetch reviews', error)
@@ -112,12 +192,14 @@ const loadMore = () => {
 }
 
 /**
- * 리뷰 상세 페이지로 이동 (필요시 구현)
+ * 리뷰 상세 페이지로 이동
  */
 const goToReviewDetail = (review) => {
   logger.debug('Review clicked', review)
-  // TODO: 리뷰 상세 페이지 구현 시 라우팅
-  // router.push(`/reviews/${review.reviewId}`)
+  router.push({
+    name: 'review-detail',
+    params: { reviewId: review.reviewId }
+  })
 }
 
 /**

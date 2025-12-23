@@ -5,7 +5,7 @@ const logger = createLogger('API:Review');
 
 /**
  * 리뷰 생성
- * 
+ *
  * @param {Object} reviewData
  * @param {number|string} reviewData.storeId - 가맹점 ID (Required)
  * @param {string} reviewData.content - 리뷰 내용
@@ -14,7 +14,8 @@ const logger = createLogger('API:Review');
  * @param {number} [reviewData.menuId] - 메뉴 ID (Required by API)
  * @param {boolean} [reviewData.isPublic=true] - 공개 여부
  * @param {string} [reviewData.imageUrl] - 이미지 URL
- * 
+ * @param {number} [reviewData.rating] - 별점 (0-5, 선택)
+ *
  * @returns {Promise<Object>} API 응답
  */
 export const createReview = async (reviewData) => {
@@ -26,7 +27,8 @@ export const createReview = async (reviewData) => {
     imageUrl: reviewData.imageUrl || null,
     // 필수값이지만 UI 흐름상 누락될 수 있는 값들은 임시로 처리하거나 상위에서 전달받아야 함
     visitId: reviewData.visitId ? Number(reviewData.visitId) : 1, // TODO: 실제 방문 인증 ID 연동 필요 (임시값 1)
-    menuId: reviewData.menuId ? Number(reviewData.menuId) : 1     // TODO: 실제 메뉴 선택 연동 필요 (임시값 1)
+    menuId: reviewData.menuId ? Number(reviewData.menuId) : 1,    // TODO: 실제 메뉴 선택 연동 필요 (임시값 1)
+    rating: reviewData.rating ?? null // 별점 (선택)
   };
 
   logger.debug('Creating review with payload:', payload);
@@ -140,4 +142,76 @@ export const getCuppingNote = async (reviewId) => {
 
   const response = await api.get(`/reviews/${reviewId}/cupping-note`);
   return response.data;
+};
+
+/**
+ * 리뷰 상세 조회
+ *
+ * @param {number} reviewId - 리뷰 ID
+ * @returns {Promise<Object>} 리뷰 상세 데이터 (ReviewedResDto)
+ */
+export const getReviewDetail = async (reviewId) => {
+  logger.debug('Fetching review detail:', reviewId);
+
+  const response = await api.get(`/reviews/${reviewId}`);
+  return response.data;
+};
+
+/**
+ * 리뷰 수정
+ *
+ * @param {number} reviewId - 리뷰 ID
+ * @param {Object} reviewData - 수정할 리뷰 데이터
+ * @param {string} [reviewData.content] - 리뷰 내용
+ * @param {Array<number>} [reviewData.flavorIds] - 선택한 Flavor ID 목록
+ * @param {boolean} [reviewData.isPublic] - 공개 여부
+ * @param {string} [reviewData.imageUrl] - 이미지 URL
+ * @param {number} [reviewData.rating] - 별점 (0-5)
+ * @returns {Promise<Object>} API 응답
+ */
+export const updateReview = async (reviewId, reviewData) => {
+  const payload = {
+    content: reviewData.content,
+    flavorIdList: reviewData.flavorIds || [],
+    isPublic: reviewData.isPublic,
+    imageUrl: reviewData.imageUrl || null,
+    rating: reviewData.rating ?? null
+  };
+
+  logger.debug('Updating review:', reviewId, payload);
+
+  const response = await api.patch(`/reviews/${reviewId}`, payload);
+  return response.data;
+};
+
+/**
+ * 리뷰 삭제
+ *
+ * @param {number} reviewId - 리뷰 ID
+ * @returns {Promise<Object>} API 응답
+ */
+export const deleteReview = async (reviewId) => {
+  logger.debug('Deleting review:', reviewId);
+
+  const response = await api.delete(`/reviews/${reviewId}`);
+  return response.data;
+};
+
+/**
+ * 커핑 노트 존재 여부 확인
+ * 404 에러가 발생하면 커핑 노트가 없는 것으로 판단
+ *
+ * @param {number} reviewId - 리뷰 ID
+ * @returns {Promise<boolean>} 커핑 노트 존재 여부
+ */
+export const checkCuppingNoteExists = async (reviewId) => {
+  try {
+    await api.get(`/reviews/${reviewId}/cupping-note`);
+    return true;
+  } catch (error) {
+    if (error.response?.status === 404) {
+      return false;
+    }
+    throw error;
+  }
 };

@@ -215,8 +215,9 @@
         <div v-else class="reviews-list">
           <div
             v-for="review in displayedReviews"
-            :key="review.id"
+            :key="review.id || review.reviewId"
             class="review-card"
+            @click="goToReviewDetail(review)"
           >
             <div class="review-header">
               <div class="reviewer-info">
@@ -226,6 +227,12 @@
                 <span class="reviewer-name">{{ review.nickname || '익명' }}</span>
               </div>
               <span class="review-date">{{ formatDate(review.createdAt) }}</span>
+            </div>
+
+            <!-- Rating -->
+            <div v-if="review.rating > 0" class="review-rating">
+              <StarRating :model-value="review.rating" :size="16" readonly />
+              <span class="rating-value">{{ review.rating }}점</span>
             </div>
 
             <div v-if="review.flavorList && review.flavorList.length > 0" class="review-flavors">
@@ -274,6 +281,7 @@ import { MENU_CATEGORIES } from '@/constants'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseChip from '@/components/common/BaseChip.vue'
+import StarRating from '@/components/common/StarRating.vue'
 import BookmarkFolderSelectModal from '@/components/saved/BookmarkFolderSelectModal.vue'
 import { getStoreById, getStoreReviews } from '@/api/cafe'
 import { getMenusByStoreId } from '@/api/menu'
@@ -511,6 +519,18 @@ const goToMenu = () => {
     name: 'menu',
     params: { storeId: storeId.value },
     query: { name: store.value?.name }
+  })
+}
+
+const goToReviewDetail = (review) => {
+  const reviewId = review.reviewId || review.id
+  if (!reviewId) {
+    logger.warn('Review ID not found', review)
+    return
+  }
+  router.push({
+    name: 'review-detail',
+    params: { reviewId }
   })
 }
 
@@ -807,6 +827,25 @@ onMounted(() => {
   padding: 1rem;
   background-color: var(--color-neutral-50);
   border-radius: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.review-card:hover {
+  background-color: var(--color-primary-50);
+}
+
+.review-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.rating-value {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-textPrimary);
 }
 
 .review-header {
