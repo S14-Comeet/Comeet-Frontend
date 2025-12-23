@@ -240,7 +240,7 @@ export const getBeans = async ({ page = 1, size = 10 } = {}) => {
 export const getBeansByRoastery = async (roasteryId, { page = 1, size = 10 } = {}) => {
   logger.debug('로스터리별 원두 조회', { roasteryId, page, size })
   const response = await api.get(`/beans/roastery/${roasteryId}`, { params: { page, size } })
-  return response.data
+  return response.data?.data || response.data
 }
 
 /**
@@ -275,7 +275,6 @@ export const getBeanById = async (beanId) => {
  * @param {string} beanData.variety - 품종 (선택)
  * @param {string} beanData.processingMethod - 가공 방식 (선택)
  * @param {string} beanData.roastingLevel - 로스팅 레벨 (LIGHT, MEDIUM, DARK)
- * @param {string} beanData.description - 설명 (선택)
  * @returns {Promise<Object>} 생성된 원두 정보
  */
 export const createBean = async (beanData) => {
@@ -293,12 +292,11 @@ export const createBean = async (beanData) => {
     farm: beanData.farm || null,
     variety: beanData.variety || null,
     processingMethod: beanData.processingMethod || null,
-    roastingLevel: beanData.roastingLevel || null,
-    description: beanData.description || null
+    roastingLevel: beanData.roastingLevel || null
   }
   logger.debug('원두 생성', payload)
   const response = await api.post('/beans', payload)
-  return response.data
+  return response.data?.data || response.data
 }
 
 // ============================================================
