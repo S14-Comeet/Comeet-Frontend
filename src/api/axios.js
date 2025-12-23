@@ -62,7 +62,7 @@ const handleTokenReissue = async (originalRequest) => {
   isRefreshing = true;
 
   try {
-    const response = await api.post('/api/auth/reissue');
+    const response = await api.post('/auth/reissue');
     const newAccessToken = response.headers['authorization'];
 
     if (!newAccessToken) {
