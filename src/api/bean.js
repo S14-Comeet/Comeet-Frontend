@@ -50,3 +50,24 @@ export const updateBean = async (beanId, beanData) => {
 export const deleteBean = async (beanId) => {
   await api.delete(`/beans/${beanId}`)
 }
+
+/**
+ * 원두 플레이버 매핑 전체 교체 (PUT)
+ * 기존 매핑을 모두 삭제하고 새로운 매핑으로 교체
+ * @param {number} beanId - 원두 ID
+ * @param {number[]} flavorIds - 플레이버 ID 목록
+ * @returns {Promise<Object>} 매핑된 플레이버 정보
+ */
+export const updateBeanFlavors = async (beanId, flavorIds) => {
+  const response = await api.put(`/beans/${beanId}/flavors`, { flavorIds })
+  return response.data?.data || response.data
+}
+
+/**
+ * 원두 플레이버 매핑 전체 삭제
+ * @param {number} beanId - 원두 ID
+ * @returns {Promise<void>}
+ */
+export const deleteBeanFlavors = async (beanId) => {
+  await api.delete(`/beans/${beanId}/flavors`)
+}

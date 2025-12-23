@@ -34,6 +34,7 @@
           <!-- Category chip + Subcategories in same row -->
           <div class="category-line">
             <button
+              type="button"
               class="flavor-chip"
               :class="{
                 'selected': isSelected(cat.code),
@@ -56,6 +57,7 @@
                 class="subcategory-wrapper"
               >
                 <button
+                  type="button"
                   class="flavor-chip sub"
                   :class="{
                     'selected': isSelected(sub.code),
@@ -80,6 +82,7 @@
                     <button
                       v-for="detail in sub.children"
                       :key="detail.id"
+                      type="button"
                       class="flavor-chip detail"
                       :class="{ 'selected': isSelected(detail.code) }"
                       :style="getChipStyle(detail)"

@@ -253,15 +253,42 @@
           </div>
         </div>
 
-        <!-- 설명 -->
+        <!-- 향미 노트 선택 -->
         <div>
-          <label class="block text-sm font-medium text-textPrimary mb-2">설명</label>
-          <textarea
-            v-model="form.description"
-            placeholder="원두에 대한 설명을 입력하세요"
-            class="w-full px-4 py-3 rounded-xl border border-border bg-white text-textPrimary placeholder:text-textSecondary focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-            rows="3"
-          ></textarea>
+          <div class="flex items-center justify-between mb-2">
+            <label class="text-sm font-medium text-textPrimary">향미 노트</label>
+            <button
+              type="button"
+              class="text-sm text-primary font-medium hover:underline"
+              @click="showFlavorSelector = !showFlavorSelector"
+            >
+              {{ showFlavorSelector ? '접기' : '선택하기' }}
+            </button>
+          </div>
+
+          <!-- 선택된 플레이버 미리보기 -->
+          <div v-if="selectedFlavorCodes.length > 0 && !showFlavorSelector" class="flex flex-wrap gap-1.5">
+            <span
+              v-for="code in selectedFlavorCodes"
+              :key="code"
+              class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-700"
+            >
+              {{ getFlavorDisplayName(code) }}
+            </span>
+          </div>
+          <p v-else-if="!showFlavorSelector" class="text-sm text-textSecondary">
+            이 원두의 향미 특성을 선택하세요 (선택사항)
+          </p>
+
+          <!-- 플레이버 셀렉터 -->
+          <Transition name="slide-down">
+            <div v-if="showFlavorSelector" class="mt-3 -mx-4">
+              <HierarchicalFlavorSelector
+                v-model="selectedFlavorCodes"
+                :max-selection="10"
+              />
+            </div>
+          </Transition>
         </div>
 
         <!-- 원두 이름 (자동 생성 + 수정 가능) -->
@@ -310,14 +337,16 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { BEAN_COUNTRIES, BEAN_VARIETY_GROUPS, BEAN_PROCESSING_METHOD_GROUPS, ROASTING_LEVELS } from '@/constants'
+import { BEAN_COUNTRIES, BEAN_VARIETY_GROUPS, BEAN_PROCESSING_METHOD_GROUPS, ROASTING_LEVELS, findFlavorInWheel } from '@/constants'
 import { getStoreById } from '@/api/cafe'
 import { createBean } from '@/api/owner'
+import { updateBeanFlavors } from '@/api/bean'
 import { createLogger } from '@/utils/logger'
 import { showSuccess, showError } from '@/utils/toast'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import HierarchicalFlavorSelector from '@/components/common/HierarchicalFlavorSelector.vue'
 
 const logger = createLogger('OwnerBeanForm')
 const route = useRoute()
@@ -357,7 +386,6 @@ const form = ref({
   variety: '',
   processingMethod: '',
   roastingLevel: '',
-  description: '',
   name: ''
 })
 
@@ -381,6 +409,10 @@ const errors = ref({
 
 const isSubmitting = ref(false)
 const isNameManuallyEdited = ref(false)
+
+// 플레이버 선택 상태
+const selectedFlavorCodes = ref([])
+const showFlavorSelector = ref(false)
 
 // 품종 선택 상태 (싱글 오리진)
 const selectedVariety = ref('')
@@ -555,6 +587,26 @@ const arrayToString = (arr) => {
 }
 
 /**
+ * 플레이버 코드를 ID로 변환
+ */
+const convertFlavorCodesToIds = (codes) => {
+  return codes
+    .map(code => {
+      const flavor = findFlavorInWheel(code)
+      return flavor?.id
+    })
+    .filter(id => id != null)
+}
+
+/**
+ * 플레이버 코드로 한글 이름 조회
+ */
+const getFlavorDisplayName = (code) => {
+  const flavor = findFlavorInWheel(code)
+  return flavor?.name || code
+}
+
+/**
  * 폼 제출
  */
 const handleSubmit = async () => {
@@ -598,8 +650,7 @@ const handleSubmit = async () => {
         farm: arrayToString(farms),
         variety: arrayToString(varieties),
         processingMethod: arrayToString(processingMethods),
-        roastingLevel: form.value.roastingLevel || null,
-        description: form.value.description.trim() || null
+        roastingLevel: form.value.roastingLevel || null
       }
     } else {
       // 싱글 오리진 모드
@@ -610,14 +661,28 @@ const handleSubmit = async () => {
         farm: form.value.farm.trim() || null,
         variety: form.value.variety.trim() || null,
         processingMethod: form.value.processingMethod || null,
-        roastingLevel: form.value.roastingLevel || null,
-        description: form.value.description.trim() || null
+        roastingLevel: form.value.roastingLevel || null
       }
     }
 
-    await createBean(beanData)
+    const createdBean = await createBean(beanData)
+    const newBeanId = createdBean?.beanId || createdBean?.id
+    logger.info('원두 생성 성공', { isBlend: isBlend.value, beanId: newBeanId })
 
-    logger.info('원두 생성 성공', { isBlend: isBlend.value })
+    // 플레이버 매핑 처리
+    if (selectedFlavorCodes.value.length > 0 && newBeanId) {
+      try {
+        const flavorIds = convertFlavorCodesToIds(selectedFlavorCodes.value)
+        if (flavorIds.length > 0) {
+          await updateBeanFlavors(newBeanId, flavorIds)
+          logger.info('플레이버 매핑 성공', { beanId: newBeanId, flavorIds })
+        }
+      } catch (flavorErr) {
+        logger.warn('플레이버 매핑 실패 (원두는 등록됨)', flavorErr)
+        // 플레이버 매핑 실패는 경고만 표시하고 진행
+      }
+    }
+
     showSuccess('원두가 등록되었습니다')
 
     // 원두 탭으로 돌아가기
@@ -687,5 +752,20 @@ onMounted(() => {
 .blend-input:focus {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 2px var(--color-primary-100);
+}
+
+/* Slide Down Transition */
+.slide-down-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-down-leave-active {
+  transition: all 0.2s ease-in;
+}
+
+.slide-down-enter-from,
+.slide-down-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 </style>
