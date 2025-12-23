@@ -1,13 +1,15 @@
 <template>
   <div class="flex flex-col min-h-full h-full bg-background">
-    <!-- Header -->
-    <BaseHeader :title="pageTitle" show-back />
-
     <!-- Content -->
     <div class="flex-1 overflow-y-auto safe-bottom">
       <!-- Loading Bean -->
-      <div v-if="isLoadingBean" class="p-4">
-        <RecommendationSkeleton type="bean" />
+      <div v-if="isLoadingBean" class="p-4 space-y-4">
+        <div class="skeleton-card">
+          <div class="skeleton h-6 w-3/4 mb-3" />
+          <div class="skeleton h-4 w-1/2 mb-2" />
+          <div class="skeleton h-4 w-2/3" />
+        </div>
+        <div class="skeleton h-64 rounded-xl" />
       </div>
 
       <!-- Error -->
@@ -22,26 +24,30 @@
       <template v-else-if="bean">
         <!-- Bean Info Card -->
         <div class="bean-detail-card mx-4 mt-4">
-          <h1 class="bean-name">{{ bean.beanName }}</h1>
+          <h1 class="bean-name">{{ bean.name }}</h1>
 
-          <div class="bean-meta">
-            <span v-if="bean.origin" class="meta-item">
-              <BaseIcon name="globe" :size="14" />
-              {{ bean.origin }}
-            </span>
-            <span v-if="bean.roastLevel" class="meta-item">
-              <BaseIcon name="fire" :size="14" />
-              {{ formatRoastingLevel(bean.roastLevel) }}
-            </span>
-          </div>
-
-          <!-- Flavor badges -->
-          <div v-if="bean.flavors?.length" class="flavor-list">
-            <FlavorBadge
-              v-for="flavor in bean.flavors"
-              :key="flavor.flavorId"
-              :flavor="flavor"
-            />
+          <!-- Origin & Processing Info -->
+          <div class="bean-info-grid">
+            <div v-if="displayCountry" class="info-item">
+              <span class="info-label">원산지</span>
+              <span class="info-value">{{ displayCountry }}</span>
+            </div>
+            <div v-if="displayFarm" class="info-item">
+              <span class="info-label">농장</span>
+              <span class="info-value">{{ displayFarm }}</span>
+            </div>
+            <div v-if="displayVariety" class="info-item">
+              <span class="info-label">품종</span>
+              <span class="info-value">{{ displayVariety }}</span>
+            </div>
+            <div v-if="displayProcessingMethod" class="info-item">
+              <span class="info-label">가공방식</span>
+              <span class="info-value">{{ displayProcessingMethod }}</span>
+            </div>
+            <div v-if="bean.roastingLevel" class="info-item">
+              <span class="info-label">로스팅</span>
+              <span class="info-value">{{ formatRoastingLevel(bean.roastingLevel) }}</span>
+            </div>
           </div>
 
           <!-- Description -->
@@ -50,8 +56,24 @@
           </p>
 
           <!-- AI Reason (if from recommendation) -->
-          <RecommendationReason v-if="bean.reason" :reason="bean.reason" />
+          <RecommendationReason v-if="recommendationReason" :reason="recommendationReason" />
         </div>
+
+        <!-- Flavor Wheel Section -->
+        <section v-if="bean.flavors?.length" class="px-4 py-4">
+          <h2 class="section-title mb-3">
+            <span class="section-icon">🎨</span>
+            향미 프로필
+          </h2>
+          <div class="flavor-wheel-wrapper">
+            <FlavorWheel
+              :size="280"
+              :highlighted-flavors="bean.flavors"
+              :show-legend="true"
+              center-label="Flavor"
+            />
+          </div>
+        </section>
 
         <!-- Menus using this bean -->
         <section class="px-4 py-4">
@@ -105,15 +127,14 @@ import { useRoute, useRouter } from 'vue-router'
 import { useGeolocation } from '@/composables/useGeolocation'
 import { createLogger } from '@/utils/logger'
 import { showWarning } from '@/utils/toast'
+import { getBeanById } from '@/api/bean'
 import {
   getMenusByBean,
   getNearbyMenusByBean,
   formatRoastingLevel
 } from '@/api/recommendation'
 
-import BaseHeader from '@/components/common/BaseHeader.vue'
-import BaseIcon from '@/components/common/BaseIcon.vue'
-import FlavorBadge from '@/components/recommendation/FlavorBadge.vue'
+import FlavorWheel from '@/components/bean/FlavorWheel.vue'
 import RecommendationReason from '@/components/recommendation/RecommendationReason.vue'
 import LocationModeToggle from '@/components/recommendation/LocationModeToggle.vue'
 import MenuRecommendationCard from '@/components/recommendation/MenuRecommendationCard.vue'
@@ -132,10 +153,25 @@ const isLoadingMenus = ref(false)
 const beanError = ref(null)
 const menuError = ref(null)
 const menuLocationMode = ref('global')
+const recommendationReason = ref(null)
 
 // Computed
 const beanId = computed(() => Number(route.params.beanId))
-const pageTitle = computed(() => bean.value?.beanName || '원두 상세')
+const pageTitle = computed(() => bean.value?.name || '원두 상세')
+
+// Format multiple values (comma separated or array)
+const formatMultiValue = (value) => {
+  if (!value) return null
+  if (Array.isArray(value)) {
+    return value.filter(Boolean).join(', ')
+  }
+  return value
+}
+
+const displayCountry = computed(() => formatMultiValue(bean.value?.country))
+const displayFarm = computed(() => formatMultiValue(bean.value?.farm))
+const displayVariety = computed(() => formatMultiValue(bean.value?.variety))
+const displayProcessingMethod = computed(() => formatMultiValue(bean.value?.processingMethod))
 
 // Methods
 const loadBeanDetail = async () => {
@@ -143,35 +179,57 @@ const loadBeanDetail = async () => {
   beanError.value = null
 
   try {
-    // 추천 페이지에서 넘어온 경우 route.query로 bean 데이터가 있을 수 있음
-    // 없으면 메뉴 조회 시 첫 번째 메뉴의 beans에서 정보 추출
-    if (route.query.bean) {
+    // Check if recommendation reason was passed
+    if (route.query.reason) {
       try {
-        bean.value = JSON.parse(route.query.bean)
+        recommendationReason.value = route.query.reason
       } catch {
-        // JSON 파싱 실패 시 무시
+        // Ignore parse error
       }
     }
 
-    // bean 데이터가 없으면 메뉴 조회 후 추출
-    if (!bean.value) {
-      await loadMenus()
-      // 첫 번째 메뉴에서 원두 정보 추출은 어려우므로, 기본 정보만 표시
-      // 실제로는 별도 API가 필요할 수 있음
-      bean.value = {
-        beanId: beanId.value,
-        beanName: `원두 #${beanId.value}`,
-        description: '',
-        origin: '',
-        roastLevel: '',
-        flavors: []
+    // Try to get bean from query params first (for quick display)
+    if (route.query.bean) {
+      try {
+        const queryBean = JSON.parse(route.query.bean)
+        bean.value = normalizeBean(queryBean)
+      } catch {
+        // Ignore parse error
       }
     }
+
+    // Fetch from API for complete data
+    const apiBean = await getBeanById(beanId.value)
+    bean.value = normalizeBean(apiBean)
+
+    logger.info('Bean detail loaded', { beanId: beanId.value, name: bean.value?.name })
+
+    // Also load menus
+    await loadMenus()
   } catch (error) {
     logger.error('Failed to load bean detail', error)
-    beanError.value = '원두 정보를 불러올 수 없습니다'
+    if (!bean.value) {
+      beanError.value = '원두 정보를 불러올 수 없습니다'
+    }
   } finally {
     isLoadingBean.value = false
+  }
+}
+
+// Normalize bean data from different sources
+const normalizeBean = (data) => {
+  if (!data) return null
+  return {
+    id: data.id || data.beanId,
+    roasteryId: data.roasteryId,
+    name: data.name || data.beanName,
+    country: data.country || data.origin,
+    farm: data.farm,
+    variety: data.variety,
+    processingMethod: data.processingMethod,
+    roastingLevel: data.roastingLevel || data.roastLevel,
+    description: data.description,
+    flavors: data.flavors || []
   }
 }
 
@@ -227,6 +285,7 @@ watch(() => route.params.beanId, () => {
   if (route.params.beanId) {
     bean.value = null
     menus.value = []
+    recommendationReason.value = null
     loadBeanDetail()
   }
 })
@@ -249,33 +308,32 @@ onMounted(() => {
   font-size: 1.375rem;
   font-weight: 700;
   color: var(--color-textPrimary);
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 1rem 0;
 }
 
-.bean-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+.bean-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
-.meta-item {
+.info-item {
   display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  font-size: 0.875rem;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.info-label {
+  font-size: 0.75rem;
   color: var(--color-textSecondary);
+  font-weight: 500;
 }
 
-.meta-item :deep(svg) {
-  color: var(--color-primary-500);
-}
-
-.flavor-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.375rem;
-  margin-bottom: 1rem;
+.info-value {
+  font-size: 0.875rem;
+  color: var(--color-textPrimary);
+  font-weight: 600;
 }
 
 .bean-description {
@@ -283,6 +341,8 @@ onMounted(() => {
   line-height: 1.6;
   color: var(--color-textSecondary);
   margin: 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border);
 }
 
 .section-title {
@@ -305,6 +365,12 @@ onMounted(() => {
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 0.75rem;
+}
+
+.flavor-wheel-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0;
 }
 
 .empty-state {
@@ -330,5 +396,33 @@ onMounted(() => {
 
 .space-y-3 > * + * {
   margin-top: 0.75rem;
+}
+
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+/* Skeleton styles */
+.skeleton-card {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--color-gray-100) 25%, var(--color-gray-200) 50%, var(--color-gray-100) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.375rem;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 </style>

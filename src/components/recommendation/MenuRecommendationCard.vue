@@ -29,9 +29,9 @@
         <span v-if="menu.price" class="price">{{ formatPrice(menu.price) }}</span>
       </div>
 
-      <!-- Flavor badges -->
+      <!-- Flavor chips -->
       <div v-if="menu.flavors?.length" class="flavor-list">
-        <FlavorBadge
+        <FlavorChip
           v-for="flavor in menu.flavors.slice(0, 3)"
           :key="flavor.flavorId"
           :flavor="flavor"
@@ -54,7 +54,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
-import FlavorBadge from './FlavorBadge.vue'
+import FlavorChip from '@/components/common/FlavorChip.vue'
 import RecommendationReason from './RecommendationReason.vue'
 import { formatDistance, formatPrice } from '@/api/recommendation'
 
@@ -141,12 +141,13 @@ const handleImageError = () => {
   position: absolute;
   top: 0.25rem;
   left: 0.25rem;
-  background-color: var(--color-primary-600);
-  color: white;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: var(--color-primary-700);
   font-size: 0.625rem;
-  font-weight: 700;
+  font-weight: 600;
   padding: 0.125rem 0.375rem;
   border-radius: 0.25rem;
+  border: 1px solid var(--color-primary-200);
 }
 
 .menu-content {

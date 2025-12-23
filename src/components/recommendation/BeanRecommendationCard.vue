@@ -13,9 +13,9 @@
       </div>
     </div>
 
-    <!-- Flavor badges -->
+    <!-- Flavor chips -->
     <div v-if="bean.flavors?.length" class="flavor-list">
-      <FlavorBadge
+      <FlavorChip
         v-for="flavor in bean.flavors"
         :key="flavor.flavorId"
         :flavor="flavor"
@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import FlavorBadge from './FlavorBadge.vue'
+import FlavorChip from '@/components/common/FlavorChip.vue'
 import RecommendationReason from './RecommendationReason.vue'
 import { formatRoastingLevel } from '@/api/recommendation'
 
@@ -78,13 +78,14 @@ const handleClick = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  background-color: var(--color-primary-600);
-  color: white;
-  font-size: 0.875rem;
-  font-weight: 700;
-  border-radius: 50%;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.375rem;
+  background-color: var(--color-primary-100);
+  color: var(--color-primary-700);
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 0.25rem;
 }
 
 .bean-info {
