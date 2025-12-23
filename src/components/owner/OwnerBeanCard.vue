@@ -34,7 +34,7 @@
             v-if="linkedMenuCount > 0"
             class="px-2 py-0.5 text-xs font-medium bg-accent/10 text-accent rounded"
           >
-            메뉴 {{ linkedMenuCount }}개
+            메뉴
           </span>
         </div>
       </div>
