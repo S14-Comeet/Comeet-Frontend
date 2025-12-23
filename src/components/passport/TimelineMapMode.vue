@@ -12,7 +12,8 @@
         <!-- 지도 영역 -->
         <div ref="mapContainer" class="map-container">
             <!-- 마커 클릭 팝업 (MarkerPopup 재사용) -->
-            <MarkerPopup :store="popupStore" :position="popupPosition" @close="showMarkerPopup = false"
+            <MarkerPopup
+:store="popupStore" :position="popupPosition" @close="showMarkerPopup = false"
                 @detail="goToStoreDetail" />
         </div>
 

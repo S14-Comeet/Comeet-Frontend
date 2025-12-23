@@ -176,9 +176,10 @@ const handleVerifyVisit = async () => {
       userLocationDto: userLoc
     })
 
-    // 4. Handle response
-    if (result && result.data) {
-      const { visitId: newVisitId, isVerified: verified } = result.data
+    // 4. Handle response (verifyVisit already returns response.data)
+    const responseData = result?.data ?? result
+    if (responseData) {
+      const { visitId: newVisitId, isVerified: verified } = responseData
       visitId.value = newVisitId
 
       if (verified) {

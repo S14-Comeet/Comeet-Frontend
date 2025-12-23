@@ -1,5 +1,6 @@
 <template>
-  <svg :class="iconClasses" :width="size" :height="size" viewBox="0 0 24 24" fill="none"
+  <svg
+:class="iconClasses" :width="size" :height="size" viewBox="0 0 24 24" fill="none"
     xmlns="http://www.w3.org/2000/svg">
     <!-- Home Line -->
     <template v-if="name === 'home-line'">
@@ -18,7 +19,8 @@
 
     <!-- Map Line -->
     <template v-else-if="name === 'map-line'">
-      <path d="M1 6V22L8 18L16 22L23 18V2L16 6L8 2L1 6Z" :stroke="color" stroke-width="1.5" stroke-linecap="round"
+      <path
+d="M1 6V22L8 18L16 22L23 18V2L16 6L8 2L1 6Z" :stroke="color" stroke-width="1.5" stroke-linecap="round"
         stroke-linejoin="round" />
       <path d="M8 2V18M16 6V22" :stroke="color" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
     </template>
@@ -75,13 +77,15 @@
 
     <!-- X (Close) -->
     <template v-else-if="name === 'x'">
-      <path d="M18 6L6 18M6 6L18 18" :stroke="color" stroke-width="1.5" stroke-linecap="round"
+      <path
+d="M18 6L6 18M6 6L18 18" :stroke="color" stroke-width="1.5" stroke-linecap="round"
         stroke-linejoin="round" />
     </template>
 
     <!-- Filter -->
     <template v-else-if="name === 'filter'">
-      <path d="M22 3H2L10 12.46V19L14 21V12.46L22 3Z" :stroke="color" stroke-width="1.5" stroke-linecap="round"
+      <path
+d="M22 3H2L10 12.46V19L14 21V12.46L22 3Z" :stroke="color" stroke-width="1.5" stroke-linecap="round"
         stroke-linejoin="round" />
     </template>
 
@@ -94,9 +98,11 @@
 
     <!-- Event (Calendar) -->
     <template v-else-if="name === 'event'">
-      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" :stroke="color" stroke-width="1.5" stroke-linecap="round"
+      <rect
+x="3" y="4" width="18" height="18" rx="2" ry="2" :stroke="color" stroke-width="1.5" stroke-linecap="round"
         stroke-linejoin="round" />
-      <path d="M16 2V6M8 2V6M3 10H21" :stroke="color" stroke-width="1.5" stroke-linecap="round"
+      <path
+d="M16 2V6M8 2V6M3 10H21" :stroke="color" stroke-width="1.5" stroke-linecap="round"
         stroke-linejoin="round" />
     </template>
 
@@ -128,7 +134,8 @@
 
     <!-- Spinner (Loading) -->
     <template v-else-if="name === 'spinner'">
-      <circle cx="12" cy="12" r="10" :stroke="color" stroke-width="2" stroke-linecap="round" fill="none"
+      <circle
+cx="12" cy="12" r="10" :stroke="color" stroke-width="2" stroke-linecap="round" fill="none"
         opacity="0.25" />
       <path d="M12 2C6.47715 2 2 6.47715 2 12" :stroke="color" stroke-width="2" stroke-linecap="round" fill="none" />
     </template>
@@ -141,28 +148,33 @@
       <path
         d="M2 8H18V17C18 17.7956 17.6839 18.5587 17.1213 19.1213C16.5587 19.6839 15.7956 20 15 20H5C4.20435 20 3.44129 19.6839 2.87868 19.1213C2.31607 18.5587 2 17.7956 2 17V8Z"
         :stroke="color" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-      <path d="M6 1V4M10 1V4M14 1V4" :stroke="color" stroke-width="1.5" stroke-linecap="round"
+      <path
+d="M6 1V4M10 1V4M14 1V4" :stroke="color" stroke-width="1.5" stroke-linecap="round"
         stroke-linejoin="round" />
     </template>
 
     <!-- Coffee To-Go -->
     <template v-else-if="name === 'coffee-to-go'">
-      <path d="M6 3L5 21H19L18 3H6Z" :stroke="color" stroke-width="1.5" stroke-linecap="round"
+      <path
+d="M6 3L5 21H19L18 3H6Z" :stroke="color" stroke-width="1.5" stroke-linecap="round"
         stroke-linejoin="round" />
       <path d="M4 9H20" :stroke="color" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-      <path d="M8 3V1M12 3V1M16 3V1" :stroke="color" stroke-width="1.5" stroke-linecap="round"
+      <path
+d="M8 3V1M12 3V1M16 3V1" :stroke="color" stroke-width="1.5" stroke-linecap="round"
         stroke-linejoin="round" />
     </template>
 
     <!-- Star Fill -->
     <template v-else-if="name === 'star-fill'">
-      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+      <path
+d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
         :fill="color" />
     </template>
 
     <!-- Lock -->
     <template v-else-if="name === 'lock'">
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" :stroke="color" stroke-width="1.5" stroke-linecap="round"
+      <rect
+x="3" y="11" width="18" height="11" rx="2" ry="2" :stroke="color" stroke-width="1.5" stroke-linecap="round"
         stroke-linejoin="round" />
       <path
         d="M7 11V7C7 5.67392 7.52678 4.40215 8.46447 3.46447C9.40215 2.52678 10.6739 2 12 2C13.3261 2 14.5979 2.52678 15.5355 3.46447C16.4732 4.40215 17 5.67392 17 7V11"
@@ -181,7 +193,8 @@
 
     <!-- Close (Same as X) -->
     <template v-else-if="name === 'close'">
-      <path d="M18 6L6 18M6 6L18 18" :stroke="color" stroke-width="1.5" stroke-linecap="round"
+      <path
+d="M18 6L6 18M6 6L18 18" :stroke="color" stroke-width="1.5" stroke-linecap="round"
         stroke-linejoin="round" />
     </template>
 
@@ -204,14 +217,16 @@
 
     <!-- Time (Clock) -->
     <template v-else-if="name === 'time'">
-      <circle cx="12" cy="12" r="10" :stroke="color" stroke-width="1.5" stroke-linecap="round"
+      <circle
+cx="12" cy="12" r="10" :stroke="color" stroke-width="1.5" stroke-linecap="round"
         stroke-linejoin="round" />
       <path d="M12 6V12L16 14" :stroke="color" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
     </template>
 
     <!-- File Copy (Copy) -->
     <template v-else-if="name === 'file-copy'">
-      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" :stroke="color" stroke-width="1.5" stroke-linecap="round"
+      <rect
+x="9" y="9" width="13" height="13" rx="2" ry="2" :stroke="color" stroke-width="1.5" stroke-linecap="round"
         stroke-linejoin="round" />
       <path
         d="M5 15H4C3.46957 15 2.96086 14.7893 2.58579 14.4142C2.21071 14.0391 2 13.5304 2 13V4C2 3.46957 2.21071 2.96086 2.58579 2.58579C2.96086 2.21071 3.46957 2 4 2H13C13.5304 2 14.0391 2.21071 14.4142 2.58579C14.7893 2.96086 15 3.46957 15 4V5"
@@ -220,7 +235,8 @@
 
     <!-- Globe (World) -->
     <template v-else-if="name === 'globe'">
-      <circle cx="12" cy="12" r="10" :stroke="color" stroke-width="1.5" stroke-linecap="round"
+      <circle
+cx="12" cy="12" r="10" :stroke="color" stroke-width="1.5" stroke-linecap="round"
         stroke-linejoin="round" />
       <path d="M2 12H22" :stroke="color" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
       <path
@@ -237,7 +253,8 @@
 
     <!-- List (햄버거 메뉴 스타일 목록) -->
     <template v-else-if="name === 'list'">
-      <path d="M3 6H21M3 12H21M3 18H21" :stroke="color" stroke-width="1.5" stroke-linecap="round"
+      <path
+d="M3 6H21M3 12H21M3 18H21" :stroke="color" stroke-width="1.5" stroke-linecap="round"
         stroke-linejoin="round" />
     </template>
 

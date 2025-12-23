@@ -82,6 +82,12 @@
 
 <script setup>
 import { computed } from 'vue'
+import { MENU_CATEGORIES } from '@/constants'
+
+// enum 값을 한글 라벨로 변환하는 맵
+const categoryLabelMap = Object.fromEntries(
+  MENU_CATEGORIES.map(cat => [cat.value, cat.label])
+)
 
 const props = defineProps({
   store: {
@@ -109,10 +115,15 @@ const popupStyle = computed(() => {
   }
 })
 
-// 카테고리 파싱 (쉼표로 구분된 문자열을 배열로)
+// 카테고리 파싱 (쉼표로 구분된 enum을 한글 라벨 배열로 변환)
 const categories = computed(() => {
   if (!props.store?.category) return []
-  return props.store.category.split(',').map(c => c.trim()).filter(c => c).slice(0, 3)
+  return props.store.category
+    .split(',')
+    .map(c => c.trim())
+    .filter(c => c)
+    .map(c => categoryLabelMap[c] || c) // enum → 한글 라벨 변환
+    .slice(0, 3)
 })
 
 // 주소 줄임 처리

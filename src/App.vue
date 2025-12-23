@@ -49,7 +49,11 @@ const isFullScreenPage = computed(() => {
 });
 
 // 뒤로가기 버튼을 표시할 페이지 목록
-const pagesWithBackButton = new Set(['notifications', 'menu', 'store-detail', 'my-reviews']);
+const pagesWithBackButton = new Set([
+  'notifications', 'menu', 'store-detail', 'my-reviews',
+  'owner-stores', 'owner-store-new', 'owner-store-edit',
+  'owner-menus', 'owner-menu-new', 'owner-menu-edit'
+]);
 const showBackButton = computed(() => pagesWithBackButton.has(route.name));
 
 // 읽지 않은 알림이 있는지

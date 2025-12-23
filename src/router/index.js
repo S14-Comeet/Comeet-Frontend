@@ -92,6 +92,49 @@ const routes = [
     path: '/passport/:passportId',
     name: 'passport-detail',
     component: () => import('@/views/PassportDetailView.vue')
+  },
+  // 점주 전용 라우트
+  {
+    path: '/owner/stores',
+    name: 'owner-stores',
+    component: () => import('@/views/owner/OwnerStoreListView.vue'),
+    meta: { requiresOwner: true }
+  },
+  {
+    path: '/owner/stores/new',
+    name: 'owner-store-new',
+    component: () => import('@/views/owner/OwnerStoreFormView.vue'),
+    meta: { requiresOwner: true }
+  },
+  {
+    path: '/owner/stores/:storeId/edit',
+    name: 'owner-store-edit',
+    component: () => import('@/views/owner/OwnerStoreFormView.vue'),
+    meta: { requiresOwner: true }
+  },
+  {
+    path: '/owner/stores/:storeId/menus',
+    name: 'owner-menus',
+    component: () => import('@/views/owner/OwnerMenuManageView.vue'),
+    meta: { requiresOwner: true }
+  },
+  {
+    path: '/owner/stores/:storeId/menus/new',
+    name: 'owner-menu-new',
+    component: () => import('@/views/owner/OwnerMenuFormView.vue'),
+    meta: { requiresOwner: true }
+  },
+  {
+    path: '/owner/menus/:menuId/edit',
+    name: 'owner-menu-edit',
+    component: () => import('@/views/owner/OwnerMenuFormView.vue'),
+    meta: { requiresOwner: true }
+  },
+  {
+    path: '/owner/stores/:storeId/beans/new',
+    name: 'owner-bean-new',
+    component: () => import('@/views/owner/OwnerBeanFormView.vue'),
+    meta: { requiresOwner: true }
   }
 ];
 
@@ -239,6 +282,15 @@ router.beforeEach(async (to, from, next) => {
     logger.info(`인증된 사용자 추가 검증 → ${redirect}로 리다이렉트`);
     next(redirect);
     return;
+  }
+
+  // ============================================================
+  // 3단계: 점주 전용 페이지 권한 체크
+  // ============================================================
+  if (to.meta?.requiresOwner && !authStore.isOwner) {
+    logger.warn('점주 권한 없음 - 접근 거부', { path: to.path })
+    next('/')
+    return
   }
 
   // 모든 검증 통과: 접근 허용

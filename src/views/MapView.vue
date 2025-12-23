@@ -15,7 +15,8 @@
     <div class="top-search-area">
       <div class="top-search-bar">
         <BaseIcon name="search" :size="18" class="search-icon" />
-        <input type="text" :value="searchKeyword" placeholder="카페명 또는 주소 검색" class="search-input"
+        <input
+type="text" :value="searchKeyword" placeholder="카페명 또는 주소 검색" class="search-input"
           @input="searchKeyword = $event.target.value" @keydown.enter="handleTopSearch"
           @focus="handleSearchInputFocus" />
         <button v-if="searchKeyword" class="clear-btn" @click="searchKeyword = ''">
@@ -25,7 +26,8 @@
     </div>
 
     <!-- Floating 알림 아이콘 (우측 상단) - 로그인 상태일 때만 표시 -->
-    <button v-if="isAuthenticated" class="floating-notification-button" aria-label="알림"
+    <button
+v-if="isAuthenticated" class="floating-notification-button" aria-label="알림"
       @click="handleNotificationClick">
       <BaseIcon name="notice" :size="24" color="var(--color-neutral-900)" />
       <span v-if="hasUnreadNotifications" class="notification-badge"></span>
@@ -53,14 +55,16 @@
     </div>
 
     <!-- 목록보기 버튼 (하단 중앙 - collapsed 상태일 때만 표시) -->
-    <button v-if="currentSheetState === 'collapsed'" class="list-view-button" :style="controlsBottomStyle"
+    <button
+v-if="currentSheetState === 'collapsed'" class="list-view-button" :style="controlsBottomStyle"
       @click="expandBottomSheet">
       <BaseIcon name="list" :size="16" />
       <span>목록보기</span>
     </button>
 
     <!-- 통합 검색 + 가게 리스트 바텀시트 -->
-    <StoreListSheet :stores="stores" :is-searching="isSearching" :initial-keyword="searchKeyword"
+    <StoreListSheet
+:stores="stores" :is-searching="isSearching" :initial-keyword="searchKeyword"
       :initial-categories="searchCategories" :initial-global-search="isGlobalSearch" :force-state="forceSheetState"
       @select-store="handleStoreSelect" @state-change="handleSheetStateChange" @search="handleSearch"
       @search-area="handleSearchThisArea" />

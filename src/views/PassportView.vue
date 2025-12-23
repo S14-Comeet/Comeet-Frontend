@@ -20,7 +20,8 @@
 
     <!-- 여권 카드 그리드 -->
     <div v-else class="passport-grid">
-      <PassportCard v-for="passport in passportStore.passports" :key="passport.passportId" :passport="passport"
+      <PassportCard
+v-for="passport in passportStore.passports" :key="passport.passportId" :passport="passport"
         @click="handleCardClick(passport)" />
     </div>
   </div>

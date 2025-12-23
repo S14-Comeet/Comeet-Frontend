@@ -41,19 +41,21 @@ npm run lint
 
 ```
 src/
-├── api/            # API clients (axios.js, auth.js, cafe.js, flavor.js, menu.js, review.js, visit.js)
+├── api/            # API clients (axios.js, auth.js, cafe.js, flavor.js, menu.js, review.js, visit.js, owner.js)
 ├── assets/         # Global styles (main.css with Tailwind @theme), icons
 ├── components/     # Reusable UI components
 │   ├── common/     # Base components (BaseButton, BaseHeader, BaseChip, StarRating, etc.)
 │   ├── map/        # Map-specific components (MapControls, MapPlaceInfo, MapPlaceDetail, etc.)
 │   ├── saved/      # Saved cafes feature components
-│   └── review/     # Review feature components
+│   ├── review/     # Review feature components
+│   └── owner/      # Owner/manager feature components (OwnerStoreCard, OwnerMenuCard, OwnerBeanSelector, OwnerRoasterySelector, OwnerImageUploader)
 ├── composables/    # Vue composables (useGeolocation, useNaverMap, useMapMarkers, useMapPopup, useMapControls)
 ├── constants/      # App-wide constants (STORAGE_KEYS, etc.)
 ├── router/         # Vue Router configuration with auth guards
 ├── store/          # Pinia stores (auth, saved, notification, flavor, etc.)
-├── utils/          # Utility functions (storage, logger, toast, geolocation, geo)
+├── utils/          # Utility functions (storage, logger, toast, geolocation, geo, address)
 ├── views/          # Page components (MapView, LoginView, ProfileView, MenuView, ReviewWriteView, etc.)
+│   └── owner/      # Owner pages (OwnerStoreListView, OwnerStoreFormView, OwnerMenuManageView, OwnerMenuFormView)
 ├── App.vue         # Root component with responsive layout shell
 ├── config.js       # App configuration (reads from .env)
 └── main.js         # Application entry point
@@ -160,6 +162,21 @@ src/
 - `formatDistance(meters)`: Human-readable format (e.g., "500m", "1.2km")
 - `isValidCoordinate(lat, lng)`: Validates coordinate ranges
 
+**Owner/Manager Features** (`src/views/owner/`, `src/api/owner.js`):
+- Role-based access: `authStore.isOwner` checks for `MANAGER` role
+- Entry point: "내 가게 관리" button in ProfileView (visible only to owners)
+- Routes protected by `meta.requiresOwner` in router guards
+- Features:
+  - Store CRUD: List my stores, create/edit/delete stores
+  - Menu CRUD: Manage menus for each store
+  - Bean linking: Connect/disconnect beans to menu items
+- API endpoints:
+  - `GET /stores/my` - My stores list
+  - `POST/PUT/DELETE /stores` - Store CRUD
+  - `POST /stores/{storeId}/menus`, `PUT/DELETE /menus/{menuId}` - Menu CRUD
+  - `POST/DELETE /menus/{menuId}/beans` - Bean linking
+  - `GET /beans/roastery/{roasteryId}`, `POST /beans` - Bean management
+
 ## Configuration Notes
 
 - Dev server: Port `5173`, auto-opens browser (vite.config.js)
@@ -169,6 +186,7 @@ src/
 - Environment variables (`.env`, access via `import.meta.env.VITE_*`):
   - `VITE_API_BASE_URL`: Backend API base URL (default: http://localhost:8080)
   - `VITE_NAVER_MAP_CLIENT_ID`: Naver Maps API client ID
+  - `VITE_KAKAO_REST_API_KEY`: Kakao REST API key (for address geocoding)
   - `VITE_APP_TITLE`, `VITE_APP_VERSION`: App metadata
   - `VITE_ENABLE_DEBUG`: Enable debug logging
 
@@ -192,3 +210,10 @@ import { getItem, setItem, removeItem } from '@/utils/storage'
 **Mobile-First Responsive Design**: The app uses a mobile-first approach with a 448px max-width container on desktop. Full-screen pages (like map) should use `isFullScreenPage` computed property in `App.vue`.
 
 **Component Naming**: Base reusable components use `Base*` prefix (BaseButton, BaseHeader). Feature-specific components don't use prefix (MapControls, SavedCafeList).
+
+**Constants** (`src/constants/index.js`): Contains shared enums and lookup data:
+- `MENU_CATEGORIES`: Menu/store category options (HAND_DRIP, ESPRESSO, etc.)
+- `BEAN_COUNTRIES`: Coffee bean origin countries with coordinates and regions
+- `BEAN_VARIETY_GROUPS`, `BEAN_PROCESSING_METHOD_GROUPS`: Grouped dropdown options
+- `ROASTING_LEVELS`: Light/Medium/Dark roasting levels
+- `VALIDATION`: Nickname and other input validation rules

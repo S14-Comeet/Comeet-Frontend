@@ -2,7 +2,8 @@
   <div class="passport-detail-view">
     <!-- 상단 커버 영역 -->
     <div class="cover-section">
-      <img v-if="passportStore.currentPassport?.coverImageUrl" :src="passportStore.currentPassport.coverImageUrl"
+      <img
+v-if="passportStore.currentPassport?.coverImageUrl" :src="passportStore.currentPassport.coverImageUrl"
         alt="커버 이미지" class="cover-image" />
       <div v-else class="cover-placeholder">
         <div class="cover-pattern"></div>
@@ -57,13 +58,15 @@
           </button>
         </div>
 
-        <PassportTimeline v-else :grouped-records="passportStore.groupedRecords"
+        <PassportTimeline
+v-else :grouped-records="passportStore.groupedRecords"
           @item-click="handleTimelineItemClick" />
       </section>
     </template>
 
     <!-- 타임라인 지도 모드 -->
-    <TimelineMapMode v-if="isMapMode" :records="passportStore.sortedRecords" :initial-index="mapModeIndex"
+    <TimelineMapMode
+v-if="isMapMode" :records="passportStore.sortedRecords" :initial-index="mapModeIndex"
       :month="passportStore.currentPassport?.month" @close="closeMapMode" @index-change="handleMapIndexChange" />
   </div>
 </template>

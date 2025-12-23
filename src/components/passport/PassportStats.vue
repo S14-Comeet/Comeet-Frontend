@@ -68,7 +68,8 @@
       <div class="journey-route">
         <template v-for="(origin, idx) in info.originSequence" :key="idx">
           <span class="stop-badge">{{ origin }}</span>
-          <BaseIcon v-if="idx < info.originSequence.length - 1" name="chevron-right" :size="12"
+          <BaseIcon
+v-if="idx < info.originSequence.length - 1" name="chevron-right" :size="12"
             color="var(--color-primary-400)" />
         </template>
       </div>
