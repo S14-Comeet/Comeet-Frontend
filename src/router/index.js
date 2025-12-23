@@ -78,6 +78,16 @@ const routes = [
     component: () => import('@/views/MyReviewsView.vue')
   },
   {
+    path: '/reviews/:reviewId',
+    name: 'review-detail',
+    component: () => import('@/views/ReviewDetailView.vue')
+  },
+  {
+    path: '/reviews/:reviewId/edit',
+    name: 'review-edit',
+    component: () => import('@/views/ReviewEditView.vue')
+  },
+  {
     path: '/my-preference',
     name: 'my-preference',
     component: () => import('@/views/MyPreferenceView.vue')
@@ -177,7 +187,8 @@ const PUBLIC_PATH_PATTERNS = [
   /^\/store\/\d+$/,   // /store/:storeId
   /^\/menu\/\d+$/,    // /menu/:storeId (store's menu list)
   /^\/menus\/\d+$/,   // /menus/:menuId (menu detail)
-  /^\/bean\/\d+$/     // /bean/:beanId
+  /^\/bean\/\d+$/,    // /bean/:beanId
+  /^\/reviews\/\d+$/  // /reviews/:reviewId (review detail)
 ];
 
 /**

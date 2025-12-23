@@ -128,9 +128,13 @@ api.interceptors.response.use(
 
     logger.info(`응답 에러: ${error.response.status} ${originalRequest?.url}`);
 
-    // 401이 아닌 에러는 Toast로 표시
+    // 401이 아닌 에러는 Toast로 표시 (특정 케이스 제외)
     if (!isUnauthorized && error.response.status >= 400) {
-      if (!originalRequest?.url?.includes('/reissue')) {
+      const isSilent = originalRequest?.url?.includes('/reissue') ||
+        // 커핑노트 404는 정상 케이스 (커핑노트 없음)
+        (originalRequest?.url?.includes('/cupping-note') && error.response.status === 404)
+
+      if (!isSilent) {
         showApiError(error);
       }
     }
