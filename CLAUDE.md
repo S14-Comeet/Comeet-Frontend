@@ -220,6 +220,7 @@ src/
 - Path aliasing: `@/` → `src/` (vite.config.js, jsconfig.json)
 - Module type: ESM (package.json)
 - Vite plugins: `@vitejs/plugin-vue`, `vite-svg-loader`, `@tailwindcss/vite`
+- Kakao API proxy: `/kakao-api` → `https://dapi.kakao.com` (for address geocoding, avoids CORS)
 - Environment variables (`.env`, access via `import.meta.env.VITE_*`):
   - `VITE_API_BASE_URL`: Backend API base URL (default: http://localhost:8080)
   - `VITE_NAVER_MAP_CLIENT_ID`: Naver Maps API client ID
@@ -247,6 +248,11 @@ import { getItem, setItem, removeItem } from '@/utils/storage'
 **Mobile-First Responsive Design**: The app uses a mobile-first approach with a 448px max-width container on desktop. Full-screen pages (like map) should use `isFullScreenPage` computed property in `App.vue`.
 
 **Component Naming**: Base reusable components use `Base*` prefix (BaseButton, BaseHeader). Feature-specific components don't use prefix (MapControls, SavedCafeList).
+
+**ESLint Configuration** (`eslint.config.js`):
+- `vue/multi-word-component-names`: off (allows single-word component names)
+- `no-unused-vars`: Allows `_` prefix for intentionally unused args, and `props`/`emit` variables
+- `naver` global: Declared as readonly for Naver Maps API access
 
 **Constants** (`src/constants/index.js`): Contains shared enums and lookup data:
 - `MENU_CATEGORIES`: Menu/store category options (HAND_DRIP, ESPRESSO, etc.)
