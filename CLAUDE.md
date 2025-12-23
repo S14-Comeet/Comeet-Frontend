@@ -41,7 +41,7 @@ npm run lint
 
 ```
 src/
-├── api/            # API clients (axios.js, auth.js, cafe.js, flavor.js, menu.js, review.js, visit.js, owner.js)
+├── api/            # API clients (axios.js, auth.js, cafe.js, flavor.js, menu.js, review.js, visit.js, owner.js, recommendation.js, passport.js, preference.js, bean.js)
 ├── assets/         # Global styles (main.css with Tailwind @theme), icons
 ├── components/     # Reusable UI components
 │   ├── common/     # Base components (BaseButton, BaseHeader, BaseChip, StarRating, etc.)
@@ -52,9 +52,9 @@ src/
 ├── composables/    # Vue composables (useGeolocation, useNaverMap, useMapMarkers, useMapPopup, useMapControls)
 ├── constants/      # App-wide constants (STORAGE_KEYS, etc.)
 ├── router/         # Vue Router configuration with auth guards
-├── store/          # Pinia stores (auth, saved, notification, flavor, etc.)
+├── store/          # Pinia stores (auth, saved, notification, flavor, recommendation, passport, etc.)
 ├── utils/          # Utility functions (storage, logger, toast, geolocation, geo, address)
-├── views/          # Page components (MapView, LoginView, ProfileView, MenuView, ReviewWriteView, etc.)
+├── views/          # Page components (MapView, LoginView, ProfileView, MenuView, ReviewWriteView, RecommendationView, PassportView, PreferenceOnboardingView, etc.)
 │   └── owner/      # Owner pages (OwnerStoreListView, OwnerStoreFormView, OwnerMenuManageView, OwnerMenuFormView)
 ├── App.vue         # Root component with responsive layout shell
 ├── config.js       # App configuration (reads from .env)
@@ -96,7 +96,7 @@ src/
 
 **State Management**:
 - Pinia stores in `src/store/` with automatic localStorage persistence
-- Main stores: `useAuthStore` (auth.js), `useSavedStore` (saved.js), `useNotificationStore` (notification.js), `useFlavorStore` (flavor.js), `useAppStore` (index.js)
+- Main stores: `useAuthStore` (auth.js), `useSavedStore` (saved.js), `useNotificationStore` (notification.js), `useFlavorStore` (flavor.js), `useRecommendationStore` (recommendation.js), `usePassportStore` (passport.js), `useAppStore` (index.js)
 - All stores use `persist: { storage: safeStorage }` for safe cross-environment persistence
 
 **API Layer**:
@@ -177,6 +177,43 @@ src/
   - `POST/DELETE /menus/{menuId}/beans` - Bean linking
   - `GET /beans/roastery/{roasteryId}`, `POST /beans` - Bean management
 
+**AI Recommendation System** (`src/views/RecommendationView.vue`, `src/api/recommendation.js`, `src/store/recommendation.js`):
+- Entry point: Bottom navigation bar "추천" tab
+- Features:
+  - Bean recommendations: Top 5 personalized bean suggestions based on user preferences
+  - Menu recommendations: Global and nearby menu suggestions with radius auto-expansion
+  - Menu detail view: Deep-link to specific menu items with store context
+- API endpoints:
+  - `GET /recommendations/beans` - Personalized bean recommendations
+  - `GET /recommendations/menus` - Global menu recommendations
+  - `GET /recommendations/menus/nearby` - Location-based recommendations (auto-expands radius)
+  - `GET /recommendations/beans/{beanId}/menus` - Menus using specific bean
+- Store pattern: `useRecommendationStore` with caching and `hasFetched*` flags to prevent redundant API calls
+
+**Coffee Passport** (`src/views/PassportView.vue`, `src/views/PassportDetailView.vue`, `src/api/passport.js`, `src/store/passport.js`):
+- Monthly passport system tracking coffee consumption
+- Features:
+  - Year/month passport list with availability status
+  - Detailed passport view with visit records grouped by date
+  - Statistics: roastery and country consumption analytics
+- API endpoints:
+  - `GET /passport?year={year}` - Yearly passport list
+  - `GET /passport/{passportId}` - Passport detail with records
+  - `GET /passport/statistics/roastery` - Roastery consumption stats
+  - `GET /passport/statistics/country` - Country origin stats
+
+**User Preferences & Onboarding** (`src/views/PreferenceOnboardingView.vue`, `src/views/MyPreferenceView.vue`, `src/api/preference.js`):
+- Flavor preference collection for personalized recommendations
+- Features:
+  - Preference onboarding: Interactive flavor profile setup (acidity, body, sweetness, bitterness)
+  - Roasting level preferences: LIGHT, MEDIUM, HEAVY selection
+  - Flavor tag selection: liked/disliked tags from FLAVOR_WHEEL
+- API endpoints:
+  - `POST /preferences/init` - Initialize default preferences
+  - `GET /preferences` - Get current preferences
+  - `PUT /preferences` - Update preferences
+  - `DELETE /preferences` - Delete preferences
+
 ## Configuration Notes
 
 - Dev server: Port `5173`, auto-opens browser (vite.config.js)
@@ -217,3 +254,6 @@ import { getItem, setItem, removeItem } from '@/utils/storage'
 - `BEAN_VARIETY_GROUPS`, `BEAN_PROCESSING_METHOD_GROUPS`: Grouped dropdown options
 - `ROASTING_LEVELS`: Light/Medium/Dark roasting levels
 - `VALIDATION`: Nickname and other input validation rules
+- `FLAVOR_WHEEL`: Hierarchical coffee flavor taxonomy (9 top-level categories with 3 levels of nesting)
+  - Each node has: `id`, `code`, `name`, `colorHex`, `children`
+  - Utility functions: `findFlavorInWheel(idOrCode)`, `getFlavorPath(idOrCode)`
