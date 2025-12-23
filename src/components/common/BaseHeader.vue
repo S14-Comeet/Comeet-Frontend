@@ -1,7 +1,7 @@
 <template>
   <header class="relative w-full h-14 bg-white flex items-center justify-center px-5 border-b border-border">
     <!-- Back Button (좌측 절대 위치) -->
-    <div v-if="showBackButton" class="absolute left-5 flex items-center">
+    <div v-if="showBackButton || showBack" class="absolute left-5 flex items-center">
       <button
         class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary-50 transition-colors"
         aria-label="뒤로가기"
@@ -11,10 +11,15 @@
       </button>
     </div>
 
-    <!-- Logo (중앙) -->
-    <router-link to="/" class="text-2xl font-bold text-primary hover:text-primary-700 transition-colors">
-      Comeet
-    </router-link>
+    <!-- Title or Logo (중앙) -->
+    <template v-if="title">
+      <h1 class="text-lg font-bold text-textPrimary">{{ title }}</h1>
+    </template>
+    <template v-else>
+      <router-link to="/" class="text-2xl font-bold text-primary hover:text-primary-700 transition-colors">
+        Comeet
+      </router-link>
+    </template>
 
     <!-- Right Action (우측 절대 위치) -->
     <div class="absolute right-5 flex items-center">
@@ -59,6 +64,13 @@ const authStore = useAuthStore()
 
 const props = defineProps({
   /**
+   * Page title (if provided, replaces Comeet logo)
+   */
+  title: {
+    type: String,
+    default: ''
+  },
+  /**
    * Show notification badge
    */
   hasNotifications: {
@@ -69,6 +81,13 @@ const props = defineProps({
    * Show back button
    */
   showBackButton: {
+    type: Boolean,
+    default: false
+  },
+  /**
+   * Show back button (alias for showBackButton)
+   */
+  showBack: {
     type: Boolean,
     default: false
   },

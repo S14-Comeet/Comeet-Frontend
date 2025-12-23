@@ -39,14 +39,10 @@
 
     <!-- Flavor Badges -->
     <div v-if="review.flavorBadges && review.flavorBadges.length > 0" class="flex flex-wrap gap-2">
-      <BaseChip
+      <FlavorChip
         v-for="flavor in review.flavorBadges"
         :key="flavor.flavorId"
-        :label="flavor.name"
-        variant="default"
-        size="small"
-        class="border"
-        :style="{ borderColor: flavor.colorHex || flavor.color }"
+        :flavor="flavor"
       />
     </div>
   </div>
@@ -55,6 +51,7 @@
 <script setup>
 import { computed } from 'vue'
 import BaseChip from '@/components/common/BaseChip.vue'
+import FlavorChip from '@/components/common/FlavorChip.vue'
 
 const props = defineProps({
   review: {

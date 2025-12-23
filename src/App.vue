@@ -11,7 +11,11 @@
         @login="handleLogin"
       />
       <main class="app-main" :class="{ 'no-header': !showHeader, 'with-nav': showNavigation, 'full-screen': isFullScreenPage }">
-        <RouterView />
+        <RouterView v-slot="{ Component }">
+          <KeepAlive :include="keepAlivePages">
+            <component :is="Component" :key="route.name" />
+          </KeepAlive>
+        </RouterView>
       </main>
       <BaseNavigationBar v-if="showNavigation" />
     </div>
@@ -19,21 +23,24 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, KeepAlive } from 'vue';
 import { RouterView, useRoute, useRouter } from 'vue-router';
 import BaseHeader from '@/components/common/BaseHeader.vue';
 import BaseNavigationBar from '@/components/common/BaseNavigationBar.vue';
 import { useNotificationStore } from '@/store/notification';
 
+// KeepAlive로 상태를 유지할 페이지 (네비게이션 바 페이지들)
+const keepAlivePages = ['MapView', 'RecommendationView', 'PassportView', 'SavedView', 'ProfileView'];
+
 const route = useRoute();
 const router = useRouter();
 const notificationStore = useNotificationStore();
 
-// 헤더를 숨길 페이지 목록
-const pagesWithoutHeader = new Set(['login', 'nickname', 'map', 'review-write', 'review-select']);
+// 헤더를 숨길 페이지 목록 (로그인, 닉네임, 지도, 리뷰 관련, 취향 온보딩)
+const pagesWithoutHeader = new Set(['login', 'nickname', 'map', 'review-write', 'review-select', 'preference-onboarding']);
 
-// 네비게이션 바를 숨길 페이지 목록 (로그인, 닉네임, 설문, 리뷰 작성)
-const pagesWithoutNavigation = new Set(['login', 'nickname', 'survey', 'review-write', 'review-select']);
+// 네비게이션 바를 숨길 페이지 목록 (로그인, 닉네임, 설문, 리뷰 작성, 취향 설정)
+const pagesWithoutNavigation = new Set(['login', 'nickname', 'survey', 'review-write', 'review-select', 'preference-onboarding']);
 
 const showHeader = computed(() => {
   return !pagesWithoutHeader.has(route.name);
@@ -48,11 +55,12 @@ const isFullScreenPage = computed(() => {
   return route.name === 'map';
 });
 
-// 뒤로가기 버튼을 표시할 페이지 목록
+// 뒤로가기 버튼을 표시할 페이지 목록 (전역 헤더 사용 페이지만)
 const pagesWithBackButton = new Set([
   'notifications', 'menu', 'store-detail', 'my-reviews',
   'owner-stores', 'owner-store-new', 'owner-store-edit',
-  'owner-menus', 'owner-menu-new', 'owner-menu-edit'
+  'owner-menus', 'owner-menu-new', 'owner-menu-edit',
+  'bean-detail', 'menu-detail', 'my-preference'
 ]);
 const showBackButton = computed(() => pagesWithBackButton.has(route.name));
 

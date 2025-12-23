@@ -106,7 +106,7 @@ const currentY = ref(0)
 const dragHeight = ref(0) // 드래그 중 실시간 높이
 
 // 시트 높이 설정값
-const COLLAPSED_HEIGHT = 100
+const COLLAPSED_HEIGHT = 0 // 완전히 숨김
 const HALF_HEIGHT_RATIO = 0.33 // 화면의 1/3
 const FULL_HEIGHT_RATIO = 0.85
 
@@ -227,6 +227,10 @@ const expandSheet = () => {
 
 // 터치 이벤트 핸들러
 const handleTouchStart = (e) => {
+  // collapsed 상태에서는 드래그로 확장 불가 (목록보기 버튼 사용)
+  if (sheetState.value === 'collapsed') {
+    return
+  }
   // full 상태에서 리스트가 스크롤된 경우 드래그 시작 안함
   if (listContainer.value && listContainer.value.scrollTop > 0 && sheetState.value === 'full') {
     return
@@ -258,7 +262,7 @@ const handleTouchMove = (e) => {
   const vh = window.innerHeight
 
   // 최소/최대 높이 제한
-  const minHeight = COLLAPSED_HEIGHT * 0.8
+  const minHeight = 50 // 드래그 중 최소 높이 (스냅 시 0으로 됨)
   const maxHeight = vh * FULL_HEIGHT_RATIO * 1.05
   dragHeight.value = Math.max(minHeight, Math.min(maxHeight, newHeight))
 }
@@ -349,11 +353,14 @@ watch(
   border-radius: 1.5rem 1.5rem 0 0;
   box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12);
   z-index: 40;
-  transition: height 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+  transition: height 0.25s cubic-bezier(0.32, 0.72, 0, 1),
+              transform 0.25s cubic-bezier(0.32, 0.72, 0, 1),
+              opacity 0.2s ease,
+              visibility 0.25s ease;
   display: flex;
   flex-direction: column;
   width: 100%;
-  will-change: height;
+  will-change: height, transform, opacity;
 }
 
 .store-list-sheet.is-dragging {
@@ -361,9 +368,11 @@ watch(
 }
 
 .store-list-sheet.state-collapsed {
-  height: auto;
-  border-radius: 1rem 1rem 0 0;
-  margin-bottom: env(safe-area-inset-bottom, 0);
+  height: 0;
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
 }
 
 .store-list-sheet.state-half {

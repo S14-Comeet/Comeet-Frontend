@@ -78,6 +78,11 @@ const routes = [
     component: () => import('@/views/MyReviewsView.vue')
   },
   {
+    path: '/my-preference',
+    name: 'my-preference',
+    component: () => import('@/views/MyPreferenceView.vue')
+  },
+  {
     path: '/store/:storeId',
     name: 'store-detail',
     component: () => import('@/views/StoreDetailView.vue')
@@ -87,6 +92,27 @@ const routes = [
     path: '/passport',
     name: 'passport',
     component: () => import('@/views/PassportView.vue')
+  },
+  // 추천 시스템 라우트
+  {
+    path: '/recommendation',
+    name: 'recommendation',
+    component: () => import('@/views/RecommendationView.vue')
+  },
+  {
+    path: '/preference-onboarding',
+    name: 'preference-onboarding',
+    component: () => import('@/views/PreferenceOnboardingView.vue')
+  },
+  {
+    path: '/bean/:beanId',
+    name: 'bean-detail',
+    component: () => import('@/views/BeanDetailView.vue')
+  },
+  {
+    path: '/menus/:menuId',
+    name: 'menu-detail',
+    component: () => import('@/views/MenuDetailView.vue')
   },
   {
     path: '/passport/:passportId',
@@ -148,8 +174,10 @@ const PUBLIC_PAGES = new Set(['/login', '/oauth/callback', '/test-components', '
 
 /** 동적 경로 패턴 체크 함수 */
 const PUBLIC_PATH_PATTERNS = [
-  /^\/store\/\d+$/,  // /store/:storeId
-  /^\/menu\/\d+$/    // /menu/:storeId
+  /^\/store\/\d+$/,   // /store/:storeId
+  /^\/menu\/\d+$/,    // /menu/:storeId (store's menu list)
+  /^\/menus\/\d+$/,   // /menus/:menuId (menu detail)
+  /^\/bean\/\d+$/     // /bean/:beanId
 ];
 
 /**

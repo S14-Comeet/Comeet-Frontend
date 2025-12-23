@@ -77,8 +77,8 @@ v-if="currentSheetState === 'collapsed'" class="list-view-button" :style="contro
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, onUnmounted, onActivated, computed, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useNaverMap } from '@/composables/useNaverMap'
 import { useGeolocation } from '@/composables/useGeolocation'
 import { useMapMarkers } from '@/composables/useMapMarkers'
@@ -88,7 +88,7 @@ import { useToast } from 'vue-toastification'
 import { useNotificationStore } from '@/store/notification'
 import { useAuthStore } from '@/store/auth'
 import { useSavedStore } from '@/store/saved'
-import { getStoresByLocation } from '@/api/cafe'
+import { getStoresByLocation, getStoreById } from '@/api/cafe'
 import { calculateDistance, formatDistance } from '@/utils/geo'
 import { createLogger } from '@/utils/logger'
 import MarkerPopup from "@/components/map/MarkerPopup.vue"
@@ -98,10 +98,14 @@ import BaseIcon from '@/components/common/BaseIcon.vue'
 
 const logger = createLogger('MapView')
 const router = useRouter()
+const route = useRoute()
 const toast = useToast()
 const notificationStore = useNotificationStore()
 const authStore = useAuthStore()
 const savedStore = useSavedStore()
+
+// 외부에서 전달받은 가게 정보 (KeepAlive 활성화 시 처리용)
+const pendingStoreNavigation = ref(null)
 
 // 기본 상태
 const mapContainer = ref(null)
@@ -166,11 +170,13 @@ const handleTopSearch = () => {
 
 // 상단 검색 입력 포커스 핸들러
 const handleSearchInputFocus = () => {
-  // 시트를 half 상태로 확장
-  forceSheetState.value = 'half'
-  setTimeout(() => {
-    forceSheetState.value = null
-  }, 100)
+  // collapsed 상태일 때만 half로 확장 (full 상태는 유지)
+  if (currentSheetState.value === 'collapsed') {
+    forceSheetState.value = 'half'
+    setTimeout(() => {
+      forceSheetState.value = null
+    }, 100)
+  }
 }
 
 // 카테고리 클릭 핸들러
@@ -560,6 +566,85 @@ onMounted(async () => {
 onUnmounted(() => {
   cleanupPopup()
   cleanupMarkers()
+})
+
+// 특정 가게로 이동하여 표시
+const navigateToStore = async (storeId) => {
+  if (!map.value || !storeId) return
+
+  try {
+    logger.info('Navigating to store', { storeId })
+
+    // 가게 정보 조회
+    const response = await getStoreById(storeId)
+    const store = response.data?.data || response.data
+
+    if (!store) {
+      logger.warn('Store not found', { storeId })
+      return
+    }
+
+    const lat = store.lat || store.latitude
+    const lng = store.lng || store.longitude
+
+    if (!lat || !lng) {
+      logger.warn('Store has no coordinates', { storeId, store })
+      return
+    }
+
+    // 마커 추가 (기존 마커 지우고 해당 가게 마커만 표시)
+    renderMarkers([store], false)
+
+    // 지도 이동 및 팝업 표시
+    map.value.setZoom(16)
+    setTimeout(() => {
+      panToWithOffset(lat, lng, { offsetRatio: 0.35 })
+      setFocusedLocation(lat, lng)
+
+      // 바텀시트 half로 설정
+      forceSheetState.value = 'half'
+      setTimeout(() => {
+        forceSheetState.value = null
+      }, 100)
+
+      // 팝업 표시
+      setTimeout(() => {
+        popupStore.value = store
+        updatePopupPosition()
+      }, 200)
+    }, 100)
+
+  } catch (error) {
+    logger.error('Failed to navigate to store', { storeId, error })
+  }
+}
+
+// KeepAlive 활성화 시 route query 처리
+onActivated(() => {
+  logger.debug('MapView activated', { query: route.query })
+
+  // storeId query가 있으면 해당 가게로 이동
+  const storeId = route.query.storeId
+  if (storeId) {
+    // query 제거 (재활성화 시 중복 처리 방지)
+    router.replace({ query: {} })
+
+    // 지도가 준비되면 이동
+    if (map.value) {
+      navigateToStore(storeId)
+    } else {
+      // 지도가 아직 초기화 안됐으면 pending으로 저장
+      pendingStoreNavigation.value = storeId
+    }
+  }
+})
+
+// 지도 초기화 후 pending navigation 처리
+watch(() => map.value, (newMap) => {
+  if (newMap && pendingStoreNavigation.value) {
+    navigateToStore(pendingStoreNavigation.value)
+    pendingStoreNavigation.value = null
+  }
 })
 </script>
 
