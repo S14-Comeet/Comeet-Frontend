@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { useToast } from 'vue-toastification'
+import { showError, showWarning } from '@/utils/toast'
 import { createLogger } from '@/utils/logger'
 
 const logger = createLogger('useGeolocation')
@@ -17,7 +17,6 @@ export function useGeolocation() {
     const location = ref(null)
     const isLoading = ref(false)
     const error = ref(null)
-    const toast = useToast()
 
     /**
      * 에러 코드에 따른 메시지 반환
@@ -51,7 +50,7 @@ export function useGeolocation() {
             if (!navigator.geolocation) {
                 const errorMsg = ERROR_MESSAGES.NOT_SUPPORTED
                 error.value = errorMsg
-                if (showToast) toast.error(errorMsg)
+                if (showToast) showError(errorMsg)
                 reject(new Error(errorMsg))
                 return
             }
@@ -87,9 +86,9 @@ export function useGeolocation() {
 
                     if (showToast) {
                         if (err.code === 1) {
-                            toast.warning(errorMsg)
+                            showWarning(errorMsg)
                         } else {
-                            toast.error(errorMsg)
+                            showError(errorMsg)
                         }
                     }
                     reject(err)
