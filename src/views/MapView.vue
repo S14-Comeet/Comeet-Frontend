@@ -139,7 +139,7 @@ const expandBottomSheet = () => {
 }
 
 // 검색 관련 상태
-const isGlobalSearch = ref(false)
+const isGlobalSearch = ref(true)
 const searchKeyword = ref('')
 const searchCategories = ref([])
 const searchLocation = ref(null) // 검색용 위치 (키워드/"이 지역" 검색 시에만 업데이트)
@@ -376,7 +376,7 @@ const handleSearch = async (searchParams) => {
         lat = center.lat()
         lng = center.lng()
       }
-      radius = 50000
+      radius = 500000  // 500km - 전국 검색 범위
 
       // 키워드 검색 시 위치 저장
       if (isKeywordSearch) {
