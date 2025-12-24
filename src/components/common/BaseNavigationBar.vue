@@ -91,12 +91,31 @@ const getIcon = (type) => {
 
 /* 네비게이션 콘텐츠 - 실제 네비게이션 바 */
 .nav-content {
+  position: relative;
   width: 100%;
-  max-width: 448px;
   background-color: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(8px);
   box-shadow: 0 -2px 8px rgba(99, 73, 54, 0.08);
   pointer-events: auto;
+}
+
+/* 데스크톱: app-shell과 동일하게 448px로 제한 */
+@media (min-width: 768px) {
+  .nav-content {
+    max-width: 448px;
+  }
+}
+
+/* 네비게이션 바 위 그라데이션 그림자 - 떠있는 효과 */
+.nav-content::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.15), transparent);
+  pointer-events: none;
 }
 
 /* 네비게이션 아이템 기본 스타일 */
