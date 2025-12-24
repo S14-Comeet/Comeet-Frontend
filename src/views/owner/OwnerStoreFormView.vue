@@ -120,37 +120,37 @@
         <!-- 영업시간 (시작/종료 시간 선택, 10분 단위) -->
         <div class="mb-4">
           <label class="block text-sm font-medium text-textPrimary mb-2">영업시간</label>
-          <div class="flex items-center gap-2">
+          <div class="flex flex-wrap items-center gap-2">
             <!-- 오픈 시간 -->
-            <div class="flex-1 flex gap-1">
+            <div class="flex-1 min-w-[120px] flex gap-1">
               <select
                 v-model="openHour"
-                class="flex-1 px-3 py-3 rounded-xl border border-border bg-white text-textPrimary focus:outline-none focus:ring-2 focus:ring-primary text-center"
+                class="flex-1 min-w-0 px-2 py-2.5 rounded-xl border border-border bg-white text-textPrimary focus:outline-none focus:ring-2 focus:ring-primary text-center text-sm"
               >
                 <option value="" disabled>시</option>
                 <option v-for="h in hours" :key="'open-'+h" :value="h">{{ h }}시</option>
               </select>
               <select
                 v-model="openMinute"
-                class="flex-1 px-3 py-3 rounded-xl border border-border bg-white text-textPrimary focus:outline-none focus:ring-2 focus:ring-primary text-center"
+                class="flex-1 min-w-0 px-2 py-2.5 rounded-xl border border-border bg-white text-textPrimary focus:outline-none focus:ring-2 focus:ring-primary text-center text-sm"
               >
                 <option value="" disabled>분</option>
                 <option v-for="m in minutes" :key="'open-'+m" :value="m">{{ m }}분</option>
               </select>
             </div>
-            <span class="text-textSecondary font-medium px-1">~</span>
+            <span class="text-textSecondary font-medium">~</span>
             <!-- 마감 시간 -->
-            <div class="flex-1 flex gap-1">
+            <div class="flex-1 min-w-[120px] flex gap-1">
               <select
                 v-model="closeHour"
-                class="flex-1 px-3 py-3 rounded-xl border border-border bg-white text-textPrimary focus:outline-none focus:ring-2 focus:ring-primary text-center"
+                class="flex-1 min-w-0 px-2 py-2.5 rounded-xl border border-border bg-white text-textPrimary focus:outline-none focus:ring-2 focus:ring-primary text-center text-sm"
               >
                 <option value="" disabled>시</option>
                 <option v-for="h in hours" :key="'close-'+h" :value="h">{{ h }}시</option>
               </select>
               <select
                 v-model="closeMinute"
-                class="flex-1 px-3 py-3 rounded-xl border border-border bg-white text-textPrimary focus:outline-none focus:ring-2 focus:ring-primary text-center"
+                class="flex-1 min-w-0 px-2 py-2.5 rounded-xl border border-border bg-white text-textPrimary focus:outline-none focus:ring-2 focus:ring-primary text-center text-sm"
               >
                 <option value="" disabled>분</option>
                 <option v-for="m in minutes" :key="'close-'+m" :value="m">{{ m }}분</option>
