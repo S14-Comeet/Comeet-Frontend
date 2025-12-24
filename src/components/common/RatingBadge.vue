@@ -2,7 +2,7 @@
   <div v-if="badgeLevel > 0" class="rating-badge" :title="badgeTitle">
     <img v-if="badgeLevel === 3" :src="threeIconUrl" alt="3 Star Rating" class="badge-icon" />
     <img v-else-if="badgeLevel === 2" :src="twoIconUrl" alt="2 Star Rating" class="badge-icon" />
-    <img v-else-if="badgeLevel === 1" :src="logoIconUrl" alt="1 Star Rating" class="badge-icon" />
+    <img v-else-if="badgeLevel === 1" :src="logoIconUrl" alt="1 Star Rating" class="badge-icon badge-icon-single" />
   </div>
 </template>
 
@@ -46,6 +46,11 @@ const badgeTitle = computed(() => {
   height: 14px;
   width: auto;
   display: block;
+}
+
+/* 1스타(logo.svg)는 정사각형이라 높이를 더 크게 설정 */
+.badge-icon-single {
+  height: 20px;
 }
 </style>
 
