@@ -34,6 +34,9 @@
 
       <!-- Store Info -->
       <div class="store-info-section">
+        <!-- 평점 배지 (미슐랭 스타 스타일) -->
+        <RatingBadge :rating="store.averageRating" class="mb-2" />
+        
         <!-- 1줄: 가게이름 + 평점 + 북마크 -->
         <div class="flex items-center justify-between gap-3">
           <div class="flex items-center gap-3 min-w-0 flex-1">
@@ -283,6 +286,7 @@ import BaseButton from '@/components/common/BaseButton.vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseChip from '@/components/common/BaseChip.vue'
 import StarRating from '@/components/common/StarRating.vue'
+import RatingBadge from '@/components/common/RatingBadge.vue'
 import BookmarkFolderSelectModal from '@/components/saved/BookmarkFolderSelectModal.vue'
 import MenuList from '@/components/MenuList.vue'
 import { getStoreById, getStoreReviews } from '@/api/cafe'
