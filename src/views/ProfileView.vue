@@ -104,9 +104,6 @@
         </div>
       </Transition>
     </Teleport>
-
-    <!-- 하단 네비게이션 -->
-    <BaseNavigationBar />
   </div>
 </template>
 
@@ -117,7 +114,7 @@ import { useAuthStore } from '@/store/auth'
 import { createLogger } from '@/utils/logger'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
-import BaseNavigationBar from '@/components/common/BaseNavigationBar.vue'
+
 
 const logger = createLogger('ProfileView')
 
