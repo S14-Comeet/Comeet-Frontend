@@ -146,10 +146,10 @@ const searchLocation = ref(null) // 검색용 위치 (키워드/"이 지역" 검
 // 상단 검색 관련 (네이버/카카오 스타일)
 const selectedTopCategory = ref(null)
 const topCategories = [
-  { name: '카페', icon: '☕' },
-  { name: '디저트', icon: '🍰' },
-  { name: '브런치', icon: '🥐' },
-  { name: '스터디', icon: '📚' },
+  { name: '카페', icon: 'coffee' },
+  { name: '디저트', icon: 'cake' },
+  { name: '브런치', icon: 'utensils' },
+  { name: '스터디', icon: 'book' },
 ]
 
 // 상단 검색 핸들러
@@ -293,7 +293,7 @@ const renderMarkers = (cafes = [], moveToFirst = false) => {
     const lng = firstCafe.lng || firstCafe.longitude
     map.value.setZoom(13)
     setTimeout(() => {
-      panToWithOffset(lat, lng, { offsetRatio: 0.3 })
+      panToWithOffset(lat, lng, { offsetRatio: 0.4 })
     }, 50)
   }
 }
@@ -305,7 +305,7 @@ const showStorePopup = (store) => {
   const lat = store.lat || store.latitude
   const lng = store.lng || store.longitude
 
-  panToWithOffset(lat, lng, { offsetRatio: 0.35 })
+  panToWithOffset(lat, lng, { offsetRatio: 0.4 })
 
   setTimeout(() => {
     popupStore.value = store
@@ -463,7 +463,7 @@ const handleMyLocation = async () => {
     await requestLocation()
 
     if (location.value && map.value) {
-      panToWithOffset(location.value.lat, location.value.lng, { offsetRatio: 0.3 })
+      panToWithOffset(location.value.lat, location.value.lng, { offsetRatio: 0.4 })
       updateMyLocationMarker(location.value.lat, location.value.lng)
       userLocation.value = { lat: location.value.lat, lng: location.value.lng }
       setFocusedLocation(location.value.lat, location.value.lng)
@@ -516,7 +516,7 @@ onMounted(async () => {
         if (location.value && map.value) {
           centerLat = location.value.lat
           centerLng = location.value.lng
-          panToWithOffset(centerLat, centerLng, { offsetRatio: 0.3 })
+          panToWithOffset(centerLat, centerLng, { offsetRatio: 0.4 })
           updateMyLocationMarker(centerLat, centerLng)
           userLocation.value = { lat: centerLat, lng: centerLng }
           setFocusedLocation(centerLat, centerLng)
@@ -597,7 +597,7 @@ const navigateToStore = async (storeId) => {
     // 지도 이동 및 팝업 표시
     map.value.setZoom(16)
     setTimeout(() => {
-      panToWithOffset(lat, lng, { offsetRatio: 0.35 })
+      panToWithOffset(lat, lng, { offsetRatio: 0.4 })
       setFocusedLocation(lat, lng)
 
       // 바텀시트 half로 설정
