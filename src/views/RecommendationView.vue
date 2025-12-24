@@ -2,23 +2,16 @@
   <div class="flex flex-col min-h-full h-full bg-background">
     <!-- Content -->
     <div class="flex-1 overflow-y-auto safe-bottom">
-      <!-- Welcome Message -->
-      <div class="px-4 pt-4 pb-2">
-        <p class="text-lg font-bold text-textPrimary">
-          {{ welcomeMessage }}
-        </p>
-        <p class="text-sm text-textSecondary mt-1">
-          취향에 맞는 메뉴와 원두를 추천해드려요
-        </p>
+      <!-- Welcome Header -->
+      <div class="welcome-header">
+        <h1 class="welcome-title">{{ welcomeMessage }}</h1>
+        <p class="welcome-subtitle">취향에 맞는 메뉴와 원두를 추천해드려요</p>
       </div>
 
       <!-- Nearby Menu Recommendations Section -->
-      <section class="px-4 py-3">
+      <section class="section">
         <div class="section-header">
-          <h2 class="section-title">
-            <span class="section-icon">📍</span>
-            내 주변 추천 메뉴
-          </h2>
+          <h2 class="section-title">내 주변 추천 메뉴</h2>
           <button
             v-if="recommendationStore.hasFetchedNearbyMenus"
             class="section-refresh-btn"
@@ -31,45 +24,49 @@
 
         <!-- Initial State -->
         <div v-if="!recommendationStore.hasFetchedNearbyMenus && !recommendationStore.isLoadingNearbyMenus && !locationError && !recommendationStore.nearbyMenuError" class="section-initial">
-          <BaseButton variant="tertiary" size="small" @click="loadNearbyMenus(false)">
+          <BaseButton variant="primary" size="small" @click="loadNearbyMenus(false)">
             추천 받기
           </BaseButton>
         </div>
 
         <!-- Radius Expanded Notice -->
-        <div v-else-if="recommendationStore.radiusExpanded && recommendationStore.hasFetchedNearbyMenus" class="radius-notice">
+        <div v-if="recommendationStore.radiusExpanded && recommendationStore.hasFetchedNearbyMenus" class="radius-notice">
+          <BaseIcon name="info" :size="14" />
           반경 {{ recommendationStore.actualRadiusKm }}km까지 확장하여 검색했습니다
         </div>
 
         <!-- Loading -->
-        <div v-if="recommendationStore.isLoadingNearbyMenus" class="space-y-3">
+        <div v-if="recommendationStore.isLoadingNearbyMenus" class="card-list">
           <RecommendationSkeleton v-for="i in 3" :key="i" type="menu" />
         </div>
 
         <!-- Location Error -->
         <div v-else-if="locationError" class="empty-state">
-          <p>{{ locationError }}</p>
-          <BaseButton variant="tertiary" size="small" class="mt-3" @click="retryNearbyMenus">
+          <BaseIcon name="map-marker" :size="32" class="empty-icon" />
+          <p class="empty-text">{{ locationError }}</p>
+          <BaseButton variant="tertiary" size="small" @click="retryNearbyMenus">
             다시 시도
           </BaseButton>
         </div>
 
         <!-- API Error -->
         <div v-else-if="recommendationStore.nearbyMenuError" class="empty-state">
-          <p>{{ recommendationStore.nearbyMenuError }}</p>
-          <BaseButton variant="tertiary" size="small" class="mt-3" @click="retryNearbyMenus">
+          <BaseIcon name="alert-circle" :size="32" class="empty-icon" />
+          <p class="empty-text">{{ recommendationStore.nearbyMenuError }}</p>
+          <BaseButton variant="tertiary" size="small" @click="retryNearbyMenus">
             다시 시도
           </BaseButton>
         </div>
 
         <!-- Empty -->
         <div v-else-if="recommendationStore.hasFetchedNearbyMenus && !recommendationStore.nearbyMenuRecommendations.length" class="empty-state">
-          <p>주변에 추천할 메뉴가 없습니다</p>
-          <p class="text-sm mt-1">검색 반경을 넓혀보세요</p>
+          <BaseIcon name="coffee" :size="32" class="empty-icon" />
+          <p class="empty-text">주변에 추천할 메뉴가 없습니다</p>
+          <p class="empty-hint">검색 반경을 넓혀보세요</p>
         </div>
 
         <!-- Nearby Menu List -->
-        <div v-else-if="recommendationStore.nearbyMenuRecommendations.length" class="space-y-3">
+        <div v-else-if="recommendationStore.nearbyMenuRecommendations.length" class="card-list">
           <MenuRecommendationCard
             v-for="menu in recommendationStore.nearbyMenuRecommendations"
             :key="menu.menuId"
@@ -80,12 +77,9 @@
       </section>
 
       <!-- Global Menu Recommendations Section -->
-      <section class="px-4 py-3">
+      <section class="section">
         <div class="section-header">
-          <h2 class="section-title">
-            <span class="section-icon">🌍</span>
-            전체 추천 메뉴
-          </h2>
+          <h2 class="section-title">전체 추천 메뉴</h2>
           <button
             v-if="recommendationStore.hasFetchedMenus"
             class="section-refresh-btn"
@@ -98,31 +92,33 @@
 
         <!-- Initial State -->
         <div v-if="!recommendationStore.hasFetchedMenus && !recommendationStore.isLoadingMenus && !recommendationStore.menuError" class="section-initial">
-          <BaseButton variant="tertiary" size="small" @click="loadGlobalMenus">
+          <BaseButton variant="primary" size="small" @click="loadGlobalMenus">
             추천 받기
           </BaseButton>
         </div>
 
         <!-- Loading -->
-        <div v-else-if="recommendationStore.isLoadingMenus" class="space-y-3">
+        <div v-if="recommendationStore.isLoadingMenus" class="card-list">
           <RecommendationSkeleton v-for="i in 3" :key="i" type="menu" />
         </div>
 
         <!-- Error -->
         <div v-else-if="recommendationStore.menuError" class="empty-state">
-          <p>{{ recommendationStore.menuError }}</p>
-          <BaseButton variant="tertiary" size="small" class="mt-3" @click="loadGlobalMenus">
+          <BaseIcon name="alert-circle" :size="32" class="empty-icon" />
+          <p class="empty-text">{{ recommendationStore.menuError }}</p>
+          <BaseButton variant="tertiary" size="small" @click="loadGlobalMenus">
             다시 시도
           </BaseButton>
         </div>
 
         <!-- Empty -->
         <div v-else-if="recommendationStore.hasFetchedMenus && !recommendationStore.menuRecommendations.length" class="empty-state">
-          <p>추천할 메뉴가 없습니다</p>
+          <BaseIcon name="coffee" :size="32" class="empty-icon" />
+          <p class="empty-text">추천할 메뉴가 없습니다</p>
         </div>
 
         <!-- Global Menu List -->
-        <div v-else-if="recommendationStore.menuRecommendations.length" class="space-y-3">
+        <div v-else-if="recommendationStore.menuRecommendations.length" class="card-list">
           <MenuRecommendationCard
             v-for="menu in recommendationStore.menuRecommendations"
             :key="menu.menuId"
@@ -133,12 +129,9 @@
       </section>
 
       <!-- Bean Recommendations Section -->
-      <section class="px-4 py-3">
+      <section class="section">
         <div class="section-header">
-          <h2 class="section-title">
-            <span class="section-icon">☕</span>
-            추천 원두
-          </h2>
+          <h2 class="section-title">추천 원두</h2>
           <button
             v-if="recommendationStore.hasFetchedBeans"
             class="section-refresh-btn"
@@ -151,32 +144,34 @@
 
         <!-- Initial State -->
         <div v-if="!recommendationStore.hasFetchedBeans && !recommendationStore.isLoadingBeans && !recommendationStore.beanError" class="section-initial">
-          <BaseButton variant="tertiary" size="small" @click="loadBeans">
+          <BaseButton variant="primary" size="small" @click="loadBeans">
             추천 받기
           </BaseButton>
         </div>
 
         <!-- Loading -->
-        <div v-else-if="recommendationStore.isLoadingBeans" class="space-y-3">
+        <div v-if="recommendationStore.isLoadingBeans" class="card-list">
           <RecommendationSkeleton v-for="i in 3" :key="i" type="bean" />
         </div>
 
         <!-- Error -->
         <div v-else-if="recommendationStore.beanError" class="empty-state">
-          <p>{{ recommendationStore.beanError }}</p>
-          <BaseButton variant="tertiary" size="small" class="mt-3" @click="loadBeans">
+          <BaseIcon name="alert-circle" :size="32" class="empty-icon" />
+          <p class="empty-text">{{ recommendationStore.beanError }}</p>
+          <BaseButton variant="tertiary" size="small" @click="loadBeans">
             다시 시도
           </BaseButton>
         </div>
 
         <!-- Empty -->
         <div v-else-if="recommendationStore.hasFetchedBeans && !recommendationStore.beanRecommendations.length" class="empty-state">
-          <p>추천할 원두가 없습니다</p>
-          <p class="text-sm mt-1">취향 설정을 완료해주세요</p>
+          <BaseIcon name="coffee" :size="32" class="empty-icon" />
+          <p class="empty-text">추천할 원두가 없습니다</p>
+          <p class="empty-hint">취향 설정을 완료해주세요</p>
         </div>
 
         <!-- Bean List -->
-        <div v-else-if="recommendationStore.beanRecommendations.length" class="space-y-3">
+        <div v-else-if="recommendationStore.beanRecommendations.length" class="card-list">
           <BeanCard
             v-for="(bean, index) in recommendationStore.beanRecommendations"
             :key="bean.beanId"
@@ -294,38 +289,46 @@ const goToMenuDetail = (menu) => {
 </script>
 
 <style scoped>
-.section-title {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: var(--color-textPrimary);
-  margin-bottom: 0.75rem;
+/* Welcome Header */
+.welcome-header {
+  padding: 1.25rem 1rem 0.75rem;
 }
 
-.section-icon {
+.welcome-title {
   font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-textPrimary);
+  margin: 0 0 0.25rem 0;
+}
+
+.welcome-subtitle {
+  font-size: 0.875rem;
+  color: var(--color-textSecondary);
+  margin: 0;
+}
+
+/* Section */
+.section {
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.section:last-of-type {
+  border-bottom: none;
 }
 
 .section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
-.section-header .section-title {
-  margin-bottom: 0;
-}
-
-/* Section Initial State */
-.section-initial {
-  display: flex;
-  justify-content: center;
-  padding: 1.5rem 0;
+.section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-textPrimary);
+  margin: 0;
 }
 
 /* Section Refresh Button */
@@ -333,10 +336,10 @@ const goToMenuDetail = (menu) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 2rem;
+  height: 2rem;
   color: var(--color-textSecondary);
-  border-radius: 0.375rem;
+  border-radius: 0.5rem;
   transition: all 0.2s;
 }
 
@@ -350,24 +353,73 @@ const goToMenuDetail = (menu) => {
   cursor: not-allowed;
 }
 
-/* Empty State */
-.empty-state {
-  text-align: center;
-  padding: 2rem 1rem;
-  color: var(--color-textSecondary);
+/* Section Initial State */
+.section-initial {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+  background-color: var(--color-neutral-50);
+  border-radius: 0.75rem;
+  border: 1px dashed var(--color-border);
 }
 
+/* Card List */
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2.5rem 1rem;
+  background-color: var(--color-neutral-50);
+  border-radius: 0.75rem;
+  gap: 0.75rem;
+}
+
+.empty-icon {
+  color: var(--color-textTertiary);
+}
+
+.empty-text {
+  font-size: 0.9375rem;
+  color: var(--color-textSecondary);
+  margin: 0;
+}
+
+.empty-hint {
+  font-size: 0.8125rem;
+  color: var(--color-textTertiary);
+  margin: 0;
+}
+
+/* Radius Notice */
 .radius-notice {
-  background-color: var(--color-primary-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  background-color: var(--color-primary-50);
   color: var(--color-primary-700);
-  padding: 0.5rem 0.75rem;
+  padding: 0.625rem 0.75rem;
   border-radius: 0.5rem;
   font-size: 0.8125rem;
   margin-bottom: 0.75rem;
-  text-align: center;
 }
 
-.space-y-3 > * + * {
-  margin-top: 0.75rem;
+/* Animation */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 </style>

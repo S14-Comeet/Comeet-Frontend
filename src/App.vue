@@ -5,9 +5,7 @@
     <div class="app-shell">
       <BaseHeader
         v-if="showHeader"
-        :has-notifications="hasUnreadNotifications"
         :show-back-button="showBackButton"
-        @notice-click="handleNoticeClick"
         @login="handleLogin"
       />
       <main class="app-main" :class="{ 'no-header': !showHeader, 'with-nav': showNavigation, 'full-screen': isFullScreenPage }">
@@ -63,14 +61,6 @@ const pagesWithBackButton = new Set([
   'bean-detail', 'menu-detail', 'my-preference'
 ]);
 const showBackButton = computed(() => pagesWithBackButton.has(route.name));
-
-// 읽지 않은 알림이 있는지
-const hasUnreadNotifications = computed(() => notificationStore.hasUnread);
-
-// 알림 아이콘 클릭 핸들러
-const handleNoticeClick = () => {
-  router.push('/notifications');
-};
 
 // 로그인 버튼 클릭 핸들러
 const handleLogin = () => {

@@ -124,10 +124,10 @@
               <span class="flex items-start gap-4">
                 <span
 :class="[
-                  'w-12 h-12 rounded-full flex items-center justify-center text-2xl',
+                  'w-12 h-12 rounded-full flex items-center justify-center',
                   selectedRole === 'MANAGER' ? 'bg-primary-100' : 'bg-surface-light'
                 ]">
-                  🏪
+                  <BaseIcon name="store" :size="24" :color="selectedRole === 'MANAGER' ? 'var(--color-primary-600)' : 'var(--color-textSecondary)'" />
                 </span>
                 <span class="flex-1 flex flex-col text-left">
                   <span
@@ -203,6 +203,7 @@ import { showSuccess } from '@/utils/toast';
 import { createLogger } from '@/utils/logger';
 import BaseInput from '@/components/common/BaseInput.vue';
 import BaseButton from '@/components/common/BaseButton.vue';
+import BaseIcon from '@/components/common/BaseIcon.vue';
 
 const logger = createLogger('NicknameRegistrationView');
 const router = useRouter();

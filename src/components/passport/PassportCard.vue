@@ -7,7 +7,7 @@ v-if="passport.coverImageUrl" :src="passport.coverImageUrl" :alt="`${passport.mo
         class="cover-image" />
       <div v-else class="cover-placeholder">
         <div class="placeholder-map">
-          <span class="map-icon">🗺️</span>
+          <BaseIcon name="map" :size="24" class="map-icon" />
           <span class="placeholder-text">{{ passport.month }}월의 커피 여정</span>
         </div>
       </div>
@@ -24,19 +24,19 @@ v-if="passport.coverImageUrl" :src="passport.coverImageUrl" :alt="`${passport.mo
       <template v-if="passport.isAvailable">
         <div class="stats-row">
           <div class="stat-item">
-            <span class="stat-icon">☕</span>
+            <BaseIcon name="coffee" :size="14" class="stat-icon" />
             <span class="stat-value">{{ passport.totalCoffeeCount }}</span>
             <span class="stat-label">잔</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
-            <span class="stat-icon">🏪</span>
+            <BaseIcon name="store" :size="14" class="stat-icon" />
             <span class="stat-value">{{ passport.totalStoreCount }}</span>
             <span class="stat-label">곳</span>
           </div>
           <div v-if="passport.topOrigin" class="stat-divider"></div>
           <div v-if="passport.topOrigin" class="stat-item origin">
-            <span class="stat-icon">🌍</span>
+            <BaseIcon name="globe" :size="14" class="stat-icon" />
             <span class="origin-name">{{ passport.topOrigin }}</span>
           </div>
         </div>
@@ -52,7 +52,7 @@ v-if="passport.coverImageUrl" :src="passport.coverImageUrl" :alt="`${passport.mo
 
       <template v-else>
         <div class="empty-state">
-          <span class="empty-icon">✈️</span>
+          <BaseIcon name="coffee" :size="16" class="empty-icon" />
           <span class="empty-text">아직 시작되지 않은 여정</span>
         </div>
       </template>
@@ -66,6 +66,8 @@ v-if="passport.coverImageUrl" :src="passport.coverImageUrl" :alt="`${passport.mo
 </template>
 
 <script setup>
+import BaseIcon from '@/components/common/BaseIcon.vue'
+
 const props = defineProps({
   passport: {
     type: Object,

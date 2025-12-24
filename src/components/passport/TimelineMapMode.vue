@@ -235,7 +235,7 @@ const createMarker = () => {
             map: map.value,
             icon: {
                 content: `<div class="timeline-marker">
-                    <div class="marker-pin">☕</div>
+                    <div class="marker-pin"></div>
                     <div class="marker-pulse"></div>
                 </div>`,
                 anchor: new window.naver.maps.Point(20, 20)

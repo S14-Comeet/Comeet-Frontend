@@ -70,14 +70,10 @@
 
         <!-- Beans Section -->
         <section v-if="menuBeans.length" class="px-4 py-4">
-          <h2 class="section-title mb-3">
-            <span class="section-icon">☕</span>
-            원두 선택
-          </h2>
+          <h2 class="section-title mb-3">원두 선택</h2>
 
           <!-- Recommended Bean Notice -->
           <div v-if="showRecommendedBeanNotice" class="recommended-bean-notice">
-            <span class="notice-icon">✨</span>
             <span>
               이 메뉴는 <strong>{{ recommendedBean.beanName || recommendedBean.name }}</strong> 원두를
               기준으로 추천되었습니다
@@ -110,10 +106,7 @@
 
         <!-- Store Section -->
         <section v-if="menu.storeId" class="px-4 py-4">
-          <h2 class="section-title mb-3">
-            <span class="section-icon">🏪</span>
-            판매 매장
-          </h2>
+          <h2 class="section-title mb-3">판매 매장</h2>
           <div class="store-card" @click="goToStore">
             <div class="store-info">
               <span class="store-name">{{ menu.storeName || '매장' }}</span>

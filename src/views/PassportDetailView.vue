@@ -46,15 +46,15 @@ v-if="passportStore.currentPassport?.coverImageUrl" :src="passportStore.currentP
       <!-- 타임라인 -->
       <section class="timeline-section">
         <div class="section-header">
-          <h2 class="section-title">☕ 방문 기록</h2>
+          <h2 class="section-title">방문 기록</h2>
           <span class="record-count">{{ passportStore.sortedRecords.length }}건</span>
         </div>
 
         <div v-if="passportStore.sortedRecords.length === 0" class="empty-state">
-          <div class="empty-icon">✈️</div>
+          <BaseIcon name="coffee" :size="32" class="empty-icon" />
           <p class="empty-message">이번 달은 아직 커피 여정이 없어요</p>
           <button class="cta-button" @click="goToMap">
-            <span>🗺️</span> 카페 찾으러 가기
+            카페 찾으러 가기
           </button>
         </div>
 
@@ -75,6 +75,7 @@ v-if="isMapMode" :records="passportStore.sortedRecords" :initial-index="mapModeI
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePassportStore } from '@/store/passport'
+import BaseIcon from '@/components/common/BaseIcon.vue'
 import PassportStats from '@/components/passport/PassportStats.vue'
 import PassportTimeline from '@/components/passport/PassportTimeline.vue'
 import TimelineMapMode from '@/components/passport/TimelineMapMode.vue'

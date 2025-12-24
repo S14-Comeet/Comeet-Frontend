@@ -91,7 +91,7 @@
         <section class="mb-6">
           <h2 class="text-lg font-bold mb-3">별점</h2>
           <div class="flex items-center gap-3">
-            <StarRating v-model="rating" :size="36" />
+            <StarRating v-model="rating" :size="36" allow-half />
             <span v-if="rating > 0" class="text-lg font-semibold text-primary">{{ rating }}점</span>
             <span v-else class="text-sm text-textSecondary">(선택)</span>
           </div>

@@ -199,7 +199,7 @@
                 :alt="selectedRoastery.name"
                 class="w-full h-full object-cover"
               />
-              <span v-else class="text-lg">☕</span>
+              <BaseIcon v-else name="coffee" :size="20" class="text-primary-400" />
             </div>
             <div class="flex-1 min-w-0">
               <p class="font-medium text-textPrimary truncate">{{ selectedRoastery.name }}</p>
@@ -265,6 +265,7 @@ import { searchAddressWithCoordinates } from '@/utils/address'
 import { MENU_CATEGORIES } from '@/constants'
 import BaseInput from '@/components/common/BaseInput.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import BaseIcon from '@/components/common/BaseIcon.vue'
 import OwnerRoasterySelector from '@/components/owner/OwnerRoasterySelector.vue'
 import OwnerImageUploader from '@/components/owner/OwnerImageUploader.vue'
 
