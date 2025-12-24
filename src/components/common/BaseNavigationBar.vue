@@ -1,36 +1,38 @@
 <template>
-  <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-nav z-[9999]">
-    <div class="w-full px-4 pb-safe">
-      <div class="flex items-center justify-around h-16">
-        <!-- 지도 -->
-        <router-link to="/map" class="nav-item" :class="{ 'nav-item-active': isActive('/map') }">
-          <component :is="getIcon('map')" class="nav-icon" />
-          <span class="nav-label">지도</span>
-        </router-link>
+  <nav class="nav-container">
+    <div class="nav-content">
+      <div class="w-full px-4 pb-safe">
+        <div class="flex items-center justify-around h-16">
+          <!-- 지도 -->
+          <router-link to="/map" class="nav-item" :class="{ 'nav-item-active': isActive('/map') }">
+            <component :is="getIcon('map')" class="nav-icon" />
+            <span class="nav-label">지도</span>
+          </router-link>
 
-        <!-- 추천 -->
-        <router-link to="/recommendation" class="nav-item" :class="{ 'nav-item-active': isActive('/recommendation') }">
-          <component :is="getIcon('sparkle')" class="nav-icon" />
-          <span class="nav-label">추천</span>
-        </router-link>
+          <!-- 추천 -->
+          <router-link to="/recommendation" class="nav-item" :class="{ 'nav-item-active': isActive('/recommendation') }">
+            <component :is="getIcon('sparkle')" class="nav-icon" />
+            <span class="nav-label">추천</span>
+          </router-link>
 
-        <!-- 여권 -->
-        <router-link to="/passport" class="nav-item" :class="{ 'nav-item-active': isActive('/passport') }">
-          <component :is="getIcon('passport')" class="nav-icon" />
-          <span class="nav-label">여권</span>
-        </router-link>
+          <!-- 여권 -->
+          <router-link to="/passport" class="nav-item" :class="{ 'nav-item-active': isActive('/passport') }">
+            <component :is="getIcon('passport')" class="nav-icon" />
+            <span class="nav-label">여권</span>
+          </router-link>
 
-        <!-- 저장 -->
-        <router-link to="/saved" class="nav-item" :class="{ 'nav-item-active': isActive('/saved') }">
-          <component :is="getIcon('bookmark')" class="nav-icon" />
-          <span class="nav-label">저장</span>
-        </router-link>
+          <!-- 저장 -->
+          <router-link to="/saved" class="nav-item" :class="{ 'nav-item-active': isActive('/saved') }">
+            <component :is="getIcon('bookmark')" class="nav-icon" />
+            <span class="nav-label">저장</span>
+          </router-link>
 
-        <!-- 마이 -->
-        <router-link to="/profile" class="nav-item" :class="{ 'nav-item-active': isActive('/profile') }">
-          <component :is="getIcon('user')" class="nav-icon" />
-          <span class="nav-label">마이</span>
-        </router-link>
+          <!-- 마이 -->
+          <router-link to="/profile" class="nav-item" :class="{ 'nav-item-active': isActive('/profile') }">
+            <component :is="getIcon('user')" class="nav-icon" />
+            <span class="nav-label">마이</span>
+          </router-link>
+        </div>
       </div>
     </div>
   </nav>
@@ -75,6 +77,47 @@ const getIcon = (type) => {
 </script>
 
 <style scoped>
+/* 네비게이션 컨테이너 - 화면 하단 고정, 가로 중앙 정렬 */
+.nav-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* 네비게이션 콘텐츠 - 실제 네비게이션 바 */
+.nav-content {
+  position: relative;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 -2px 8px rgba(99, 73, 54, 0.08);
+  pointer-events: auto;
+}
+
+/* 데스크톱: app-shell과 동일하게 448px로 제한 */
+@media (min-width: 768px) {
+  .nav-content {
+    max-width: 448px;
+  }
+}
+
+/* 네비게이션 바 위 그라데이션 그림자 - 떠있는 효과 */
+.nav-content::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.15), transparent);
+  pointer-events: none;
+}
+
 /* 네비게이션 아이템 기본 스타일 */
 .nav-item {
   display: flex;
@@ -130,14 +173,6 @@ const getIcon = (type) => {
   .nav-item:hover .nav-icon {
     transform: scale(1.05);
   }
-}
-
-/* 상단 그림자 (네비게이션바) */
-nav {
-  box-shadow: 0 -2px 8px rgba(99, 73, 54, 0.08);
-  /* Primary 700 8% opacity */
-  backdrop-filter: blur(8px);
-  background-color: rgba(255, 255, 255, 0.95);
 }
 
 /* iOS Safe Area 대응 */

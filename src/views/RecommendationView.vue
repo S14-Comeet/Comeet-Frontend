@@ -183,9 +183,6 @@
         </div>
       </section>
     </div>
-
-    <!-- Navigation -->
-    <BaseNavigationBar />
   </div>
 </template>
 
@@ -196,7 +193,7 @@ import { useAuthStore } from '@/store/auth'
 import { useRecommendationStore } from '@/store/recommendation'
 import { useGeolocation } from '@/composables/useGeolocation'
 
-import BaseNavigationBar from '@/components/common/BaseNavigationBar.vue'
+
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BeanCard from '@/components/common/BeanCard.vue'
