@@ -305,9 +305,18 @@ const confirmDelete = () => {
 const handleDelete = async () => {
   isDeleting.value = true
   try {
+    // 삭제 전에 storeId 저장 (삭제 후 이동할 페이지 결정용)
+    const storeId = reviewData.value?.storeId
+
     await deleteReview(reviewId.value)
     showSuccess('리뷰가 삭제되었습니다.')
-    router.replace({ name: 'my-reviews' })
+
+    // storeId가 있으면 가게 상세 페이지로, 없으면 내 리뷰 목록으로 이동
+    if (storeId) {
+      router.replace({ name: 'store-detail', params: { storeId } })
+    } else {
+      router.replace({ name: 'my-reviews' })
+    }
   } catch (e) {
     logger.error('Failed to delete review', e)
     showError('리뷰 삭제에 실패했습니다.')

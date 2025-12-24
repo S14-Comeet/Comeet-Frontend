@@ -265,9 +265,9 @@ const handleSubmit = async () => {
     })
 
     // 2. If professional mode, create cupping note
-    if (reviewMode.value === 'professional' && reviewResponse?.data?.reviewId) {
+    if (reviewMode.value === 'professional' && reviewResponse?.data?.reviewInfo?.reviewId) {
       try {
-        await createCuppingNote(reviewResponse.data.reviewId, cuppingNote.value)
+        await createCuppingNote(reviewResponse.data.reviewInfo.reviewId, cuppingNote.value)
       } catch (cuppingError) {
         logger.warn('Failed to save cupping note', cuppingError)
         // Don't fail the whole review if cupping note fails

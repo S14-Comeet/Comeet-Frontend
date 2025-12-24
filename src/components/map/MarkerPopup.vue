@@ -30,20 +30,30 @@
           </button>
         </div>
 
-        <h4 class="store-name">{{ store.name }}</h4>
+        <div class="store-name-row">
+          <h4 class="store-name">{{ store.name }}</h4>
+          <RatingBadge :rating="store.averageRating" />
+        </div>
 
         <p v-if="store.address" class="store-address">
           {{ truncateAddress(store.address) }}
         </p>
 
-        <!-- 별점, 방문수, 리뷰수 -->
+        <!-- 별점 · 리뷰수 · 방문수 · 거리 -->
         <div class="store-stats">
           <!-- 별점 -->
           <div class="stat-item">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" class="star-icon">
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
             </svg>
-            <span class="stat-value">{{ store.avgRating?.toFixed(1) || '-' }}</span>
+            <span class="stat-value">{{ store.averageRating?.toFixed(1) || '-' }}</span>
+          </div>
+          <!-- 리뷰수 -->
+          <div class="stat-item">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <span class="stat-value">{{ store.reviewCount ?? 0 }}</span>
           </div>
           <!-- 방문수 -->
           <div class="stat-item">
@@ -54,13 +64,6 @@
               <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
             </svg>
             <span class="stat-value">{{ store.visitCount ?? 0 }}</span>
-          </div>
-          <!-- 리뷰수 -->
-          <div class="stat-item">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-            <span class="stat-value">{{ store.reviewCount ?? 0 }}</span>
           </div>
           <!-- 거리 -->
           <div v-if="store.distanceText" class="stat-item">
@@ -83,6 +86,7 @@
 <script setup>
 import { computed } from 'vue'
 import { MENU_CATEGORIES } from '@/constants'
+import RatingBadge from '@/components/common/RatingBadge.vue'
 
 // enum 값을 한글 라벨로 변환하는 맵
 const categoryLabelMap = Object.fromEntries(
@@ -211,6 +215,12 @@ const handleClick = () => {
 .close-btn:hover {
   background: var(--color-neutral-100);
   color: var(--color-neutral-600);
+}
+
+.store-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
 }
 
 .store-name {

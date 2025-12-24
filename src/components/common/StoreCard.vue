@@ -7,20 +7,26 @@
     <!-- Compact variant (for StoreListSheet - 지도) -->
     <template v-if="variant === 'compact'">
       <div class="store-info">
-        <!-- 1줄: 가게명 + 별점 -->
+        <!-- 1줄: 가게명 + 커슐랭 배지 -->
         <div class="store-header-row">
           <h4 class="store-name">{{ store.name }}</h4>
-          <div v-if="store.averageRating" class="rating-inline">
-            <BaseIcon name="star-fill" :size="14" class="text-accent" />
-            <span class="rating-value">{{ formatRating(store.averageRating) }}</span>
-          </div>
+          <RatingBadge :rating="store.averageRating" />
           <span v-if="store.isClosed" class="closed-badge">영업종료</span>
         </div>
 
-        <!-- 2줄: 리뷰 수 · 카테고리 -->
+        <!-- 2줄: 별점 · 리뷰 수 · 방문 수 · 카테고리 -->
         <div class="store-meta-row">
+          <div v-if="store.averageRating" class="rating-inline">
+            <BaseIcon name="star-fill" :size="12" class="text-accent" />
+            <span class="rating-value">{{ formatRating(store.averageRating) }}</span>
+          </div>
+          <span v-if="store.averageRating" class="meta-dot">·</span>
           <span class="review-info">
             리뷰 <span class="review-count">{{ store.reviewCount || 0 }}</span>
+          </span>
+          <span class="meta-dot">·</span>
+          <span class="review-info">
+            방문 <span class="review-count">{{ store.visitCount || 0 }}</span>
           </span>
           <span class="meta-dot">·</span>
           <BaseChip
@@ -58,19 +64,25 @@
       </div>
 
       <div class="store-content">
-        <!-- 1줄: 가게명 + 별점 -->
+        <!-- 1줄: 가게명 + 커슐랭 배지 -->
         <div class="store-header-row">
           <h3 class="store-name">{{ store.name }}</h3>
-          <div class="rating-inline">
-            <BaseIcon name="star-fill" :size="14" class="text-accent" />
-            <span class="rating-value">{{ formatRating(store.averageRating) }}</span>
-          </div>
+          <RatingBadge :rating="store.averageRating" />
         </div>
 
-        <!-- 2줄: 리뷰 수 · 카테고리 -->
+        <!-- 2줄: 별점 · 리뷰 수 · 방문 수 · 카테고리 -->
         <div class="store-meta-row">
+          <div v-if="store.averageRating" class="rating-inline">
+            <BaseIcon name="star-fill" :size="12" class="text-accent" />
+            <span class="rating-value">{{ formatRating(store.averageRating) }}</span>
+          </div>
+          <span v-if="store.averageRating" class="meta-dot">·</span>
           <span class="review-info">
             리뷰 <span class="review-count">{{ store.reviewCount || 0 }}</span>
+          </span>
+          <span class="meta-dot">·</span>
+          <span class="review-info">
+            방문 <span class="review-count">{{ store.visitCount || 0 }}</span>
           </span>
           <span class="meta-dot">·</span>
           <BaseChip
@@ -115,6 +127,7 @@ import { ref, computed } from 'vue'
 import { MENU_CATEGORIES } from '@/constants'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseChip from '@/components/common/BaseChip.vue'
+import RatingBadge from '@/components/common/RatingBadge.vue'
 import { formatDate } from '@/utils/date'
 
 // enum 값을 한글 라벨로 변환하는 맵
@@ -240,11 +253,11 @@ const handleImageError = () => {
    공통 스타일
    ========================================== */
 
-/* 헤더 (가게명 + 별점) */
+/* 헤더 (가게명 + 커슐랭 배지) */
 .store-header-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.375rem;
   margin-bottom: 0.375rem;
 }
 
@@ -255,7 +268,7 @@ const handleImageError = () => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  flex: 1;
+  max-width: 70%;
   min-width: 0;
 }
 
@@ -267,7 +280,7 @@ const handleImageError = () => {
 }
 
 .rating-value {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--color-textPrimary);
 }

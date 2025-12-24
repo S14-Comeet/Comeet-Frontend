@@ -25,14 +25,6 @@ type="text" :value="searchKeyword" placeholder="카페명 또는 주소 검색" 
       </div>
     </div>
 
-    <!-- Floating 알림 아이콘 (우측 상단) - 로그인 상태일 때만 표시 -->
-    <button
-v-if="isAuthenticated" class="floating-notification-button" aria-label="알림"
-      @click="handleNotificationClick">
-      <BaseIcon name="notice" :size="24" color="var(--color-neutral-900)" />
-      <span v-if="hasUnreadNotifications" class="notification-badge"></span>
-    </button>
-
     <!-- 이 지역 검색 버튼 (상단 중앙) -->
     <button v-if="showSearchButton" class="search-area-button" :disabled="isSearching" @click="handleSearchThisArea">
       <BaseIcon v-if="isSearching" name="spinner" :size="16" class="animate-spin" />
@@ -77,7 +69,7 @@ v-if="currentSheetState === 'collapsed'" class="list-view-button" :style="contro
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, onActivated, computed, watch } from 'vue'
+import { ref, onMounted, onUnmounted, onActivated, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useNaverMap } from '@/composables/useNaverMap'
 import { useGeolocation } from '@/composables/useGeolocation'
@@ -85,8 +77,6 @@ import { useMapMarkers } from '@/composables/useMapMarkers'
 import { useMapPopup } from '@/composables/useMapPopup'
 import { useMapControls } from '@/composables/useMapControls'
 import { showInfo, showError } from '@/utils/toast'
-import { useNotificationStore } from '@/store/notification'
-import { useAuthStore } from '@/store/auth'
 import { useSavedStore } from '@/store/saved'
 import { getStoresByLocation, getStoreById } from '@/api/cafe'
 import { calculateDistance, formatDistance } from '@/utils/geo'
@@ -99,8 +89,6 @@ import BaseIcon from '@/components/common/BaseIcon.vue'
 const logger = createLogger('MapView')
 const router = useRouter()
 const route = useRoute()
-const notificationStore = useNotificationStore()
-const authStore = useAuthStore()
 const savedStore = useSavedStore()
 
 // 외부에서 전달받은 가게 정보 (KeepAlive 활성화 시 처리용)
@@ -152,17 +140,14 @@ const topCategories = [
   { name: '스터디', icon: 'book' },
 ]
 
-// 상단 검색 핸들러
+// 상단 검색 핸들러 (전역 검색)
 const handleTopSearch = () => {
   if (!map.value || !searchKeyword.value.trim()) return
-
-  const center = map.value.getCenter()
-  const radius = getRadiusFromBounds()
 
   handleSearch({
     keyword: searchKeyword.value.trim(),
     categories: selectedTopCategory.value || undefined,
-    isGlobalSearch: false,
+    isGlobalSearch: true,
     searchType: 'keyword'
   })
 }
@@ -231,15 +216,6 @@ const {
   clearFocusedLocation,
   setSheetState
 } = useMapControls(map)
-
-// 인증 상태
-const isAuthenticated = computed(() => authStore.isAuthenticated)
-const hasUnreadNotifications = computed(() => notificationStore.hasUnread)
-
-// 알림 아이콘 클릭 핸들러
-const handleNotificationClick = () => {
-  router.push('/notifications')
-}
 
 // 위치 기반 가게 목록 불러오기
 const fetchStores = async (latitude, longitude, radius = 1000, options = {}) => {
@@ -648,46 +624,6 @@ watch(() => map.value, (newMap) => {
 </script>
 
 <style scoped>
-/* Floating 알림 버튼 */
-.floating-notification-button {
-  position: absolute;
-  top: 0.75rem;
-  right: 1rem;
-  z-index: 100;
-  width: 2.5rem;
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-  border-radius: 50%;
-  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.floating-notification-button:hover {
-  background-color: rgba(255, 255, 255, 1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.floating-notification-button:active {
-  transform: scale(0.95);
-  background-color: var(--color-primary-50);
-}
-
-/* 알림 배지 */
-.notification-badge {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  width: 0.5rem;
-  height: 0.5rem;
-  background-color: var(--color-error);
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.9);
-}
-
 /* 이 지역 검색 버튼 (검색바 아래 플로팅) */
 .search-area-button {
   position: absolute;
@@ -767,11 +703,6 @@ watch(() => map.value, (newMap) => {
 
 /* 모바일에서 Safe Area 대응 */
 @media (max-width: 640px) {
-  .floating-notification-button {
-    top: max(0.75rem, env(safe-area-inset-top));
-    right: max(1rem, env(safe-area-inset-right));
-  }
-
   .search-area-button {
     /* 검색바 높이(4.25rem) + safe-area + 간격 */
     top: calc(max(0.75rem, env(safe-area-inset-top)) + 4rem);
