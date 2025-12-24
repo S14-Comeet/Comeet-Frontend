@@ -4,32 +4,47 @@
     :class="[`variant-${variant}`, { 'is-closed': store.isClosed }]"
     @click="handleClick"
   >
-    <!-- Compact variant (for StoreListSheet) -->
+    <!-- Compact variant (for StoreListSheet - 지도) -->
     <template v-if="variant === 'compact'">
       <div class="store-info">
-        <div class="store-name-row">
-          <span class="store-category-badge">{{ displayCategory }}</span>
+        <!-- 1줄: 가게명 + 별점 -->
+        <div class="store-header-row">
           <h4 class="store-name">{{ store.name }}</h4>
-          <span v-if="store.isClosed" class="closed-badge">영업종료</span>
-        </div>
-        <p class="store-address">{{ store.address || '주소 정보 없음' }}</p>
-        <div class="store-meta-row">
-          <div v-if="store.averageRating" class="store-rating">
+          <div v-if="store.averageRating" class="rating-inline">
             <BaseIcon name="star-fill" :size="14" class="text-accent" />
             <span class="rating-value">{{ formatRating(store.averageRating) }}</span>
-            <span class="review-count">({{ store.reviewCount || 0 }})</span>
           </div>
-          <span v-if="store.distanceText" class="store-distance">
-            <BaseIcon name="map-marker" :size="12" class="distance-icon" />
-            {{ store.distanceText }}
+          <span v-if="store.isClosed" class="closed-badge">영업종료</span>
+        </div>
+
+        <!-- 2줄: 리뷰 수 · 카테고리 -->
+        <div class="store-meta-row">
+          <span class="review-info">
+            리뷰 <span class="review-count">{{ store.reviewCount || 0 }}</span>
           </span>
+          <span class="meta-dot">·</span>
+          <BaseChip
+            :label="displayCategory"
+            variant="accent"
+            size="xs"
+          />
+        </div>
+
+        <!-- 3줄: 주소 -->
+        <p class="store-address">{{ store.address || '주소 정보 없음' }}</p>
+
+        <!-- 4줄: 거리 (있으면) -->
+        <div v-if="store.distanceText" class="store-distance">
+          <BaseIcon name="map-marker" :size="12" />
+          <span>{{ store.distanceText }}</span>
         </div>
       </div>
-      <BaseIcon name="chevron-right" :size="20" class="text-primary-300 flex-shrink-0" />
+      <BaseIcon name="chevron-right" :size="20" class="chevron-icon" />
     </template>
 
-    <!-- Detailed variant (for SavedCafeList, default) -->
+    <!-- Detailed variant (for SavedCafeList - 저장목록) -->
     <template v-else>
+      <!-- 썸네일 -->
       <div class="store-thumbnail">
         <img
           v-if="hasValidThumbnail"
@@ -38,38 +53,47 @@
           class="thumbnail-img"
           @error="handleImageError"
         />
-        <BaseIcon v-else name="bookmark-fill" :size="32" class="text-primary-300" />
+        <BaseIcon v-else name="coffee" :size="28" class="thumbnail-placeholder" />
         <span v-if="store.isClosed" class="closed-overlay">영업종료</span>
       </div>
 
       <div class="store-content">
-        <div class="store-header">
-          <h3 class="store-name-detail">{{ store.name }}</h3>
-          <BaseChip
-            v-if="store.category"
-            :label="displayCategory"
-            variant="primary"
-            size="small"
-          />
-        </div>
-
-        <p class="store-address-detail">{{ store.address || '주소 정보 없음' }}</p>
-
-        <div class="store-meta">
-          <div class="rating-badge">
+        <!-- 1줄: 가게명 + 별점 -->
+        <div class="store-header-row">
+          <h3 class="store-name">{{ store.name }}</h3>
+          <div class="rating-inline">
             <BaseIcon name="star-fill" :size="14" class="text-accent" />
             <span class="rating-value">{{ formatRating(store.averageRating) }}</span>
           </div>
-          <span class="meta-divider"></span>
-          <span class="meta-text">리뷰 {{ store.reviewCount || 0 }}개</span>
-          <template v-if="showAddedDate && store.addedAt">
-            <span class="meta-divider"></span>
-            <span class="meta-text">{{ formatDate(store.addedAt) }} 추가</span>
-          </template>
+        </div>
+
+        <!-- 2줄: 리뷰 수 · 카테고리 -->
+        <div class="store-meta-row">
+          <span class="review-info">
+            리뷰 <span class="review-count">{{ store.reviewCount || 0 }}</span>
+          </span>
+          <span class="meta-dot">·</span>
+          <BaseChip
+            :label="displayCategory"
+            variant="primary"
+            size="xs"
+          />
+        </div>
+
+        <!-- 3줄: 주소 -->
+        <p class="store-address">{{ store.address || '주소 정보 없음' }}</p>
+
+        <!-- 4줄: 추가일 또는 거리 -->
+        <div v-if="showAddedDate && store.addedAt" class="store-meta-extra">
+          <span class="meta-date">{{ formatDate(store.addedAt) }} 저장</span>
+        </div>
+        <div v-else-if="store.distanceText" class="store-distance">
+          <BaseIcon name="map-marker" :size="12" />
+          <span>{{ store.distanceText }}</span>
         </div>
       </div>
 
-      <!-- Actions slot for delete button etc -->
+      <!-- 삭제 버튼 -->
       <div v-if="showActions" class="store-actions" @click.stop>
         <slot name="actions">
           <button
@@ -78,7 +102,7 @@
             :aria-label="`${store.name} 삭제`"
             @click="handleDelete"
           >
-            <BaseIcon name="x" :size="20" />
+            <BaseIcon name="x" :size="18" />
           </button>
         </slot>
       </div>
@@ -91,6 +115,7 @@ import { ref, computed } from 'vue'
 import { MENU_CATEGORIES } from '@/constants'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseChip from '@/components/common/BaseChip.vue'
+import { formatDate } from '@/utils/date'
 
 // enum 값을 한글 라벨로 변환하는 맵
 const categoryLabelMap = Object.fromEntries(
@@ -131,28 +156,17 @@ const hasValidThumbnail = computed(() => {
          !imageError.value
 })
 
-// 카테고리를 한글로 변환 (comma-separated enum -> 한글 라벨)
+// 카테고리를 한글로 변환 (첫 번째 카테고리만 표시)
 const displayCategory = computed(() => {
   if (!props.store.category) return '카페'
 
-  return props.store.category
-    .split(',')
-    .map(cat => categoryLabelMap[cat.trim()] || cat.trim())
-    .join(', ')
+  const firstCategory = props.store.category.split(',')[0].trim()
+  return categoryLabelMap[firstCategory] || firstCategory
 })
 
 const formatRating = (rating) => {
-  if (!rating && rating !== 0) return 'N/A'
+  if (!rating && rating !== 0) return '0.0'
   return Number(rating).toFixed(1)
-}
-
-const formatDate = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}.${month}.${day}`
 }
 
 const handleClick = () => {
@@ -171,7 +185,7 @@ const handleImageError = () => {
 <style scoped>
 .store-card {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -180,9 +194,17 @@ const handleImageError = () => {
   opacity: 0.6;
 }
 
-/* Compact variant styles */
+/* ==========================================
+   Compact variant styles (지도 리스트용)
+   ========================================== */
 .store-card.variant-compact {
-  padding: 0.875rem 1rem;
+  padding: 1rem;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.store-card.variant-compact:last-child {
+  border-bottom: none;
 }
 
 .store-card.variant-compact:hover {
@@ -198,21 +220,56 @@ const handleImageError = () => {
   min-width: 0;
 }
 
-.store-name-row {
+/* ==========================================
+   Detailed variant styles (저장목록용)
+   ========================================== */
+.store-card.variant-detailed {
+  gap: 0.875rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid var(--color-border);
+}
+
+.store-card.variant-detailed:hover {
+  border-color: var(--color-primary-300);
+  box-shadow: 0 4px 12px rgba(132, 97, 72, 0.08);
+}
+
+/* ==========================================
+   공통 스타일
+   ========================================== */
+
+/* 헤더 (가게명 + 별점) */
+.store-header-row {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.375rem;
 }
 
-.store-category-badge {
+.store-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-textPrimary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.rating-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
   flex-shrink: 0;
-  padding: 0.125rem 0.5rem;
-  background-color: var(--color-accent);
-  color: white;
-  font-size: 0.625rem;
+}
+
+.rating-value {
+  font-size: 0.875rem;
   font-weight: 600;
-  border-radius: 0.25rem;
+  color: var(--color-textPrimary);
 }
 
 .closed-badge {
@@ -225,44 +282,40 @@ const handleImageError = () => {
   border-radius: 0.25rem;
 }
 
-.store-name {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-neutral-900);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* 메타 라인 (리뷰 수 · 카테고리) */
+.store-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 0.375rem;
 }
 
+.review-info {
+  font-size: 0.8125rem;
+  color: var(--color-textSecondary);
+}
+
+.review-count {
+  font-weight: 600;
+  color: var(--color-textPrimary);
+}
+
+.meta-dot {
+  color: var(--color-textTertiary);
+  font-size: 0.75rem;
+}
+
+/* 주소 */
 .store-address {
   font-size: 0.8125rem;
   color: var(--color-textSecondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 0.25rem;
+  margin: 0;
 }
 
-.store-meta-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.store-rating {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--color-neutral-700);
-}
-
-.review-count {
-  color: var(--color-textSecondary);
-  font-weight: 400;
-}
-
+/* 거리 */
 .store-distance {
   display: flex;
   align-items: center;
@@ -270,32 +323,33 @@ const handleImageError = () => {
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--color-primary-600);
+  margin-top: 0.375rem;
 }
 
-.distance-icon {
-  color: var(--color-primary-500);
+/* 추가일 등 메타 정보 */
+.store-meta-extra {
+  margin-top: 0.375rem;
 }
 
-/* Detailed variant styles */
-.store-card.variant-detailed {
-  gap: 1rem;
-  padding: 1rem;
-  background: white;
-  border-radius: 0.75rem;
-  border: 1px solid var(--color-border);
+.meta-date {
+  font-size: 0.75rem;
+  color: var(--color-textTertiary);
 }
 
-.store-card.variant-detailed:hover {
-  border-color: var(--color-primary);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+/* 화살표 아이콘 (compact) */
+.chevron-icon {
+  color: var(--color-primary-300);
+  flex-shrink: 0;
+  align-self: center;
 }
 
+/* 썸네일 (detailed) */
 .store-thumbnail {
   position: relative;
-  width: 5rem;
-  height: 5rem;
-  border-radius: 0.5rem;
-  background-color: var(--color-primary-100);
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 0.75rem;
+  background-color: var(--color-primary-50);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -309,6 +363,10 @@ const handleImageError = () => {
   object-fit: cover;
 }
 
+.thumbnail-placeholder {
+  color: var(--color-primary-200);
+}
+
 .closed-overlay {
   position: absolute;
   inset: 0;
@@ -317,89 +375,35 @@ const handleImageError = () => {
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.5);
   color: white;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 600;
 }
 
+/* 컨텐츠 영역 (detailed) */
 .store-content {
   flex: 1;
   min-width: 0;
 }
 
-.store-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
-}
-
-.store-name-detail {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--color-textPrimary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.store-address-detail {
-  font-size: 0.8125rem;
-  color: var(--color-textSecondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 0.5rem;
-}
-
-.store-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.rating-badge {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.rating-value {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--color-textPrimary);
-}
-
-.meta-divider {
-  width: 1px;
-  height: 0.75rem;
-  background-color: var(--color-border);
-}
-
-.meta-text {
-  font-size: 0.75rem;
-  color: var(--color-textSecondary);
-}
-
+/* 액션 버튼 */
 .store-actions {
   flex-shrink: 0;
+  align-self: flex-start;
 }
 
 .action-btn {
-  padding: 0.5rem;
+  padding: 0.375rem;
   border-radius: 0.5rem;
-  color: var(--color-textSecondary);
+  color: var(--color-textTertiary);
   transition: all 0.2s;
 }
 
 .action-btn:hover {
   background-color: var(--color-neutral-100);
-  color: var(--color-textPrimary);
+  color: var(--color-textSecondary);
 }
 
 .delete-btn:hover {
-  background-color: var(--color-error);
   background-color: rgba(211, 47, 47, 0.1);
   color: var(--color-error);
 }

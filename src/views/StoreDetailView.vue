@@ -34,78 +34,70 @@
 
       <!-- Store Info -->
       <div class="store-info-section">
-        <div class="flex items-start justify-between gap-3">
-          <div>
-            <div class="flex items-center gap-2 mb-1 flex-wrap">
-              <BaseChip
-                v-for="(cat, idx) in displayCategories"
-                :key="idx"
-                :label="cat"
-                variant="primary"
-              />
-              <span v-if="store.isClosed" class="closed-badge">영업종료</span>
+        <!-- 1줄: 가게이름 + 평점 + 북마크 -->
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3 min-w-0 flex-1">
+            <h1 class="text-xl font-bold text-textPrimary truncate">{{ store.name }}</h1>
+            <div class="flex items-center gap-1 shrink-0">
+              <BaseIcon name="star-fill" :size="16" class="text-accent" />
+              <span class="text-sm font-semibold text-textPrimary">{{ formatRating(store.averageRating) }}</span>
             </div>
-            <h1 class="text-2xl font-bold text-textPrimary">{{ store.name }}</h1>
           </div>
           <button
             class="bookmark-btn"
             :class="{ 'is-bookmarked': isBookmarked }"
             @click="toggleBookmark"
           >
-            <BaseIcon :name="isBookmarked ? 'bookmark-fill' : 'bookmark-line'" :size="24" />
+            <BaseIcon :name="isBookmarked ? 'bookmark-fill' : 'bookmark-line'" :size="20" />
           </button>
         </div>
 
-        <p v-if="store.description" class="text-textSecondary text-sm mt-2 leading-relaxed">
-          {{ store.description }}
-        </p>
+        <!-- 2줄: 리뷰·방문 + 카테고리 태그 -->
+        <div class="flex items-center gap-3 mt-2 flex-wrap">
+          <span class="text-sm text-textSecondary">
+            리뷰 <span class="font-semibold text-textPrimary">{{ store.reviewCount || 0 }}</span>
+            <span class="mx-1">·</span>
+            방문 <span class="font-semibold text-textPrimary">{{ store.visitCount || 0 }}</span>
+          </span>
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <BaseChip
+              v-for="(cat, idx) in displayCategories"
+              :key="idx"
+              :label="cat"
+              variant="primary"
+              size="sm"
+            />
+            <span v-if="store.isClosed" class="closed-badge">영업종료</span>
+          </div>
+        </div>
 
-        <!-- Rating & Stats -->
-        <div class="stats-row">
-          <div class="stat-item">
-            <div class="stat-main">
-              <BaseIcon name="star-fill" :size="20" class="text-accent" />
-              <span class="stat-value">{{ formatRating(store.averageRating) }}</span>
-            </div>
-            <span class="stat-label">평점</span>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <span class="stat-value">{{ store.reviewCount || 0 }}</span>
-            <span class="stat-label">리뷰</span>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <span class="stat-value">{{ store.visitCount || 0 }}</span>
-            <span class="stat-label">방문</span>
-          </div>
+        <!-- 3줄: 설명 -->
+        <div v-if="store.description" class="mt-3">
+          <p
+            class="text-textSecondary text-sm leading-relaxed"
+            :class="{ 'line-clamp-3': !isDescriptionExpanded }"
+          >
+            {{ store.description }}
+          </p>
+          <button
+            v-if="store.description.length > 100"
+            class="text-primary text-sm font-medium mt-1"
+            @click="isDescriptionExpanded = !isDescriptionExpanded"
+          >
+            {{ isDescriptionExpanded ? '접기' : '더보기' }}
+          </button>
         </div>
       </div>
 
       <!-- Detail Info -->
       <div class="detail-section">
-        <h2 class="section-title">상세 정보</h2>
-
         <div class="detail-list">
           <!-- Address -->
           <div class="detail-item" @click="copyAddress">
-            <BaseIcon name="map-marker" :size="20" class="text-primary" />
-            <div class="detail-content">
-              <span class="detail-label">주소</span>
-              <span class="detail-value">{{ store.address || '정보 없음' }}</span>
-            </div>
-            <BaseIcon name="file-copy" :size="16" class="text-textSecondary" />
+            <BaseIcon name="map-marker" :size="16" class="text-primary shrink-0" />
+            <span class="detail-value">{{ store.address || '정보 없음' }}</span>
+            <BaseIcon name="file-copy" :size="14" class="text-textSecondary shrink-0" />
           </div>
-
-          <!-- Map Button -->
-          <button class="detail-item map-button" @click="showOnMap">
-            <BaseIcon name="map-marker" :size="20" class="text-primary" />
-            <div class="detail-content">
-              <span class="detail-label">위치</span>
-              <span class="detail-value">지도에서 보기</span>
-            </div>
-            <BaseIcon name="chevron-right" :size="16" class="text-textSecondary" />
-          </button>
 
           <!-- Phone -->
           <a
@@ -113,43 +105,37 @@
             :href="`tel:${store.phoneNumber}`"
             class="detail-item"
           >
-            <BaseIcon name="call" :size="20" class="text-primary" />
-            <div class="detail-content">
-              <span class="detail-label">전화번호</span>
-              <span class="detail-value">{{ store.phoneNumber }}</span>
-            </div>
-            <BaseIcon name="chevron-right" :size="16" class="text-textSecondary" />
+            <BaseIcon name="call" :size="16" class="text-primary shrink-0" />
+            <span class="detail-value">{{ store.phoneNumber }}</span>
+            <BaseIcon name="chevron-right" :size="14" class="text-textSecondary shrink-0" />
           </a>
 
           <!-- Business Hours -->
-          <div class="detail-item">
-            <BaseIcon name="time" :size="20" class="text-primary" />
-            <div class="detail-content">
-              <span class="detail-label">영업시간</span>
-              <span class="detail-value">
-                {{ formatBusinessHours(store.openTime, store.closeTime) }}
-              </span>
-            </div>
+          <div class="detail-item no-action">
+            <BaseIcon name="time" :size="16" class="text-primary shrink-0" />
+            <span class="detail-value">{{ formatBusinessHours(store.openTime, store.closeTime) }}</span>
           </div>
         </div>
+
+        <!-- Map Button -->
+        <button class="map-link" @click="showOnMap">
+          <BaseIcon name="map-fill" :size="14" class="shrink-0" />
+          <span>지도에서 보기</span>
+        </button>
       </div>
 
       <!-- Menu Section -->
       <div class="menu-section">
         <div class="section-header">
-          <h2 class="section-title">메뉴</h2>
-          <div class="flex items-center gap-2">
-            <button
-              v-if="menus.length > 5"
-              class="text-primary text-sm font-medium"
-              @click="showAllMenus = !showAllMenus"
-            >
-              {{ showAllMenus ? '접기' : '전체 보기' }}
-            </button>
-          </div>
+          <h2 class="section-title">메뉴 {{ menus.length }}개</h2>
+          <button
+            v-if="menus.length > 5"
+            class="text-primary text-sm font-medium"
+            @click="showAllMenus = !showAllMenus"
+          >
+            {{ showAllMenus ? '접기' : '전체 보기' }}
+          </button>
         </div>
-
-        <p class="text-sm text-textSecondary mb-3">메뉴를 선택하고 기록을 남겨보세요.</p>
 
         <div v-if="isLoadingMenus" class="py-8 text-center">
           <BaseIcon name="spinner" :size="24" class="text-primary animate-spin" />
@@ -228,10 +214,11 @@
             <p class="review-content">{{ review.content }}</p>
 
             <img
-              v-if="review.imageUrl"
+              v-if="review.imageUrl && review.imageUrl !== 'undefined' && review.imageUrl !== 'null'"
               :src="review.imageUrl"
-              :alt="`${review.nickname}의 리뷰 이미지`"
+              :alt="`${review.nickname || '사용자'}의 리뷰 이미지`"
               class="review-image"
+              @error="$event.target.style.display = 'none'"
             />
           </div>
         </div>
@@ -305,6 +292,7 @@ import { verifyVisit } from '@/api/visit'
 import { showSuccess, showError, showWarning } from '@/utils/toast'
 import { useAuthStore } from '@/store/auth'
 import { useGeolocation } from '@/composables/useGeolocation'
+import { formatDate } from '@/utils/date'
 
 const logger = createLogger('StoreDetailView')
 
@@ -333,6 +321,7 @@ const bookmarkedFolderIds = ref([])
 const showBookmarkModal = ref(false)
 const showAllReviews = ref(false)
 const showAllMenus = ref(false)
+const isDescriptionExpanded = ref(false)
 
 // 방문 인증 관련
 const selectedMenu = ref(null)
@@ -377,22 +366,25 @@ const formatRating = (rating) => {
   return Number(rating).toFixed(1)
 }
 
-const formatDate = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}.${month}.${day}`
-}
-
 const formatBusinessHours = (open, close) => {
   if (!open && !close) return '정보 없음'
   const formatTime = (time) => {
     if (!time) return ''
-    // Handle both "HH:mm:ss" and "HH:mm" formats
-    const parts = time.split(':')
-    return `${parts[0]}:${parts[1]}`
+    // Handle string format "HH:mm:ss" or "HH:mm"
+    if (typeof time === 'string') {
+      const parts = time.split(':')
+      if (parts.length < 2) return time
+      return `${parts[0]}:${parts[1]}`
+    }
+    // Handle array format [hour, minute, second]
+    if (Array.isArray(time)) {
+      return `${String(time[0]).padStart(2, '0')}:${String(time[1] || 0).padStart(2, '0')}`
+    }
+    // Handle object format {hour, minute, second}
+    if (typeof time === 'object' && time.hour !== undefined) {
+      return `${String(time.hour).padStart(2, '0')}:${String(time.minute || 0).padStart(2, '0')}`
+    }
+    return ''
   }
   return `${formatTime(open)} - ${formatTime(close)}`
 }
@@ -444,8 +436,19 @@ const fetchReviews = async () => {
   try {
     const response = await getStoreReviews(storeId.value)
     // API 응답 구조에 따라 유연하게 처리
+    // { reviews: [...] } 또는 [...] 둘 다 지원
     const data = response?.data ?? response
-    reviews.value = Array.isArray(data) ? data : []
+    if (Array.isArray(data)) {
+      reviews.value = data
+    } else if (data?.reviews && Array.isArray(data.reviews)) {
+      reviews.value = data.reviews
+    } else if (data?.content && Array.isArray(data.content)) {
+      // 페이징 응답 구조
+      reviews.value = data.content
+    } else {
+      reviews.value = []
+    }
+    logger.info(`Loaded ${reviews.value.length} reviews`)
   } catch (e) {
     logger.error('Failed to fetch reviews', e)
     reviews.value = []
@@ -697,7 +700,7 @@ onMounted(() => {
 
 /* Store Info Section */
 .store-info-section {
-  padding: 1.25rem;
+  padding: 1.25rem 1.5rem;
   background: white;
   border-bottom: 1px solid var(--color-border);
 }
@@ -712,85 +715,44 @@ onMounted(() => {
 }
 
 .bookmark-btn {
-  padding: 0.5rem;
-  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: white;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   color: var(--color-textSecondary);
   transition: all 0.2s;
+  flex-shrink: 0;
 }
 
 .bookmark-btn:hover {
   background-color: var(--color-primary-50);
+  border-color: var(--color-primary-200);
 }
 
 .bookmark-btn.is-bookmarked {
   color: var(--color-primary);
-}
-
-/* Stats Row */
-.stats-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
-  margin-top: 1.25rem;
-  padding: 1rem;
-  background-color: var(--color-neutral-50);
-  border-radius: 0.75rem;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.stat-main {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.stat-value {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-textPrimary);
-}
-
-.stat-label {
-  font-size: 0.75rem;
-  color: var(--color-textSecondary);
-}
-
-.stat-divider {
-  width: 1px;
-  height: 2rem;
-  background-color: var(--color-border);
+  background-color: var(--color-primary-50);
+  border-color: var(--color-primary-200);
 }
 
 /* Detail Section */
 .detail-section {
-  padding: 1.25rem;
+  padding: 0.75rem 1.5rem;
   background: white;
   border-bottom: 1px solid var(--color-border);
 }
 
 /* Menu Section */
 .menu-section {
-  padding: 1.25rem 0 0 0;
+  padding: 1rem 1.5rem;
+  padding-top: 1.5rem;
   background: white;
-  border-bottom: 8px solid var(--color-neutral-100);
-}
-
-.menu-section .section-header,
-.menu-section .text-sm {
-  padding: 0 1.25rem;
-}
-
-/* MenuList 컴포넌트 내부 패딩 조정 */
-.menu-section :deep(.menu-list) {
-  padding: 0.5rem 1rem;
-  padding-bottom: 0.5rem;
+  border-top: 6px solid var(--color-neutral-100);
 }
 
 .menu-more-btn {
@@ -821,7 +783,6 @@ onMounted(() => {
   font-size: 1.125rem;
   font-weight: 700;
   color: var(--color-textPrimary);
-  margin-bottom: 1rem;
 }
 
 .section-header {
@@ -834,48 +795,65 @@ onMounted(() => {
 .detail-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0;
 }
 
 .detail-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem;
-  background-color: var(--color-neutral-50);
-  border-radius: 0.75rem;
+  gap: 0.625rem;
+  padding: 0.625rem 0;
+  border-bottom: 1px solid var(--color-border);
   cursor: pointer;
   transition: background-color 0.2s;
   text-decoration: none;
 }
 
+.detail-item:last-child {
+  border-bottom: none;
+}
+
 .detail-item:hover {
-  background-color: var(--color-primary-50);
-}
-
-.detail-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.detail-label {
-  display: block;
-  font-size: 0.75rem;
-  color: var(--color-textSecondary);
-  margin-bottom: 0.125rem;
+  opacity: 0.7;
 }
 
 .detail-value {
-  display: block;
-  font-size: 0.9375rem;
+  flex: 1;
+  font-size: 0.8125rem;
   color: var(--color-textPrimary);
-  font-weight: 500;
+}
+
+.detail-item.no-action {
+  cursor: default;
+}
+
+.detail-item.no-action:hover {
+  opacity: 1;
+}
+
+.map-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.5rem;
+  padding: 0;
+  font-size: 0.8125rem;
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.map-link:hover {
+  text-decoration: underline;
 }
 
 /* Reviews Section */
 .reviews-section {
-  padding: 1.25rem;
+  padding: 1rem 1.5rem;
+  padding-top: 1.5rem;
   background: white;
+  border-top: 6px solid var(--color-neutral-100);
 }
 
 .empty-reviews {
@@ -910,6 +888,8 @@ onMounted(() => {
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.75rem;
+  line-height: 1;
+  overflow: visible;
 }
 
 .rating-value {

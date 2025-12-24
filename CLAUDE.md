@@ -48,14 +48,14 @@ src/
 │   ├── map/        # Map-specific components (MapControls, MapPlaceInfo, MapPlaceDetail, etc.)
 │   ├── saved/      # Saved cafes feature components
 │   ├── review/     # Review feature components
-│   └── owner/      # Owner/manager feature components (OwnerStoreCard, OwnerMenuCard, OwnerBeanSelector, OwnerRoasterySelector, OwnerImageUploader)
+│   └── owner/      # Owner/manager feature components (OwnerStoreCard, OwnerMenuCard, OwnerBeanSelector, OwnerRoasterySelector, OwnerFlavorSelector, OwnerImageUploader)
 ├── composables/    # Vue composables (useGeolocation, useNaverMap, useMapMarkers, useMapPopup, useMapControls)
 ├── constants/      # App-wide constants (STORAGE_KEYS, etc.)
 ├── router/         # Vue Router configuration with auth guards
 ├── store/          # Pinia stores (auth, saved, notification, flavor, recommendation, passport, etc.)
 ├── utils/          # Utility functions (storage, logger, toast, geolocation, geo, address)
 ├── views/          # Page components (MapView, LoginView, ProfileView, MenuView, ReviewWriteView, RecommendationView, PassportView, PreferenceOnboardingView, etc.)
-│   └── owner/      # Owner pages (OwnerStoreListView, OwnerStoreFormView, OwnerMenuManageView, OwnerMenuFormView)
+│   └── owner/      # Owner pages (OwnerStoreListView, OwnerStoreFormView, OwnerMenuManageView, OwnerMenuFormView, OwnerBeanFormView)
 ├── App.vue         # Root component with responsive layout shell
 ├── config.js       # App configuration (reads from .env)
 └── main.js         # Application entry point
@@ -75,8 +75,8 @@ src/
   - Non-401 errors (4xx, 5xx) automatically trigger toast notifications
 - `src/router/index.js` has navigation guards with two-phase logic:
   - **Public pages** (`PUBLIC_PAGES` Set + `PUBLIC_PATH_PATTERNS` regex array):
-    - Static paths: `/map`, `/saved`, `/login`, `/oauth/callback`, `/test-components`
-    - Dynamic patterns: `/store/:storeId` (matched via regex)
+    - Static paths: `/map`, `/saved`, `/login`, `/oauth/callback`, `/test-components`, `/passport`
+    - Dynamic patterns: `/store/:storeId`, `/menus/:menuId`, `/bean/:beanId`, `/reviews/:reviewId` (matched via regex)
     - Unauthenticated users: Access granted
     - Authenticated users with role `GUEST`: Redirect to `/nickname`
     - Authenticated users trying to access `/login`: Redirect to `/`
@@ -128,6 +128,7 @@ src/
 - Conditional rendering: `BaseHeader` (hidden for login/nickname/map), `BaseNavigationBar` (hidden for login/nickname)
 - Full-screen pages (e.g., map) use `.full-screen` class to override padding/constraints
 - Navigation bar adds bottom padding to prevent content overlap
+- **KeepAlive**: Main navigation pages (MapView, RecommendationView, PassportView, SavedView, ProfileView) use Vue's KeepAlive to preserve component state when switching between tabs
 
 **Design System**:
 - Tailwind CSS v4 with custom theme in `src/assets/main.css` using `@theme` directive
@@ -239,9 +240,11 @@ import { getItem, setItem, removeItem } from '@/utils/storage'
 **Adding New Routes**: Remember to update multiple locations:
 1. Route definition in `router/index.js`
 2. `PUBLIC_PAGES` Set or `PUBLIC_PATH_PATTERNS` array in `router/index.js` (if unauthenticated access needed - NOTE: public pages still enforce GUEST checks for authenticated users)
-3. `pagesWithoutHeader` Set in `App.vue:33` (if header should be hidden)
-4. `pagesWithoutNavigation` Set in `App.vue:36` (if bottom nav should be hidden)
-5. `isFullScreenPage` computed in `App.vue:47` (if page needs full viewport without padding)
+3. `pagesWithoutHeader` Set in `App.vue` (if header should be hidden)
+4. `pagesWithoutNavigation` Set in `App.vue` (if bottom nav should be hidden)
+5. `isFullScreenPage` computed in `App.vue` (if page needs full viewport without padding)
+6. `pagesWithBackButton` Set in `App.vue` (if back button should be shown in header)
+7. `keepAlivePages` array in `App.vue` (if page state should be preserved when navigating away)
 
 **Token Refresh Mechanism**: The axios interceptor handles token refresh automatically. Avoid manually implementing refresh logic in components. If you get a 401 error that bypasses the interceptor, check if `originalRequest._retry` flag is being set.
 

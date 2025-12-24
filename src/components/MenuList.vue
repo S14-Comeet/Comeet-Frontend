@@ -159,7 +159,7 @@ onMounted(() => {
 .menu-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0;
 }
 
 .loading-indicator {
@@ -167,31 +167,32 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 1rem;
+  padding: 0.75rem;
   color: var(--color-textSecondary);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 
 .menu-card {
-  background: white;
-  border-radius: 12px;
+  background: transparent;
   overflow: hidden;
   transition: all 0.2s;
-  border: 2px solid transparent;
+  border-bottom: 1px solid var(--color-border);
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.menu-card:last-child {
+  border-bottom: none;
 }
 
 .menu-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: var(--color-neutral-50);
 }
 
 .menu-card:active {
-  transform: scale(0.99);
+  background-color: var(--color-neutral-100);
 }
 
 .menu-card.selected {
-  border-color: var(--color-primary);
   background-color: var(--color-primary-50);
 }
 
@@ -206,9 +207,9 @@ onMounted(() => {
 
 .menu-item {
   display: flex;
-  gap: 0.875rem;
-  align-items: flex-start;
-  padding: 1rem;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem 0;
 }
 
 .menu-image-wrapper {
@@ -234,6 +235,11 @@ onMounted(() => {
   justify-content: center;
 }
 
+.menu-image-placeholder :deep(svg) {
+  width: 24px;
+  height: 24px;
+}
+
 .menu-info {
   flex: 1;
   display: flex;
@@ -244,14 +250,14 @@ onMounted(() => {
 
 .menu-name {
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-textPrimary);
   margin: 0;
   line-height: 1.3;
 }
 
 .menu-description {
-  font-size: 0.8rem;
+  font-size: 0.8125rem;
   color: var(--color-textSecondary);
   line-height: 1.4;
   margin: 0;
@@ -262,29 +268,30 @@ onMounted(() => {
 }
 
 .menu-price {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 0.9375rem;
+  font-weight: 600;
   color: var(--color-primary);
-  margin: 0.25rem 0 0 0;
+  margin: 0;
+  margin-top: 0.125rem;
 }
 
 /* 원두 칩 (항상 표시) */
 .bean-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.375rem;
-  margin-top: 0.5rem;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
 }
 
 .bean-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  padding: 0.375rem 0.625rem;
-  background-color: var(--color-neutral-100);
-  color: var(--color-textPrimary);
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
+  padding: 0.25rem 0.625rem;
+  background-color: var(--color-primary-50);
+  color: var(--color-primary-700);
+  border: 1px solid var(--color-primary-200);
+  border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
@@ -292,29 +299,31 @@ onMounted(() => {
 }
 
 .bean-chip:hover {
-  background-color: var(--color-primary-50);
+  background-color: var(--color-primary-100);
   border-color: var(--color-primary-300);
-  color: var(--color-primary);
+  color: var(--color-primary-800);
 }
 
 .bean-chip svg {
-  color: var(--color-textSecondary);
+  color: var(--color-primary-500);
+  width: 10px;
+  height: 10px;
 }
 
 .bean-chip:hover svg {
-  color: var(--color-primary);
+  color: var(--color-primary-700);
 }
 
 .bean-empty-inline {
-  margin-top: 0.5rem;
-  font-size: 0.75rem;
+  margin-top: 0.125rem;
+  font-size: 0.6875rem;
   color: var(--color-textSecondary);
 }
 
 @media (max-width: 640px) {
   .menu-item {
-    gap: 0.75rem;
-    padding: 0.875rem;
+    gap: 0.875rem;
+    padding: 0.875rem 0;
   }
 
   .menu-image-wrapper {
@@ -323,11 +332,11 @@ onMounted(() => {
   }
 
   .menu-name {
-    font-size: 0.95rem;
+    font-size: 0.9375rem;
   }
 
   .menu-price {
-    font-size: 0.95rem;
+    font-size: 0.875rem;
   }
 }
 </style>

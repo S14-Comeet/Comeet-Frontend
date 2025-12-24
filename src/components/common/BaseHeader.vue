@@ -16,31 +16,15 @@
       <h1 class="text-lg font-bold text-textPrimary">{{ title }}</h1>
     </template>
     <template v-else>
-      <router-link to="/" class="text-2xl font-bold text-primary hover:text-primary-700 transition-colors">
-        Comeet
+      <router-link to="/" class="logo-link" aria-label="Comeet 홈">
+        <img :src="logoUrl" alt="Comeet" class="logo-icon" />
       </router-link>
     </template>
 
     <!-- Right Action (우측 절대 위치) -->
     <div class="absolute right-5 flex items-center">
-      <!-- 로그인 상태: 알림 아이콘 표시 -->
-      <template v-if="isAuthenticated">
-        <button
-          class="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary-50 transition-colors"
-          aria-label="Notifications"
-          @click="$emit('notice-click')"
-        >
-          <BaseIcon name="notice" :size="24" color="var(--color-neutral-900)" />
-          <!-- Badge (show when hasNotifications is true) -->
-          <span
-            v-if="hasNotifications"
-            class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"
-          ></span>
-        </button>
-      </template>
-
       <!-- 비로그인 상태: 로그인 버튼 표시 -->
-      <template v-else>
+      <template v-if="!isAuthenticated">
         <BaseButton
           variant="ghost"
           size="small"
@@ -58,6 +42,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import logoUrl from '@/assets/logo.svg?url'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -69,13 +54,6 @@ const props = defineProps({
   title: {
     type: String,
     default: ''
-  },
-  /**
-   * Show notification badge
-   */
-  hasNotifications: {
-    type: Boolean,
-    default: false
   },
   /**
    * Show back button
@@ -101,7 +79,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['notice-click', 'back', 'login'])
+const emit = defineEmits(['back', 'login'])
 
 // Computed properties
 const isAuthenticated = computed(() => {
@@ -127,5 +105,18 @@ const handleLogin = () => {
 </script>
 
 <style scoped>
-/* Additional styles if needed */
+.logo-link {
+  display: flex;
+  align-items: center;
+  transition: opacity 0.2s;
+}
+
+.logo-link:hover {
+  opacity: 0.8;
+}
+
+.logo-icon {
+  height: 44px;
+  width: auto;
+}
 </style>

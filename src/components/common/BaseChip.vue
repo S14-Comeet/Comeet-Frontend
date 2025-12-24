@@ -1,7 +1,8 @@
 <template>
   <div
     :class="[
-      'box-border flex gap-2 h-10 items-center justify-center rounded-full transition-opacity transition-transform duration-200',
+      'box-border flex gap-2 items-center justify-center rounded-full transition-opacity transition-transform duration-200',
+      sizeClasses,
       chipClasses,
       clickable && 'cursor-pointer hover:opacity-80 active:scale-95',
       removable && 'pr-2' // Adjust padding for remove button
@@ -14,7 +15,7 @@
     <!-- Default variant -->
     <p
       v-if="variant === 'default'"
-      class="font-sans text-sm text-center text-neutral-900 leading-tight"
+      :class="['font-sans text-center text-neutral-900 leading-tight', textSizeClass]"
     >
       {{ label }}
     </p>
@@ -22,7 +23,7 @@
     <!-- Black/Selected variant -->
     <p
       v-else-if="variant === 'black'"
-      class="font-sans font-bold text-sm text-center text-white leading-tight"
+      :class="['font-sans font-bold text-center text-white leading-tight', textSizeClass]"
     >
       {{ label }}
     </p>
@@ -34,7 +35,8 @@
     >
       <p
         :class="[
-          'font-sans text-sm text-center leading-tight',
+          'font-sans text-center leading-tight',
+          textSizeClass,
           selected ? 'font-bold text-primary-700' : 'font-medium text-primary'
         ]"
       >
@@ -57,7 +59,23 @@
     <!-- Primary Selected variant -->
     <p
       v-else-if="variant === 'primary-selected'"
-      class="font-sans font-bold text-sm text-center text-primary-700 leading-tight"
+      :class="['font-sans font-bold text-center text-primary-700 leading-tight', textSizeClass]"
+    >
+      {{ label }}
+    </p>
+
+    <!-- Neutral variant -->
+    <p
+      v-else-if="variant === 'neutral'"
+      :class="['font-sans font-medium text-center text-neutral-600 leading-tight', textSizeClass]"
+    >
+      {{ label }}
+    </p>
+
+    <!-- Accent variant -->
+    <p
+      v-else-if="variant === 'accent'"
+      :class="['font-sans font-semibold text-center text-white leading-tight', textSizeClass]"
     >
       {{ label }}
     </p>
@@ -94,11 +112,13 @@ const props = defineProps({
    * - black: Black background with white text (selected state)
    * - primary: Warm brown border with brown text
    * - primary-selected: Light brown background with brown border
+   * - neutral: Light gray background with dark text (for subtle labels)
+   * - accent: Orange background with white text (for category highlights)
    */
   variant: {
     type: String,
     default: 'default',
-    validator: (value) => ['default', 'black', 'primary', 'primary-selected'].includes(value)
+    validator: (value) => ['default', 'black', 'primary', 'primary-selected', 'neutral', 'accent'].includes(value)
   },
   /**
    * Show dropdown icon (only for primary variant)
@@ -134,6 +154,17 @@ const props = defineProps({
   removable: {
     type: Boolean,
     default: false
+  },
+  /**
+   * Chip size
+   * - xs: Extra small chip (h-5, text-[10px]) - for compact labels
+   * - sm: Smaller chip (h-7, text-xs)
+   * - md: Default size (h-10, text-sm)
+   */
+  size: {
+    type: String,
+    default: 'md',
+    validator: (value) => ['xs', 'sm', 'md'].includes(value)
   }
 })
 
@@ -154,14 +185,34 @@ const handleKeyDown = (event) => {
   }
 }
 
+const sizeClasses = computed(() => {
+  const sizes = {
+    xs: 'h-5 px-2',
+    sm: 'h-7 px-3',
+    md: 'h-10 px-4'
+  }
+  return sizes[props.size] || sizes.md
+})
+
+const textSizeClass = computed(() => {
+  const textSizes = {
+    xs: 'text-[10px]',
+    sm: 'text-xs',
+    md: 'text-sm'
+  }
+  return textSizes[props.size] || textSizes.md
+})
+
 const chipClasses = computed(() => {
   const base = {
-    'default': 'bg-white border border-border px-4',
-    'black': 'bg-neutral-900 px-4',
+    'default': 'bg-white border border-border',
+    'black': 'bg-neutral-900',
     'primary': props.selected
-      ? 'bg-primary-300 border border-primary-700 px-4 pl-4 pr-3'
-      : 'bg-white border border-primary px-4 pl-4 pr-3',
-    'primary-selected': 'bg-primary-300 border border-primary-700 px-4'
+      ? 'bg-primary-300 border border-primary-700'
+      : 'bg-white border border-primary',
+    'primary-selected': 'bg-primary-300 border border-primary-700',
+    'neutral': 'bg-neutral-100 border border-neutral-200',
+    'accent': 'bg-accent border border-accent'
   }
 
   return base[props.variant] || base.default
