@@ -151,6 +151,13 @@ api.interceptors.response.use(
       throw error;
     }
 
+    const skipReissueUrls = ['/logout', '/reissue'];
+    if (skipReissueUrls.some(url => originalRequest?.url?.includes(url))) {
+      logger.debug('재발급 스킵 대상 URL - 재발급 시도 생략');
+      throw error;
+    }
+
+
     if (isRefreshing) {
       return waitForTokenRefresh(originalRequest);
     }
