@@ -13,8 +13,8 @@
       <BaseButton label="다시 시도" variant="primary" @click="fetchStoreDetail" />
     </div>
 
-    <!-- Content -->
-    <div v-else-if="store" class="flex-1 overflow-y-auto pb-20">
+    <!-- Content - 하단 바와 네비게이션 바를 고려한 패딩 -->
+    <div v-else-if="store" class="flex-1 overflow-y-auto" :class="selectedMenu ? 'pb-48' : 'pb-24'">
       <!-- Hero Section -->
       <div class="store-hero">
         <div class="hero-image">
@@ -137,21 +137,19 @@
       <!-- Menu Section -->
       <div class="menu-section">
         <div class="section-header">
-          <h2 class="section-title">메뉴 {{ menus.length }}개</h2>
+          <h2 class="section-title">메뉴</h2>
           <div class="flex items-center gap-2">
             <button
-              v-if="menus.length > 3"
+              v-if="menus.length > 5"
               class="text-primary text-sm font-medium"
               @click="showAllMenus = !showAllMenus"
             >
               {{ showAllMenus ? '접기' : '전체 보기' }}
             </button>
-            <button class="menu-more-btn" @click="goToMenu">
-              <span>메뉴 보기</span>
-              <BaseIcon name="chevron-right" :size="14" />
-            </button>
           </div>
         </div>
+
+        <p class="text-sm text-textSecondary mb-3">메뉴를 선택하고 기록을 남겨보세요.</p>
 
         <div v-if="isLoadingMenus" class="py-8 text-center">
           <BaseIcon name="spinner" :size="24" class="text-primary animate-spin" />
@@ -161,30 +159,13 @@
           <p class="text-textSecondary text-sm">등록된 메뉴가 없습니다</p>
         </div>
 
-        <div v-else class="menu-list">
-          <div
-            v-for="menu in displayedMenus"
-            :key="menu.id"
-            class="menu-card"
-            @click="goToMenu"
-          >
-            <div class="menu-image-wrapper">
-              <img
-                v-if="menu.imageUrl || menu.image_url"
-                :src="menu.imageUrl || menu.image_url"
-                :alt="menu.name"
-                class="menu-image"
-              />
-              <div v-else class="menu-image-placeholder">
-                <BaseIcon name="coffee" :size="24" class="text-primary-300" />
-              </div>
-            </div>
-            <div class="menu-info">
-              <h4 class="menu-name">{{ menu.name }}</h4>
-              <p class="menu-price">{{ formatPrice(menu.price) }}원</p>
-            </div>
-          </div>
-        </div>
+        <MenuList
+          v-else
+          :menus="displayedMenus"
+          :selected-menu-id="selectedMenu?.id"
+          :disabled="isVerified"
+          @select-menu="handleMenuSelect"
+        />
       </div>
 
       <!-- Reviews Section -->
@@ -198,10 +179,6 @@
               @click="showAllReviews = !showAllReviews"
             >
               {{ showAllReviews ? '접기' : '전체 보기' }}
-            </button>
-            <button class="review-write-btn" @click="goToReview">
-              <BaseIcon name="pencil" :size="14" />
-              <span>작성하기</span>
             </button>
           </div>
         </div>
@@ -270,6 +247,43 @@
       @close="showBookmarkModal = false"
       @update="handleBookmarkUpdate"
     />
+
+    <!-- 하단 고정 버튼: 메뉴 선택 시 표시 -->
+    <div v-if="selectedMenu && !isVerified" class="fixed-bottom-bar">
+      <div class="selected-menu-info">
+        <span class="selected-label">선택한 메뉴</span>
+        <span class="selected-name">{{ selectedMenu.name }}</span>
+      </div>
+      <BaseButton
+        :label="isVerifying ? '인증 중...' : '방문 인증'"
+        size="large"
+        class="w-full"
+        :loading="isVerifying"
+        @click="handleVerifyVisit"
+      />
+      <p v-if="verificationMessage" class="verification-message" :class="verificationStatus">
+        {{ verificationMessage }}
+      </p>
+    </div>
+
+    <!-- 인증 완료 후: 리뷰 작성 버튼 -->
+    <div v-if="isVerified" class="fixed-bottom-bar verified">
+      <div class="verified-info">
+        <BaseIcon name="check" :size="20" class="text-primary" />
+        <div>
+          <p class="verified-text">방문 인증 완료!</p>
+          <p class="verified-menu">{{ selectedMenu?.name }}</p>
+        </div>
+      </div>
+      <div class="verified-actions">
+        <BaseButton
+          label="리뷰 작성하기"
+          size="medium"
+          @click="goToReviewWrite"
+        />
+        <button class="reset-btn" @click="resetVerification">다른 메뉴 인증</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -283,11 +297,14 @@ import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseChip from '@/components/common/BaseChip.vue'
 import StarRating from '@/components/common/StarRating.vue'
 import BookmarkFolderSelectModal from '@/components/saved/BookmarkFolderSelectModal.vue'
+import MenuList from '@/components/MenuList.vue'
 import { getStoreById, getStoreReviews } from '@/api/cafe'
 import { getMenusByStoreId } from '@/api/menu'
 import { getStoreBookmarkStatus } from '@/api/bookmark'
-import { showSuccess, showError } from '@/utils/toast'
+import { verifyVisit } from '@/api/visit'
+import { showSuccess, showError, showWarning } from '@/utils/toast'
 import { useAuthStore } from '@/store/auth'
+import { useGeolocation } from '@/composables/useGeolocation'
 
 const logger = createLogger('StoreDetailView')
 
@@ -299,6 +316,7 @@ const categoryLabelMap = Object.fromEntries(
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const { location: geoLocation, error: geoError, requestLocation } = useGeolocation()
 
 const storeId = computed(() => route.params.storeId)
 const isAuthenticated = computed(() => authStore.isAuthenticated)
@@ -315,6 +333,14 @@ const bookmarkedFolderIds = ref([])
 const showBookmarkModal = ref(false)
 const showAllReviews = ref(false)
 const showAllMenus = ref(false)
+
+// 방문 인증 관련
+const selectedMenu = ref(null)
+const isVerifying = ref(false)
+const isVerified = ref(false)
+const visitId = ref(null)
+const verificationMessage = ref('')
+const verificationStatus = ref('default') // 'default' | 'success' | 'error'
 
 const hasValidThumbnail = computed(() => {
   return store.value?.thumbnailUrl &&
@@ -343,7 +369,7 @@ const displayedMenus = computed(() => {
   if (showAllMenus.value) {
     return menus.value
   }
-  return menus.value.slice(0, 3)
+  return menus.value.slice(0, 5)
 })
 
 const formatRating = (rating) => {
@@ -502,24 +528,128 @@ const showOnMap = () => {
   })
 }
 
-const goToReview = () => {
+// 메뉴 선택 처리
+const handleMenuSelect = (menu) => {
+  // 인증 완료 후에는 메뉴 변경 불가
+  if (isVerified.value) return
+
+  // 같은 메뉴 선택 시 선택 해제
+  if (selectedMenu.value?.id === menu.id) {
+    selectedMenu.value = null
+    verificationMessage.value = ''
+  } else {
+    selectedMenu.value = menu
+    verificationMessage.value = ''
+  }
+}
+
+// 방문 인증 처리
+const handleVerifyVisit = async () => {
+  if (!selectedMenu.value || !store.value) return
+
+  // 로그인 확인
+  if (!isAuthenticated.value) {
+    showError('로그인이 필요합니다')
+    router.push('/login')
+    return
+  }
+
+  isVerifying.value = true
+  verificationStatus.value = 'default'
+  verificationMessage.value = '위치 확인 중...'
+
+  try {
+    // 1. 가게 좌표 확인
+    const storeLat = store.value.latitude
+    const storeLng = store.value.longitude
+
+    if (!storeLat || !storeLng) {
+      verificationMessage.value = '가게 위치 정보가 없습니다.'
+      verificationStatus.value = 'error'
+      isVerifying.value = false
+      return
+    }
+
+    // 2. 사용자 위치 요청
+    await requestLocation()
+
+    if (geoError.value || !geoLocation.value) {
+      verificationMessage.value = '위치 정보를 가져올 수 없습니다. GPS를 확인해주세요.'
+      verificationStatus.value = 'error'
+      isVerifying.value = false
+      return
+    }
+
+    const storeLoc = { latitude: storeLat, longitude: storeLng }
+    const userLoc = { latitude: geoLocation.value.lat, longitude: geoLocation.value.lng }
+
+    logger.debug('방문 인증 시도', {
+      store: { id: storeId.value, name: store.value.name },
+      menu: { id: selectedMenu.value.id, name: selectedMenu.value.name },
+      storeLoc,
+      userLoc
+    })
+
+    // 3. 인증 API 호출
+    const result = await verifyVisit({
+      menuId: selectedMenu.value.id,
+      storeLocationDto: storeLoc,
+      userLocationDto: userLoc
+    })
+
+    // 4. 응답 처리
+    const responseData = result?.data ?? result
+    if (responseData) {
+      const { visitId: newVisitId, isVerified: verified } = responseData
+      visitId.value = newVisitId
+
+      if (verified) {
+        isVerified.value = true
+        verificationMessage.value = ''
+        verificationStatus.value = 'success'
+        showSuccess('방문이 인증되었습니다!')
+      } else {
+        verificationMessage.value = '가게 근처(100m 이내)에서 인증해주세요.'
+        verificationStatus.value = 'error'
+        showWarning('가게 근처에서 다시 시도해주세요.')
+      }
+    } else {
+      throw new Error('인증 응답을 받지 못했습니다.')
+    }
+  } catch (e) {
+    verificationMessage.value = '인증 요청 중 오류가 발생했습니다.'
+    verificationStatus.value = 'error'
+    showError(e.response?.data?.message || '방문 인증에 실패했습니다.')
+    logger.error('방문 인증 실패', e)
+  } finally {
+    isVerifying.value = false
+  }
+}
+
+// 리뷰 작성 페이지로 이동
+const goToReviewWrite = () => {
+  if (!isVerified.value || !selectedMenu.value) return
+
   router.push({
-    name: 'review-select',
+    name: 'review-write',
     query: {
       storeId: storeId.value,
       name: store.value?.name,
-      lat: store.value?.latitude,
-      lng: store.value?.longitude
+      menuId: selectedMenu.value.id,
+      menuName: selectedMenu.value.name,
+      menuPrice: selectedMenu.value.price,
+      visitId: visitId.value
     }
   })
 }
 
-const goToMenu = () => {
-  router.push({
-    name: 'menu',
-    params: { storeId: storeId.value },
-    query: { name: store.value?.name }
-  })
+// 인증 상태 초기화 (다른 메뉴 인증)
+const resetVerification = () => {
+  selectedMenu.value = null
+  isVerified.value = false
+  visitId.value = null
+  verificationMessage.value = ''
+  verificationStatus.value = 'default'
 }
 
 const goToReviewDetail = (review) => {
@@ -532,10 +662,6 @@ const goToReviewDetail = (review) => {
     name: 'review-detail',
     params: { reviewId }
   })
-}
-
-const formatPrice = (price) => {
-  return price?.toLocaleString('ko-KR') || '0'
 }
 
 onMounted(() => {
@@ -651,9 +777,20 @@ onMounted(() => {
 
 /* Menu Section */
 .menu-section {
-  padding: 1.25rem;
+  padding: 1.25rem 0 0 0;
   background: white;
   border-bottom: 8px solid var(--color-neutral-100);
+}
+
+.menu-section .section-header,
+.menu-section .text-sm {
+  padding: 0 1.25rem;
+}
+
+/* MenuList 컴포넌트 내부 패딩 조정 */
+.menu-section :deep(.menu-list) {
+  padding: 0.5rem 1rem;
+  padding-bottom: 0.5rem;
 }
 
 .menu-more-btn {
@@ -678,73 +815,6 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   padding: 2rem;
-}
-
-.menu-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.menu-card {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background-color: var(--color-neutral-50);
-  border-radius: 0.75rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.menu-card:hover {
-  background-color: var(--color-primary-50);
-}
-
-.menu-image-wrapper {
-  flex-shrink: 0;
-  width: 60px;
-  height: 60px;
-  border-radius: 0.5rem;
-  overflow: hidden;
-  background-color: var(--color-primary-100);
-}
-
-.menu-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.menu-image-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--color-primary-50);
-}
-
-.menu-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.menu-name {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--color-textPrimary);
-  margin: 0 0 0.25rem 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.menu-price {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-primary);
-  margin: 0;
 }
 
 .section-title {
@@ -925,5 +995,110 @@ onMounted(() => {
   border: none;
   width: 100%;
   text-align: left;
+}
+
+/* Fixed Bottom Bar - 네비게이션 바 위에 표시 (64px) */
+.fixed-bottom-bar {
+  position: fixed;
+  bottom: 64px; /* 네비게이션 바 높이 */
+  left: 0;
+  right: 0;
+  max-width: 448px;
+  margin: 0 auto;
+  padding: 1rem;
+  background: white;
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 50;
+}
+
+@media (max-width: 640px) {
+  .fixed-bottom-bar {
+    bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+.selected-menu-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--color-primary-50);
+  border-radius: 0.5rem;
+}
+
+.selected-label {
+  font-size: 0.75rem;
+  color: var(--color-textSecondary);
+}
+
+.selected-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.verification-message {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.verification-message.error {
+  color: var(--color-error);
+}
+
+.verification-message.success {
+  color: var(--color-primary);
+}
+
+.verification-message.default {
+  color: var(--color-textSecondary);
+}
+
+/* Verified State */
+.fixed-bottom-bar.verified {
+  background-color: var(--color-primary-50);
+}
+
+.verified-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.verified-text {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.verified-menu {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-textSecondary);
+}
+
+.verified-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.reset-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: var(--color-textSecondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.reset-btn:hover {
+  color: var(--color-primary);
 }
 </style>

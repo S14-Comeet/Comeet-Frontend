@@ -2,18 +2,18 @@
   <div class="location-mode-toggle">
     <button
       class="toggle-btn"
-      :class="{ active: modelValue === 'global' }"
-      @click="selectMode('global')"
-    >
-      전체
-    </button>
-    <button
-      class="toggle-btn"
       :class="{ active: modelValue === 'nearby' }"
       @click="selectMode('nearby')"
     >
       <BaseIcon name="map-marker" :size="14" class="mr-1" />
       내 주변
+    </button>
+    <button
+      class="toggle-btn"
+      :class="{ active: modelValue === 'global' }"
+      @click="selectMode('global')"
+    >
+      전체
     </button>
   </div>
 </template>

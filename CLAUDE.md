@@ -142,7 +142,7 @@ src/
 - Global Naver Maps script loaded via `index.html` with client ID from env
 - `waitForNaverMaps()` helper polls for `window.naver.maps` availability before initialization
 - Map-related composables are modular and inject dependencies:
-  - `useMapMarkers(map, markers, clearMarkers, addMarker)`: Marker rendering with zoom-based scaling, my-location marker
+  - `useMapMarkers(map, markers, clearMarkers)`: Marker rendering with zoom-based scaling, my-location marker
   - `useMapPopup(map)`: Popup positioning with RAF-throttled updates during map events
   - `useMapControls(map)`: Zoom controls with visual center pivot, bottom sheet offset handling
 

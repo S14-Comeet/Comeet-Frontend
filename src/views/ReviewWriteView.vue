@@ -107,6 +107,17 @@
           ></textarea>
         </section>
 
+        <!-- Image Upload -->
+        <section class="mb-4">
+          <h2 class="text-lg font-bold mb-3">사진 첨부</h2>
+          <OwnerImageUploader
+            v-model="imageUrl"
+            alt="리뷰 이미지"
+            helper-text="JPG, PNG 파일을 업로드하세요 (최대 5MB)"
+            :allow-url-input="false"
+          />
+        </section>
+
         <!-- Public Toggle -->
         <section class="mb-4">
           <label class="flex items-center justify-between p-4 bg-neutral-50 rounded-xl cursor-pointer">
@@ -148,6 +159,7 @@ import BaseIcon from '@/components/common/BaseIcon.vue'
 import StarRating from '@/components/common/StarRating.vue'
 import HierarchicalFlavorSelector from '@/components/common/HierarchicalFlavorSelector.vue'
 import CuppingNoteForm from '@/components/review/CuppingNoteForm.vue'
+import OwnerImageUploader from '@/components/owner/OwnerImageUploader.vue'
 import { createReview, createCuppingNote } from '@/api/review'
 import { findFlavorInWheel } from '@/constants'
 import { showSuccess, showError } from '@/utils/toast'
@@ -174,6 +186,7 @@ const selectedFlavors = ref([])
 const isPublic = ref(true)
 const isSubmitting = ref(false)
 const rating = ref(0) // 별점 (0-5, 선택)
+const imageUrl = ref('') // 이미지 URL
 
 // Cupping note state
 const DEFAULT_CUPPING_SCORE = 6.5
@@ -223,10 +236,14 @@ const flavorCodesToIds = (codes) => {
 onMounted(() => {
   if (!menuId || !visitId) {
     showError('메뉴 선택 정보가 없습니다.')
-    router.replace({
-      name: 'review-select',
-      query: { storeId, name: cafeName }
-    })
+    if (storeId) {
+      router.replace({
+        name: 'store-detail',
+        params: { storeId }
+      })
+    } else {
+      router.replace({ name: 'map' })
+    }
   }
 })
 
@@ -243,7 +260,8 @@ const handleSubmit = async () => {
       visitId,
       menuId,
       isPublic: isPublic.value,
-      rating: rating.value > 0 ? rating.value : null // 별점 (선택)
+      rating: rating.value > 0 ? rating.value : null, // 별점 (선택)
+      imageUrl: imageUrl.value || null // 이미지 URL
     })
 
     // 2. If professional mode, create cupping note

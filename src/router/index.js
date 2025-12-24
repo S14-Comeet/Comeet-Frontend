@@ -58,16 +58,6 @@ const routes = [
     component: () => import('@/views/OAuthCallbackView.vue')
   },
   {
-    path: '/menu/:storeId',
-    name: 'menu',
-    component: () => import('@/views/MenuView.vue')
-  },
-  {
-    path: '/review/select',
-    name: 'review-select',
-    component: () => import('@/views/ReviewSelectView.vue')
-  },
-  {
     path: '/review/write',
     name: 'review-write',
     component: () => import('@/views/ReviewWriteView.vue')
@@ -185,7 +175,6 @@ const PUBLIC_PAGES = new Set(['/login', '/oauth/callback', '/test-components', '
 /** 동적 경로 패턴 체크 함수 */
 const PUBLIC_PATH_PATTERNS = [
   /^\/store\/\d+$/,   // /store/:storeId
-  /^\/menu\/\d+$/,    // /menu/:storeId (store's menu list)
   /^\/menus\/\d+$/,   // /menus/:menuId (menu detail)
   /^\/bean\/\d+$/,    // /bean/:beanId
   /^\/reviews\/\d+$/  // /reviews/:reviewId (review detail)
