@@ -1,62 +1,60 @@
 <template>
-  <div class="bg-white rounded-xl p-4 shadow-sm border border-border">
-    <!-- 가맹점 정보 -->
-    <div class="flex gap-4">
+  <div class="owner-store-card">
+    <!-- 가게 정보 영역 -->
+    <div class="store-info-area">
       <!-- 썸네일 -->
-      <div class="w-20 h-20 rounded-lg bg-primary-100 flex-shrink-0 overflow-hidden">
+      <div class="store-thumbnail">
         <img
           v-if="store.thumbnailUrl"
           :src="store.thumbnailUrl"
           :alt="store.name"
-          class="w-full h-full object-cover"
+          class="thumbnail-img"
         />
-        <div v-else class="w-full h-full flex items-center justify-center">
-          <BaseIcon name="coffee" :size="32" class="text-primary-400" />
-        </div>
+        <BaseIcon v-else name="coffee" :size="28" class="thumbnail-placeholder" />
+        <span v-if="store.isClosed" class="closed-overlay">영업종료</span>
       </div>
 
       <!-- 정보 -->
-      <div class="flex-1 min-w-0">
-        <div class="flex items-start justify-between gap-2">
-          <h3 class="font-bold text-textPrimary truncate">{{ store.name }}</h3>
-          <span
-            v-if="store.isClosed"
-            class="flex-shrink-0 px-2 py-0.5 text-xs font-medium bg-error/10 text-error rounded"
-          >
-            영업종료
-          </span>
+      <div class="store-content">
+        <!-- 1줄: 가게명 + 별점 -->
+        <div class="store-header-row">
+          <h3 class="store-name">{{ store.name }}</h3>
+          <div class="rating-inline">
+            <BaseIcon name="star-fill" :size="14" class="text-accent" />
+            <span class="rating-value">{{ formatRating(store.averageRating) }}</span>
+          </div>
         </div>
 
-        <p class="text-sm text-textSecondary mt-1 line-clamp-1">{{ store.address }}</p>
-
-        <div class="flex items-center gap-3 mt-2 text-xs text-textSecondary">
-          <span v-if="store.openingHours" class="flex items-center gap-1">
-            <BaseIcon name="time" :size="12" />
-            {{ store.openingHours }}
+        <!-- 2줄: 리뷰 · 방문 · 카테고리 -->
+        <div class="store-meta-row">
+          <span class="meta-info">
+            리뷰 <span class="meta-count">{{ store.reviewCount || 0 }}</span>
           </span>
-          <span v-if="store.category">
-            {{ formatCategory(store.category) }}
+          <span class="meta-dot">·</span>
+          <span class="meta-info">
+            방문 <span class="meta-count">{{ store.visitCount || 0 }}</span>
           </span>
+          <span class="meta-dot">·</span>
+          <BaseChip
+            :label="displayCategory"
+            variant="primary"
+            size="xs"
+          />
         </div>
 
-        <!-- 통계 -->
-        <div class="flex items-center gap-4 mt-2 text-xs">
-          <span class="flex items-center gap-1 text-accent">
-            <BaseIcon name="star-fill" :size="12" />
-            {{ store.averageRating?.toFixed(1) || '-' }}
-          </span>
-          <span class="text-textSecondary">
-            리뷰 {{ store.reviewCount || 0 }}개
-          </span>
-          <span class="text-textSecondary">
-            방문 {{ store.visitCount || 0 }}회
-          </span>
+        <!-- 3줄: 주소 -->
+        <p class="store-address">{{ store.address || '주소 정보 없음' }}</p>
+
+        <!-- 4줄: 영업시간 (있으면) -->
+        <div v-if="store.openingHours || (store.openTime && store.closeTime)" class="store-hours">
+          <BaseIcon name="time" :size="12" />
+          <span>{{ store.openingHours || formatHours(store.openTime, store.closeTime) }}</span>
         </div>
       </div>
     </div>
 
     <!-- 액션 버튼들 -->
-    <div class="flex gap-2 mt-4 pt-4 border-t border-border">
+    <div class="action-area">
       <BaseButton
         variant="secondary"
         size="small"
@@ -78,7 +76,7 @@
       <BaseButton
         variant="ghost"
         size="small"
-        class="!text-error"
+        class="delete-btn"
         @click="$emit('delete', store)"
       >
         <BaseIcon name="close" :size="16" />
@@ -88,8 +86,10 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import BaseChip from '@/components/common/BaseChip.vue'
 import { MENU_CATEGORIES } from '@/constants'
 
 // enum 값을 한글 라벨로 변환하는 맵
@@ -97,7 +97,7 @@ const categoryLabelMap = Object.fromEntries(
   MENU_CATEGORIES.map(cat => [cat.value, cat.label])
 )
 
-defineProps({
+const props = defineProps({
   store: {
     type: Object,
     required: true
@@ -107,15 +107,177 @@ defineProps({
 defineEmits(['edit', 'delete', 'manage-menus'])
 
 /**
- * 카테고리 포맷팅 (comma-separated enum을 한글로 변환)
+ * 별점 포맷팅
  */
-const formatCategory = (category) => {
-  if (!category) return ''
-  return category
-    .split(',')
-    .map(c => c.trim())
-    .filter(c => c)
-    .map(c => categoryLabelMap[c] || c)
-    .join(', ')
+const formatRating = (rating) => {
+  if (!rating && rating !== 0) return '0.0'
+  return Number(rating).toFixed(1)
+}
+
+/**
+ * 카테고리 포맷팅 (첫 번째 카테고리만)
+ */
+const displayCategory = computed(() => {
+  if (!props.store.category) return '카페'
+  const firstCategory = props.store.category.split(',')[0].trim()
+  return categoryLabelMap[firstCategory] || firstCategory
+})
+
+/**
+ * 영업시간 포맷팅
+ */
+const formatHours = (openTime, closeTime) => {
+  if (!openTime || !closeTime) return '정보 없음'
+  return `${openTime} - ${closeTime}`
 }
 </script>
+
+<style scoped>
+.owner-store-card {
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.store-info-area {
+  display: flex;
+  gap: 0.875rem;
+  padding: 1rem;
+}
+
+/* 썸네일 */
+.store-thumbnail {
+  position: relative;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 0.75rem;
+  background-color: var(--color-primary-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.thumbnail-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbnail-placeholder {
+  color: var(--color-primary-200);
+}
+
+.closed-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+/* 컨텐츠 */
+.store-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 헤더 (가게명 + 별점) */
+.store-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.375rem;
+}
+
+.store-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-textPrimary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.rating-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.rating-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-textPrimary);
+}
+
+/* 메타 라인 */
+.store-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 0.375rem;
+  flex-wrap: wrap;
+}
+
+.meta-info {
+  font-size: 0.8125rem;
+  color: var(--color-textSecondary);
+}
+
+.meta-count {
+  font-weight: 600;
+  color: var(--color-textPrimary);
+}
+
+.meta-dot {
+  color: var(--color-textTertiary);
+  font-size: 0.75rem;
+}
+
+/* 주소 */
+.store-address {
+  font-size: 0.8125rem;
+  color: var(--color-textSecondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+/* 영업시간 */
+.store-hours {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--color-textTertiary);
+  margin-top: 0.375rem;
+}
+
+/* 액션 버튼 영역 */
+.action-area {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-neutral-50);
+}
+
+.delete-btn {
+  color: var(--color-error) !important;
+}
+
+.delete-btn:hover {
+  background-color: rgba(211, 47, 47, 0.1) !important;
+}
+</style>
