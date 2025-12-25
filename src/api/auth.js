@@ -57,12 +57,26 @@ export const reissueToken = async () => {
 };
 
 /**
- * Role 업데이트
- * @param {Object} roleData - 업데이트할 Role 정보
- * @returns {Promise<Object>}
+ * 사용자 정보 수정
+ * PUT /user
+ * @param {Object} userData - 수정할 사용자 정보
+ * @param {string} [userData.nickname] - 변경할 닉네임 (1~12자, 한글/영문만 허용)
+ * @param {string} [userData.profileImageUrl] - 변경할 프로필 이미지 URL
+ * @returns {Promise<Object>} 수정된 사용자 정보
  */
-export const updateRole = async (roleData) => {
-  const response = await api.patch(API_ENDPOINTS.AUTH.UPDATE_ROLE, roleData);
+export const updateUser = async (userData) => {
+  const response = await api.put(API_ENDPOINTS.USER.UPDATE, userData);
+  return response.data.data;
+};
+
+/**
+ * 역할(Role) 변경
+ * PUT /user/role
+ * @param {string} role - 변경할 역할 ('USER' | 'MANAGER')
+ * @returns {Promise<Object>} 수정된 사용자 정보
+ */
+export const updateUserRole = async (role) => {
+  const response = await api.put(API_ENDPOINTS.USER.ROLE, { role });
   return response.data.data;
 };
 

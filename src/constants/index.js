@@ -46,8 +46,10 @@ export const API_ENDPOINTS = {
   // 사용자 정보
   USER: {
     INFO: '/user',
+    UPDATE: '/user',
     NICKNAME_CHECK: '/user/nickname/check',
-    REGISTER: '/user/register'
+    REGISTER: '/user/register',
+    ROLE: '/user/role'
   },
   // 알림
   NOTIFICATION: {

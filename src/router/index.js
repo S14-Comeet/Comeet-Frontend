@@ -83,6 +83,11 @@ const routes = [
     component: () => import('@/views/MyPreferenceView.vue')
   },
   {
+    path: '/my-profile/edit',
+    name: 'my-profile-edit',
+    component: () => import('@/views/MyProfileEditView.vue')
+  },
+  {
     path: '/store/:storeId',
     name: 'store-detail',
     component: () => import('@/views/StoreDetailView.vue')

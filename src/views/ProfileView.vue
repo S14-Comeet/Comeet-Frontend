@@ -50,8 +50,10 @@
           <span class="text-textPrimary">내 리뷰</span>
           <span class="text-textSecondary">›</span>
         </button>
-        <!-- TODO: 내 정보 수정 기능 구현 필요 -->
-        <button class="w-full flex items-center justify-between p-4 border-b border-primary-200 hover:bg-primary-50 transition-colors">
+        <button
+          class="w-full flex items-center justify-between p-4 border-b border-primary-200 hover:bg-primary-50 transition-colors"
+          @click="goToProfileEdit"
+        >
           <span class="text-textPrimary">내 정보 수정</span>
           <span class="text-textSecondary">›</span>
         </button>
@@ -158,6 +160,13 @@ const goToMyReviews = () => {
  */
 const goToOwnerStores = () => {
   router.push('/owner/stores')
+}
+
+/**
+ * 내 정보 수정 페이지로 이동
+ */
+const goToProfileEdit = () => {
+  router.push('/my-profile/edit')
 }
 
 /**
