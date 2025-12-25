@@ -266,3 +266,28 @@ import { getItem, setItem, removeItem } from '@/utils/storage'
 - `FLAVOR_WHEEL`: Hierarchical coffee flavor taxonomy (9 top-level categories with 3 levels of nesting)
   - Each node has: `id`, `code`, `name`, `colorHex`, `children`
   - Utility functions: `findFlavorInWheel(idOrCode)`, `getFlavorPath(idOrCode)`
+
+## Task Completion Checklist
+
+After making code changes, always run:
+```bash
+npm run lint   # Lint and auto-fix
+npm run build  # Verify production build
+```
+
+**New Route Checklist**:
+1. Route definition in `router/index.js`
+2. `PUBLIC_PAGES` Set or `PUBLIC_PATH_PATTERNS` array (if public access needed)
+3. `pagesWithoutHeader` Set in `App.vue` (if header hidden)
+4. `pagesWithoutNavigation` Set in `App.vue` (if bottom nav hidden)
+5. `isFullScreenPage` computed in `App.vue` (if full viewport)
+6. `pagesWithBackButton` Set in `App.vue` (if back button in header)
+7. `keepAlivePages` array in `App.vue` (if state preservation needed)
+
+**New API Checklist**:
+1. Create/modify domain-specific file in `src/api/`
+2. Import shared axios: `import api from './axios'`
+
+**New Store Checklist**:
+1. Create file in `src/store/`
+2. Add `persist: { storage: safeStorage }` option
