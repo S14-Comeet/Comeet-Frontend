@@ -124,10 +124,10 @@
               <span class="flex items-start gap-4">
                 <span
 :class="[
-                  'w-12 h-12 rounded-full flex items-center justify-center',
+                  'w-12 h-12 rounded-full flex items-center justify-center text-2xl',
                   selectedRole === 'MANAGER' ? 'bg-primary-100' : 'bg-surface-light'
                 ]">
-                  <BaseIcon name="store" :size="24" :color="selectedRole === 'MANAGER' ? 'var(--color-primary-600)' : 'var(--color-textSecondary)'" />
+                  🏠
                 </span>
                 <span class="flex-1 flex flex-col text-left">
                   <span

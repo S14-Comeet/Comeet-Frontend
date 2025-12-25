@@ -58,7 +58,7 @@ const pagesWithBackButton = new Set([
   'notifications', 'store-detail', 'my-reviews', 'review-detail', 'review-edit',
   'owner-stores', 'owner-store-new', 'owner-store-edit',
   'owner-menus', 'owner-menu-new', 'owner-menu-edit',
-  'bean-detail', 'menu-detail', 'my-preference'
+  'bean-detail', 'menu-detail', 'my-preference', 'my-profile-edit'
 ]);
 const showBackButton = computed(() => pagesWithBackButton.has(route.name));
 
