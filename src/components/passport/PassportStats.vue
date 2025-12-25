@@ -95,9 +95,6 @@ const formatDistance = (distance) => {
 <style scoped>
 .passport-stats {
   padding: var(--space-lg) var(--page-padding);
-  margin-top: -40px;
-  position: relative;
-  z-index: 10;
 }
 
 /* 메인 통계 카드 */
