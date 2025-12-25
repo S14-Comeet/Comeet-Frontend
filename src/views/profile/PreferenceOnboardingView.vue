@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-white relative flex flex-col">
-    <!-- Header -->
+    
     <div class="flex-none flex items-center justify-between px-4 py-3 border-b border-border">
       <button
         class="w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity"
@@ -20,7 +20,7 @@
       </button>
     </div>
 
-    <!-- Progress Bar -->
+    
     <div class="flex-none px-4 py-3">
       <div class="flex gap-2">
         <div
@@ -35,10 +35,10 @@
       </p>
     </div>
 
-    <!-- Content -->
+    
     <div class="flex-1 overflow-hidden flex flex-col pb-24">
       <Transition :name="transitionName" mode="out-in">
-        <!-- Step 1: 맛 선호도 -->
+        
         <div v-if="currentStep === 1" key="step1" class="flex-1 flex flex-col px-4 overflow-y-auto">
           <div class="mb-6">
             <h2 class="text-xl font-bold text-textPrimary">어떤 맛을 좋아하세요?</h2>
@@ -75,7 +75,7 @@
           <div class="flex-1" />
         </div>
 
-        <!-- Step 2: 로스팅 선호 -->
+        
         <div v-else-if="currentStep === 2" key="step2" class="flex-1 flex flex-col px-4 overflow-y-auto">
           <div class="mb-6">
             <h2 class="text-xl font-bold text-textPrimary">로스팅은 어떻게 좋아하세요?</h2>
@@ -119,7 +119,7 @@
           <div class="flex-1" />
         </div>
 
-        <!-- Step 3: 좋아하는 향미 -->
+        
         <div v-else-if="currentStep === 3" key="step3" class="flex-1 flex flex-col overflow-y-auto">
           <div class="px-4 mb-4">
             <h2 class="text-xl font-bold text-textPrimary">좋아하는 향미는?</h2>
@@ -132,7 +132,7 @@
           <HierarchicalFlavorSelector v-model="likedFlavorCodes" :max-selection="10" />
         </div>
 
-        <!-- Step 4: 피하고 싶은 향미 -->
+        
         <div v-else-if="currentStep === 4" key="step4" class="flex-1 flex flex-col overflow-y-auto">
           <div class="px-4 mb-4">
             <h2 class="text-xl font-bold text-textPrimary">피하고 싶은 향미는?</h2>
@@ -151,7 +151,7 @@
       </Transition>
     </div>
 
-    <!-- Floating Bottom Button -->
+    
     <div class="floating-button-container">
       <BaseButton
         variant="primary"
@@ -183,7 +183,6 @@ const logger = createLogger('PreferenceOnboardingView')
 const router = useRouter()
 const recommendationStore = useRecommendationStore()
 
-// Constants
 const totalSteps = 4
 const roastingLevels = [
   { value: 'LIGHT', label: '라이트', description: '산미가 강하고 과일향이 풍부해요' },
@@ -191,7 +190,6 @@ const roastingLevels = [
   { value: 'HEAVY', label: '다크', description: '깊은 쓴맛과 고소한 향이 특징이에요' }
 ]
 
-// State
 const currentStep = ref(1)
 const isSubmitting = ref(false)
 const transitionDirection = ref('forward')
@@ -204,11 +202,9 @@ const preferences = reactive({
   preferredRoastLevels: []
 })
 
-// Flavor codes (직접 code 저장)
 const likedFlavorCodes = ref([])
 const dislikedFlavorCodes = ref([])
 
-// Computed
 const transitionName = computed(() => {
   return transitionDirection.value === 'forward' ? 'slide-left' : 'slide-right'
 })
@@ -216,13 +212,13 @@ const transitionName = computed(() => {
 const canProceed = computed(() => {
   switch (currentStep.value) {
     case 1:
-      return true // 슬라이더는 기본값이 있으므로 항상 진행 가능
+      return true
     case 2:
       return preferences.preferredRoastLevels.length > 0
     case 3:
-      return likedFlavorCodes.value.length > 0 // 최소 1개 선택 필요
+      return likedFlavorCodes.value.length > 0
     case 4:
-      return true // 비선호 플레이버는 선택 사항
+      return true
     default:
       return false
   }
@@ -238,7 +234,6 @@ const nextButtonLabel = computed(() => {
   return '다음'
 })
 
-// Methods
 const isRoastSelected = (value) => {
   return preferences.preferredRoastLevels.includes(value)
 }
@@ -273,7 +268,6 @@ const handleNext = async () => {
     return
   }
 
-  // Final step - submit
   await submitPreferences()
 }
 
@@ -281,17 +275,16 @@ const submitPreferences = async () => {
   isSubmitting.value = true
 
   try {
-    // First initialize preference (creates default if not exists)
+
     try {
       await initPreference()
     } catch (e) {
-      // Ignore if already exists
+
       if (e.response?.status !== 409) {
         logger.warn('Preference init returned:', e.response?.status)
       }
     }
 
-    // Prepare request data (이제 직접 code 사용)
     const requestData = {
       prefAcidity: preferences.prefAcidity,
       prefBody: preferences.prefBody,
@@ -305,7 +298,6 @@ const submitPreferences = async () => {
     logger.info('Submitting preferences:', requestData)
     await updatePreference(requestData)
 
-    // Clear recommendation cache so it fetches fresh with new preferences
     recommendationStore.clearCache()
 
     showSuccess('취향 설정이 완료되었어요!')

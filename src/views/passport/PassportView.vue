@@ -1,6 +1,5 @@
 <template>
   <div class="passport-view">
-    <!-- 헤더 영역 -->
     <header class="passport-header">
       <h1 class="title">커피여권</h1>
       <YearSelector :selected-year="passportStore.selectedYear" @change="handleYearChange" />
@@ -12,13 +11,11 @@
       </div>
     </div>
 
-    <!-- 에러 상태 -->
     <div v-else-if="passportStore.error" class="error-container">
       <p class="error-message">{{ passportStore.error }}</p>
       <button class="retry-button" @click="loadPassports">다시 시도</button>
     </div>
 
-    <!-- 여권 카드 그리드 -->
     <div v-else class="passport-grid">
       <PassportCard
 v-for="passport in passportStore.passports" :key="passport.passportId" :passport="passport"
@@ -33,7 +30,9 @@ import { useRouter } from 'vue-router'
 import { usePassportStore } from '@/store/passport'
 import PassportCard from '@/components/passport/PassportCard.vue'
 import YearSelector from '@/components/passport/YearSelector.vue'
+import { createLogger } from '@/utils/logger'
 
+const logger = createLogger('PassportView')
 const router = useRouter()
 const passportStore = usePassportStore()
 
@@ -44,7 +43,7 @@ const loadPassports = async () => {
   try {
     await passportStore.fetchPassportList()
   } catch (error) {
-    console.error('Failed to load passports:', error)
+    logger.error('Failed to load passports', error)
   }
 }
 
@@ -88,7 +87,6 @@ onMounted(() => {
   color: var(--color-primary-700);
 }
 
-/* 여권 카드 리스트 (1열) */
 .passport-grid {
   display: flex;
   flex-direction: column;
@@ -106,7 +104,6 @@ onMounted(() => {
   border-radius: 16px;
 }
 
-/* 에러 상태 */
 .error-container {
   display: flex;
   flex-direction: column;

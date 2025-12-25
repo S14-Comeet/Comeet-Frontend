@@ -28,7 +28,6 @@ const props = defineProps({
 
 const emit = defineEmits(['click'])
 
-// Find flavor info from wheel data to get Korean name
 const flavorInfo = computed(() => {
   if (!props.flavor) return null
   return findFlavorInWheel(props.flavor.code) ||
@@ -36,17 +35,14 @@ const flavorInfo = computed(() => {
          findFlavorInWheel(props.flavor.id)
 })
 
-// Display name: prefer wheel name (Korean), fallback to flavor.name, then code
 const displayName = computed(() => {
   return flavorInfo.value?.name || props.flavor.name || props.flavor.code
 })
 
-// Display color: prefer wheel color, fallback to provided colorHex
 const displayColor = computed(() => {
   return flavorInfo.value?.colorHex || props.flavor.colorHex || '#846148'
 })
 
-// Check if color is light (needs dark text)
 const isLightColor = (hex) => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
   if (!result) return false

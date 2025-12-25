@@ -1,11 +1,9 @@
 <template>
   <div class="menu-view">
-    <!-- Loading State -->
     <div v-if="isLoading" class="loading-state">
       <BaseIcon name="spinner" :size="32" class="text-primary animate-spin" />
     </div>
 
-    <!-- Error State -->
     <div v-else-if="error" class="error-state">
       <BaseIcon name="x" :size="48" class="text-error mb-4" />
       <p class="text-textPrimary font-medium mb-2">메뉴를 불러올 수 없습니다</p>
@@ -13,17 +11,14 @@
       <BaseButton label="다시 시도" variant="primary" @click="fetchMenus" />
     </div>
 
-    <!-- Empty State -->
     <div v-else-if="menuData.length === 0" class="empty-state">
       <BaseIcon name="coffee" :size="48" class="text-primary-300 mb-4" />
       <p class="text-textSecondary">등록된 메뉴가 없습니다</p>
     </div>
 
-    <!-- Menu List -->
     <template v-else>
       <MenuList :menus="menuData" />
 
-      <!-- Review Button Section -->
       <div class="review-button-section">
         <ReviewButton @click="goToReview" />
       </div>
@@ -35,7 +30,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { createLogger } from '@/utils/logger'
-import MenuList from '@/components/MenuList.vue'
+import MenuList from '@/components/menu/MenuList.vue'
 import ReviewButton from '@/components/review/ReviewButton.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'

@@ -24,7 +24,7 @@ import BaseIcon from '@/components/common/BaseIcon.vue'
 defineProps({
   modelValue: {
     type: String,
-    default: 'global', // 'global' | 'nearby'
+    default: 'global',
     validator: (value) => ['global', 'nearby'].includes(value)
   }
 })

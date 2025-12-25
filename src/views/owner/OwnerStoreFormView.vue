@@ -1,6 +1,5 @@
 <template>
   <div class="page-container">
-    <!-- 페이지 헤더 -->
     <div class="bg-white px-4 py-5 border-b border-border flex-shrink-0">
       <h1 class="text-xl font-bold text-textPrimary">
         {{ isEditMode ? '가맹점 수정' : '가맹점 등록' }}
@@ -10,18 +9,14 @@
       </p>
     </div>
 
-    <!-- 로딩 상태 (수정 모드에서 데이터 로딩) -->
     <div v-if="isLoadingStore" class="flex-1 flex justify-center items-center">
       <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
     </div>
 
-    <!-- 폼 -->
     <form v-else class="form-content" @submit.prevent="handleSubmit">
-      <!-- 기본 정보 -->
       <div class="bg-white rounded-xl p-4 mb-4">
         <h2 class="text-base font-bold text-textPrimary mb-4">기본 정보</h2>
 
-        <!-- 가맹점명 -->
         <div class="mb-4">
           <label class="block text-sm font-medium text-textPrimary mb-2">
             가맹점명 <span class="text-error">*</span>
@@ -34,7 +29,6 @@
           />
         </div>
 
-        <!-- 설명 -->
         <div class="mb-4">
           <label class="block text-sm font-medium text-textPrimary mb-2">설명</label>
           <textarea
@@ -45,7 +39,6 @@
           ></textarea>
         </div>
 
-        <!-- 카테고리 (다중 선택) -->
         <div class="mb-4">
           <label class="block text-sm font-medium text-textPrimary mb-2">
             카테고리
@@ -70,11 +63,9 @@
         </div>
       </div>
 
-      <!-- 위치 정보 -->
       <div class="bg-white rounded-xl p-4 mb-4">
         <h2 class="text-base font-bold text-textPrimary mb-4">위치 정보</h2>
 
-        <!-- 주소 검색 -->
         <div class="mb-4">
           <label class="block text-sm font-medium text-textPrimary mb-2">
             주소 <span class="text-error">*</span>
@@ -101,11 +92,9 @@
 
       </div>
 
-      <!-- 연락처 및 영업시간 -->
       <div class="bg-white rounded-xl p-4 mb-4">
         <h2 class="text-base font-bold text-textPrimary mb-4">연락처 및 영업시간</h2>
 
-        <!-- 전화번호 (자동 포맷팅) -->
         <div class="mb-4">
           <label class="block text-sm font-medium text-textPrimary mb-2">전화번호</label>
           <BaseInput
@@ -117,11 +106,9 @@
           />
         </div>
 
-        <!-- 영업시간 (시작/종료 시간 선택, 10분 단위) -->
         <div class="mb-4">
           <label class="block text-sm font-medium text-textPrimary mb-2">영업시간</label>
           <div class="flex flex-wrap items-center gap-2">
-            <!-- 오픈 시간 -->
             <div class="flex-1 min-w-[120px] flex gap-1">
               <select
                 v-model="openHour"
@@ -139,7 +126,6 @@
               </select>
             </div>
             <span class="text-textSecondary font-medium">~</span>
-            <!-- 마감 시간 -->
             <div class="flex-1 min-w-[120px] flex gap-1">
               <select
                 v-model="closeHour"
@@ -159,7 +145,6 @@
           </div>
         </div>
 
-        <!-- 영업 상태 (수정 모드에서만) -->
         <div v-if="isEditMode" class="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
           <div>
             <p class="font-medium text-textPrimary">영업 종료</p>
@@ -172,7 +157,6 @@
         </div>
       </div>
 
-      <!-- 이미지 -->
       <div class="bg-white rounded-xl p-4 mb-4">
         <h2 class="text-base font-bold text-textPrimary mb-4">이미지</h2>
         <label class="block text-sm font-medium text-textPrimary mb-2">썸네일</label>
@@ -182,7 +166,6 @@
         />
       </div>
 
-      <!-- 로스터리 선택 (등록 모드에서만 필수) -->
       <div v-if="!isEditMode" class="bg-white rounded-xl p-4 mb-4">
         <h2 class="text-base font-bold text-textPrimary mb-4">소속 로스터리</h2>
         <div>
@@ -190,7 +173,6 @@
             로스터리 <span class="text-error">*</span>
           </label>
 
-          <!-- 선택된 로스터리 표시 -->
           <div v-if="selectedRoastery" class="flex items-center gap-3 p-3 rounded-lg border-2 border-primary bg-primary-50 mb-2">
             <div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center overflow-hidden flex-shrink-0">
               <img
@@ -213,7 +195,6 @@
             </button>
           </div>
 
-          <!-- 검색 버튼 -->
           <BaseButton
             v-else
             variant="secondary"
@@ -229,7 +210,6 @@
       </div>
     </form>
 
-    <!-- 로스터리 선택 모달 -->
     <OwnerRoasterySelector
       v-model="showRoasterySelector"
       :initial-roastery-id="form.roasteryId"
@@ -238,7 +218,6 @@
       @select-pending="handlePendingRoasterySelect"
     />
 
-    <!-- 하단 버튼 -->
     <div class="bottom-button-area">
       <BaseButton
         variant="primary"
@@ -273,26 +252,22 @@ const logger = createLogger('OwnerStoreForm')
 const route = useRoute()
 const router = useRouter()
 
-// 상태
 const isEditMode = computed(() => !!route.params.storeId)
 const isLoadingStore = ref(false)
 const isSubmitting = ref(false)
 const isSearchingAddress = ref(false)
 const showRoasterySelector = ref(false)
 const selectedRoastery = ref(null)
-const pendingRoastery = ref(null) // 새로 생성할 로스터리 (아직 API 호출 전)
+const pendingRoastery = ref(null)
 
-// 영업시간 (별도 관리)
 const openHour = ref('')
 const openMinute = ref('')
 const closeHour = ref('')
 const closeMinute = ref('')
 
-// 시간 선택 옵션 (00~23시, 10분 단위)
 const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'))
 const minutes = ['00', '10', '20', '30', '40', '50']
 
-// 폼 데이터
 const form = ref({
   name: '',
   description: '',
@@ -300,7 +275,7 @@ const form = ref({
   latitude: '',
   longitude: '',
   phoneNumber: '',
-  categories: [], // 다중 선택 (배열)
+  categories: [],
   thumbnailUrl: '',
   roasteryId: '',
   isClosed: false
@@ -310,13 +285,10 @@ const form = ref({
  * 전화번호 자동 포맷팅 (숫자만 입력 → 하이픈 자동 추가)
  */
 const handlePhoneInput = (value) => {
-  // 숫자만 추출
   const numbers = value.replace(/\D/g, '')
 
-  // 포맷팅 적용
   let formatted = ''
   if (numbers.startsWith('02')) {
-    // 서울 (02-XXXX-XXXX 또는 02-XXX-XXXX)
     if (numbers.length <= 2) {
       formatted = numbers
     } else if (numbers.length <= 5) {
@@ -327,7 +299,6 @@ const handlePhoneInput = (value) => {
       formatted = `${numbers.slice(0, 2)}-${numbers.slice(2, 6)}-${numbers.slice(6, 10)}`
     }
   } else if (numbers.startsWith('01')) {
-    // 휴대폰 (010-XXXX-XXXX)
     if (numbers.length <= 3) {
       formatted = numbers
     } else if (numbers.length <= 7) {
@@ -336,7 +307,6 @@ const handlePhoneInput = (value) => {
       formatted = `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`
     }
   } else {
-    // 기타 지역번호 (0XX-XXX-XXXX 또는 0XX-XXXX-XXXX)
     if (numbers.length <= 3) {
       formatted = numbers
     } else if (numbers.length <= 6) {
@@ -351,7 +321,6 @@ const handlePhoneInput = (value) => {
   form.value.phoneNumber = formatted
 }
 
-// 에러 상태
 const errors = ref({
   name: '',
   address: '',
@@ -366,7 +335,6 @@ const isFormValid = computed(() => {
   const hasAddress = form.value.address.trim().length > 0
   const hasLatitude = form.value.latitude !== '' && !isNaN(Number(form.value.latitude))
   const hasLongitude = form.value.longitude !== '' && !isNaN(Number(form.value.longitude))
-  // pending 로스터리도 유효한 선택으로 인정
   const hasRoastery = isEditMode.value || form.value.roasteryId === 'pending' || (form.value.roasteryId !== '' && !isNaN(Number(form.value.roasteryId)))
 
   return hasName && hasAddress && hasLatitude && hasLongitude && hasRoastery
@@ -389,7 +357,6 @@ const validateForm = () => {
     isValid = false
   }
 
-  // 좌표 검증 (주소 검색으로 자동 입력되므로, 없으면 주소 재검색 필요)
   const lat = Number(form.value.latitude)
   const lng = Number(form.value.longitude)
   if (isNaN(lat) || lat < -90 || lat > 90 || isNaN(lng) || lng < -180 || lng > 180) {
@@ -419,12 +386,10 @@ const loadStoreData = async () => {
     const response = await getStoreById(route.params.storeId)
     const store = response.data || response
 
-    // 카테고리는 comma-separated string을 배열로 변환
     const categories = store.category
       ? store.category.split(',').map(c => c.trim()).filter(Boolean)
       : []
 
-    // 영업시간 파싱 (HH:mm-HH:mm)
     if (store.openingHours) {
       const [open, close] = store.openingHours.split('-')
       if (open) {
@@ -468,7 +433,6 @@ const handleSubmit = async () => {
 
   isSubmitting.value = true
   try {
-    // 영업시간 조합 (HH:mm-HH:mm)
     const openingHours = (openHour.value && closeHour.value)
       ? `${openHour.value}:${openMinute.value || '00'}-${closeHour.value}:${closeMinute.value || '00'}`
       : null
@@ -490,7 +454,6 @@ const handleSubmit = async () => {
       await updateStore(route.params.storeId, formData)
       showSuccess('가맹점이 수정되었습니다')
     } else {
-      // 새 로스터리가 있으면 먼저 생성
       let roasteryId = form.value.roasteryId
 
       if (pendingRoastery.value) {
@@ -541,7 +504,7 @@ const toggleCategory = (categoryValue) => {
  */
 const handleRoasterySelect = (roastery) => {
   selectedRoastery.value = roastery
-  pendingRoastery.value = null // pending 초기화
+  pendingRoastery.value = null
   form.value.roasteryId = roastery.id.toString()
   errors.value.roasteryId = ''
   logger.debug('로스터리 선택', roastery)
@@ -552,8 +515,8 @@ const handleRoasterySelect = (roastery) => {
  */
 const handlePendingRoasterySelect = (roastery) => {
   pendingRoastery.value = roastery
-  selectedRoastery.value = roastery // UI 표시용
-  form.value.roasteryId = 'pending' // 임시값
+  selectedRoastery.value = roastery
+  form.value.roasteryId = 'pending'
   errors.value.roasteryId = ''
   logger.debug('새 로스터리 선택 (대기)', roastery)
 }
@@ -575,17 +538,14 @@ const handleAddressSearch = async () => {
   try {
     const result = await searchAddressWithCoordinates()
 
-    // 주소 및 좌표 자동 입력
     form.value.address = result.address
     form.value.latitude = result.latitude.toString()
     form.value.longitude = result.longitude.toString()
 
-    // 에러 초기화
     errors.value.address = ''
 
     logger.debug('주소 검색 완료', result)
   } catch (err) {
-    // 사용자가 취소한 경우는 무시
     if (err.message !== '주소 검색이 취소되었습니다') {
       logger.error('주소 검색 실패', err)
       showWarning(err.message || '주소 검색에 실패했습니다')
@@ -593,13 +553,6 @@ const handleAddressSearch = async () => {
   } finally {
     isSearchingAddress.value = false
   }
-}
-
-/**
- * 이미지 로드 에러 처리
- */
-const handleImageError = (e) => {
-  e.target.style.display = 'none'
 }
 
 onMounted(() => {

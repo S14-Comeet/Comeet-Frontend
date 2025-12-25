@@ -79,4 +79,3 @@ export const updateUserRole = async (role) => {
   const response = await api.put(API_ENDPOINTS.USER.ROLE, { role });
   return response.data.data;
 };
-

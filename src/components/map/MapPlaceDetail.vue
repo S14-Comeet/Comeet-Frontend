@@ -11,7 +11,7 @@
           class="relative bg-white rounded-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto p-6"
           @click.stop
       >
-        <!-- 닫기 버튼 -->
+        
         <button
             class="absolute top-4 right-4 text-textSecondary hover:text-primary hover:bg-primary-50 rounded-full p-1 transition-all"
             aria-label="장소 상세 닫기"
@@ -22,7 +22,7 @@
           </svg>
         </button>
 
-        <!-- 카페 정보 -->
+        
         <h2 class="text-2xl font-bold text-textPrimary mb-4">
           {{ place.name }}
         </h2>
@@ -59,7 +59,7 @@
           </div>
         </div>
 
-        <!-- 리뷰 작성 버튼 (New) -->
+        
         <div class="mt-8 pt-4 border-t border-border flex justify-end">
           <BaseButton
             label="리뷰 작성하기"
@@ -82,7 +82,6 @@ import BaseButton from '@/components/common/BaseButton.vue'
 
 const logger = createLogger('MapPlaceDetail')
 
-// enum 값을 한글 라벨로 변환하는 맵
 const categoryLabelMap = Object.fromEntries(
   MENU_CATEGORIES.map(cat => [cat.value, cat.label])
 )
@@ -91,7 +90,6 @@ const props = defineProps({
   place: Object,
 })
 
-// 카테고리를 한글로 변환
 const displayCategories = computed(() => {
   if (!props.place?.category) return []
   return props.place.category
@@ -106,9 +104,9 @@ const router = useRouter()
 
 const goToReview = () => {
   if (!props.place) return
-  // Use storeId or fallback to id
+
   const id = props.place.storeId || props.place.id
-  
+
   if (!id) {
     logger.warn('Store ID not found in place object', props.place)
     return

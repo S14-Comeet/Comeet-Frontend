@@ -7,7 +7,7 @@
         @click.self="$emit('update:modelValue', false)"
       >
         <div class="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col shadow-xl">
-          <!-- 헤더 -->
+          
           <div class="flex items-center justify-between p-4 border-b border-border">
             <h3 class="text-lg font-bold text-textPrimary">
               {{ isCreateMode ? '새 로스터리 등록' : '로스터리 선택' }}
@@ -20,9 +20,9 @@
             </button>
           </div>
 
-          <!-- 로스터리 검색/선택 모드 -->
+          
           <template v-if="!isCreateMode">
-            <!-- 검색 -->
+            
             <div class="p-4 border-b border-border">
               <div class="relative">
                 <BaseInput
@@ -36,14 +36,14 @@
               </div>
             </div>
 
-            <!-- 로스터리 목록 -->
+            
             <div class="flex-1 overflow-y-auto p-4">
-              <!-- 로딩 -->
+              
               <div v-if="isLoading && roasteries.length === 0" class="flex justify-center py-8">
                 <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
               </div>
 
-              <!-- 빈 상태 -->
+              
               <div v-else-if="roasteries.length === 0" class="text-center py-8">
                 <p class="text-textSecondary mb-4">
                   {{ searchKeyword ? '검색 결과가 없습니다' : '등록된 로스터리가 없습니다' }}
@@ -57,9 +57,9 @@
                 </BaseButton>
               </div>
 
-              <!-- 목록 -->
+              
               <div v-else class="space-y-2">
-                <!-- 새 로스터리 등록 버튼 (목록 맨 위) -->
+                
                 <button
                   type="button"
                   class="w-full flex items-center gap-3 p-3 rounded-lg border-2 border-dashed border-primary-300 bg-primary-50 hover:bg-primary-100 transition-colors text-left"
@@ -84,7 +84,7 @@
                     : 'border-border hover:border-primary-300'"
                   @click="selectRoastery(roastery)"
                 >
-                  <!-- 로고 -->
+                  
                   <div class="w-12 h-12 rounded-lg bg-neutral-100 flex items-center justify-center overflow-hidden flex-shrink-0">
                     <img
                       v-if="roastery.logoUrl"
@@ -96,7 +96,7 @@
                     <BaseIcon v-else name="cafe" :size="24" class="text-textSecondary" />
                   </div>
 
-                  <!-- 정보 -->
+                  
                   <div class="flex-1 min-w-0">
                     <p class="font-medium text-textPrimary truncate">{{ roastery.name }}</p>
                     <p v-if="roastery.websiteUrl" class="text-xs text-textSecondary truncate">
@@ -104,13 +104,13 @@
                     </p>
                   </div>
 
-                  <!-- 선택 표시 -->
+                  
                   <div v-if="selectedId === roastery.id" class="text-primary">
                     <BaseIcon name="check" :size="20" />
                   </div>
                 </button>
 
-                <!-- 더 보기 -->
+                
                 <button
                   v-if="hasMore"
                   type="button"
@@ -123,7 +123,7 @@
               </div>
             </div>
 
-            <!-- 하단 버튼 -->
+            
             <div class="p-4 border-t border-border safe-bottom">
               <BaseButton
                 variant="primary"
@@ -202,9 +202,8 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import { getRoasteries, searchRoasteries, createRoastery } from '@/api/owner'
+import { getRoasteries, searchRoasteries } from '@/api/owner'
 import { createLogger } from '@/utils/logger'
-import { showSuccess, showError } from '@/utils/toast'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
@@ -230,7 +229,6 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'select', 'select-pending'])
 
-// 검색/선택 상태
 const roasteries = ref([])
 const selectedId = ref(null)
 const selectedRoastery = ref(null)
@@ -240,9 +238,7 @@ const isSearching = ref(false)
 const currentPage = ref(1)
 const hasMore = ref(false)
 
-// 생성 모드 상태
 const isCreateMode = ref(false)
-const isCreating = ref(false)
 const newRoastery = ref({
   name: '',
   logoUrl: '',
@@ -252,7 +248,6 @@ const createErrors = ref({
   name: ''
 })
 
-// 디바운스 타이머
 let searchTimer = null
 
 /**
@@ -330,7 +325,7 @@ const confirm = () => {
  */
 const startCreateMode = () => {
   isCreateMode.value = true
-  // 가맹점명을 기본값으로 설정
+
   newRoastery.value = {
     name: props.defaultName || '',
     logoUrl: '',
@@ -350,7 +345,7 @@ const cancelCreateMode = () => {
  * 로스터리 생성 (지연 - 가맹점 등록 시점에 실제 생성)
  */
 const handleCreateRoastery = () => {
-  // 유효성 검사
+
   createErrors.value = { name: '' }
 
   if (!newRoastery.value.name.trim()) {
@@ -358,13 +353,12 @@ const handleCreateRoastery = () => {
     return
   }
 
-  // 실제 생성하지 않고 pending 데이터만 전달
   const pendingRoastery = {
-    id: null, // 아직 생성되지 않음을 표시
+    id: null,
     name: newRoastery.value.name.trim(),
     logoUrl: newRoastery.value.logoUrl.trim() || null,
     websiteUrl: newRoastery.value.websiteUrl.trim() || null,
-    isPending: true // 대기 중 표시
+    isPending: true
   }
 
   emit('select-pending', pendingRoastery)
@@ -389,7 +383,6 @@ const handleImageError = (e) => {
   e.target.style.display = 'none'
 }
 
-// 모달이 열릴 때 데이터 로드
 watch(() => props.modelValue, (isOpen) => {
   if (isOpen) {
     selectedId.value = props.initialRoasteryId ? Number(props.initialRoasteryId) : null

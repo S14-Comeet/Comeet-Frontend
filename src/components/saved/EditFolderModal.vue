@@ -9,7 +9,6 @@
         class="bg-white rounded-2xl max-w-md w-full p-6"
         @click.stop
       >
-        <!-- 헤더 -->
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-xl font-bold text-textPrimary">즐겨찾기 목록 수정</h2>
           <button
@@ -20,9 +19,7 @@
           </button>
         </div>
 
-        <!-- 폼 -->
         <form class="space-y-4" @submit.prevent="handleSubmit">
-          <!-- 아이콘 선택 -->
           <div>
             <label class="block text-sm font-medium text-textPrimary mb-2">
               아이콘 선택
@@ -49,7 +46,6 @@
             </div>
           </div>
 
-          <!-- 목록 이름 -->
           <div>
             <label class="block text-sm font-medium text-textPrimary mb-2">
               목록 이름 <span class="text-error">*</span>
@@ -62,7 +58,6 @@
             <p v-if="errors.name" class="text-xs text-error mt-1">{{ errors.name }}</p>
           </div>
 
-          <!-- 목록 설명 -->
           <div>
             <label class="block text-sm font-medium text-textPrimary mb-2">
               목록 설명
@@ -75,7 +70,6 @@
             />
           </div>
 
-          <!-- 버튼 -->
           <div class="flex gap-3 pt-2">
             <BaseButton
               type="button"
@@ -121,7 +115,6 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'submit'])
 
-// 폴더 아이콘으로 사용 가능한 아이콘 목록
 const availableIcons = [
   'bookmark-fill',
   'coffee',
@@ -147,7 +140,6 @@ const errors = ref({
   name: ''
 })
 
-// 모달이 열릴 때 폴더 데이터로 초기화
 watch(() => props.isOpen, (newValue) => {
   if (newValue && props.folder) {
     formData.value = {
@@ -170,7 +162,6 @@ const handleClose = () => {
 }
 
 const handleSubmit = () => {
-  // 유효성 검사
   errors.value.name = ''
 
   if (!formData.value.name.trim()) {
@@ -183,7 +174,6 @@ const handleSubmit = () => {
     return
   }
 
-  // 폼 제출
   emit('submit', {
     icon: formData.value.icon,
     name: formData.value.name.trim(),
@@ -203,7 +193,6 @@ const handleSubmit = () => {
   opacity: 0;
 }
 
-/* Textarea 스타일 */
 textarea {
   font-family: 'Pretendard', sans-serif;
 }

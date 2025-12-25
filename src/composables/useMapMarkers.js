@@ -6,15 +6,14 @@ import { ref } from 'vue'
  * @returns {number} 스케일 값
  */
 const getMarkerScale = (zoom) => {
-  const maxSizeZoom = 12  // 이 줌 이하에서 최대 크기
-  const minSizeZoom = 19  // 이 줌 이상에서 최소 크기
-  const maxScale = 1.0    // 최대 크기 스케일 (줌 12 이하)
-  const minScale = 0.7    // 최소 크기 스케일 (줌 19 이상)
+  const maxSizeZoom = 12
+  const minSizeZoom = 19
+  const maxScale = 1.0
+  const minScale = 0.7
 
   if (zoom <= maxSizeZoom) return maxScale
   if (zoom >= minSizeZoom) return minScale
 
-  // 줌 12~19 사이에서 선형 보간
   const ratio = (zoom - maxSizeZoom) / (minSizeZoom - maxSizeZoom)
   return maxScale - ratio * (maxScale - minScale)
 }

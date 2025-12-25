@@ -22,14 +22,12 @@ const router = useRouter()
 const authStore = useAuthStore()
 const message = ref('로그인 처리 중...')
 
-// OAuth 콜백 처리
 onMounted(async () => {
   try {
     const urlParams = new URLSearchParams(globalThis.location.search)
     const accessToken = urlParams.get('accessToken')
     const error = urlParams.get('error')
 
-    // 에러 또는 토큰 없음
     if (error || !accessToken) {
       logger.warn('OAuth 콜백 실패', { error, hasToken: !!accessToken })
       showError('로그인에 실패했습니다. 다시 시도해주세요.')
@@ -37,15 +35,12 @@ onMounted(async () => {
       return
     }
 
-    // AccessToken 저장
     setAccessToken(accessToken)
     logger.info('OAuth 토큰 저장 완료')
 
-    // 사용자 정보 가져오기
     message.value = '사용자 정보를 가져오는 중...'
     await authStore.fetchUser()
 
-    // role에 따라 페이지 이동
     if (authStore.isRegistered) {
       logger.info('등록된 사용자 → 메인 페이지')
       const nickname = authStore.user?.nickname || authStore.user?.name || '사용자'

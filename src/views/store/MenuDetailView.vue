@@ -1,8 +1,6 @@
 <template>
   <div class="flex flex-col min-h-full h-full bg-background">
-    <!-- Content -->
     <div class="flex-1 overflow-y-auto safe-bottom">
-      <!-- Loading -->
       <div v-if="isLoading" class="p-4 space-y-4">
         <div class="skeleton h-48 rounded-xl" />
         <div class="skeleton-card">
@@ -12,7 +10,6 @@
         </div>
       </div>
 
-      <!-- Error -->
       <div v-else-if="error" class="p-4">
         <div class="empty-state">
           <p>{{ error }}</p>
@@ -20,9 +17,7 @@
         </div>
       </div>
 
-      <!-- Menu Detail -->
       <template v-else-if="menu">
-        <!-- Menu Image -->
         <div class="menu-image-container">
           <img
             v-if="hasValidImage"
@@ -36,7 +31,6 @@
           </div>
         </div>
 
-        <!-- Menu Info Card -->
         <div class="menu-info-card mx-4 -mt-6 relative z-10">
           <h1 class="menu-name">{{ menuName }}</h1>
 
@@ -48,18 +42,16 @@
             {{ menuDescription }}
           </p>
 
-          <!-- AI Reason (if from recommendation) -->
           <RecommendationReason v-if="recommendationReason" :reason="recommendationReason" />
         </div>
 
-        <!-- Flavor Wheel Section -->
         <section v-if="menuFlavors.length" class="px-4 py-4">
           <h2 class="section-title mb-3">
             <span class="section-icon">🎨</span>
             향미 프로필
           </h2>
           <div class="flavor-wheel-wrapper">
-            <FlavorWheel
+            <BeanFlavorWheel
               :size="280"
               :highlighted-flavors="menuFlavors"
               :show-legend="true"
@@ -68,11 +60,9 @@
           </div>
         </section>
 
-        <!-- Beans Section -->
         <section v-if="menuBeans.length" class="px-4 py-4">
           <h2 class="section-title mb-3">원두 선택</h2>
 
-          <!-- Recommended Bean Notice -->
           <div v-if="showRecommendedBeanNotice" class="recommended-bean-notice">
             <span>
               이 메뉴는 <strong>{{ recommendedBean.beanName || recommendedBean.name }}</strong> 원두를
@@ -104,7 +94,6 @@
           </div>
         </section>
 
-        <!-- Store Section -->
         <section v-if="menu.storeId" class="px-4 py-4">
           <h2 class="section-title mb-3">판매 매장</h2>
           <div class="store-card" @click="goToStore">
@@ -133,14 +122,13 @@ import { getMenuById } from '@/api/menu'
 import { formatPrice } from '@/api/recommendation'
 
 import BaseIcon from '@/components/common/BaseIcon.vue'
-import FlavorWheel from '@/components/bean/FlavorWheel.vue'
+import BeanFlavorWheel from '@/components/bean/BeanFlavorWheel.vue'
 import RecommendationReason from '@/components/recommendation/RecommendationReason.vue'
 
 const logger = createLogger('MenuDetailView')
 const route = useRoute()
 const router = useRouter()
 
-// State
 const menu = ref(null)
 const isLoading = ref(false)
 const error = ref(null)
@@ -149,17 +137,13 @@ const recommendationReason = ref(null)
 const recommendedBeanId = ref(null)
 const recommendedFlavors = ref([])
 
-// Computed
 const menuId = computed(() => Number(route.params.menuId))
 
-// API 필드 매핑 (name → menuName, description → menuDescription 등)
 const menuName = computed(() => menu.value?.menuName || menu.value?.name || '')
 const menuDescription = computed(() => menu.value?.menuDescription || menu.value?.description || '')
 const menuImage = computed(() => menu.value?.menuImageUrl || menu.value?.imageUrl || '')
 const menuBeans = computed(() => menu.value?.beans || menu.value?.beanBadges || [])
 const menuFlavors = computed(() => menu.value?.flavors || [])
-
-const pageTitle = computed(() => menuName.value || '메뉴 상세')
 
 const hasValidImage = computed(() => {
   return menuImage.value &&
@@ -167,37 +151,31 @@ const hasValidImage = computed(() => {
          !imageError.value
 })
 
-// Check if we came from recommendation (has context)
 const isFromRecommendation = computed(() => {
   return !!recommendationReason.value || !!recommendedBeanId.value
 })
 
-// Check if a bean is the recommended one
 const isRecommendedBean = (bean) => {
   if (!recommendedBeanId.value) return false
   const beanId = bean.beanId || bean.id
   return Number(beanId) === Number(recommendedBeanId.value)
 }
 
-// Get the recommended bean info for display
 const recommendedBean = computed(() => {
   if (!recommendedBeanId.value || !menuBeans.value.length) return null
   return menuBeans.value.find(b => isRecommendedBean(b))
 })
 
-// Show notice when multiple beans and one is recommended
 const showRecommendedBeanNotice = computed(() => {
   return isFromRecommendation.value && menuBeans.value.length > 1 && recommendedBean.value
 })
 
-// Methods
 const loadMenuDetail = async () => {
   isLoading.value = true
   error.value = null
   imageError.value = false
 
   try {
-    // Check if recommendation context was passed
     if (route.query.reason) {
       recommendationReason.value = route.query.reason
     }
@@ -207,12 +185,9 @@ const loadMenuDetail = async () => {
     if (route.query.recommendedFlavors) {
       try {
         recommendedFlavors.value = JSON.parse(route.query.recommendedFlavors)
-      } catch {
-        // Ignore parse error
-      }
+      } catch { /* empty */ }
     }
 
-    // Pre-fill store info from query params (from recommendation)
     const prefilledMenu = {}
     if (route.query.storeId) {
       prefilledMenu.storeId = Number(route.query.storeId)
@@ -227,24 +202,18 @@ const loadMenuDetail = async () => {
       menu.value = prefilledMenu
     }
 
-    // Try to get menu from query params first (for quick display)
     if (route.query.menu) {
       try {
         menu.value = { ...menu.value, ...JSON.parse(route.query.menu) }
-      } catch {
-        // Ignore parse error
-      }
+      } catch { /* empty */ }
     }
 
-    // Fetch from API for complete data
     const response = await getMenuById(menuId.value)
     const apiMenu = response?.data || response
 
-    // Merge with prefilled data (keep store info if API doesn't return it)
     menu.value = {
-      ...menu.value,  // Keep prefilled store info
-      ...apiMenu,     // Override with API data
-      // Ensure store info is preserved if API returns null/undefined
+      ...menu.value,
+      ...apiMenu,
       storeId: apiMenu?.storeId || menu.value?.storeId,
       storeName: apiMenu?.storeName || menu.value?.storeName,
       storeAddress: apiMenu?.storeAddress || menu.value?.storeAddress
@@ -268,7 +237,6 @@ const goToBeanDetail = (bean) => {
 
 const goToStore = () => {
   if (menu.value?.storeId) {
-    // Navigate to map and focus on the store
     router.push({
       name: 'map',
       query: { storeId: menu.value.storeId }
@@ -276,7 +244,6 @@ const goToStore = () => {
   }
 }
 
-// Watch for route changes
 watch(() => route.params.menuId, () => {
   if (route.params.menuId) {
     menu.value = null
@@ -287,7 +254,6 @@ watch(() => route.params.menuId, () => {
   }
 })
 
-// Lifecycle
 onMounted(() => {
   loadMenuDetail()
 })
@@ -363,7 +329,6 @@ onMounted(() => {
   padding: 0.5rem 0;
 }
 
-/* Beans List */
 .beans-list {
   display: flex;
   flex-direction: column;
@@ -413,7 +378,6 @@ onMounted(() => {
   color: var(--color-textSecondary);
 }
 
-/* Recommended Bean Styles */
 .recommended-bean-notice {
   display: flex;
   align-items: flex-start;
@@ -457,7 +421,6 @@ onMounted(() => {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-/* Store Card */
 .store-card {
   display: flex;
   align-items: center;
@@ -520,7 +483,6 @@ onMounted(() => {
   margin-top: 0.25rem;
 }
 
-/* Empty & Error States */
 .empty-state {
   text-align: center;
   padding: 2rem 1rem;
@@ -542,7 +504,6 @@ onMounted(() => {
   background-color: var(--color-primary-700);
 }
 
-/* Skeleton */
 .skeleton-card {
   background: white;
   border-radius: 0.75rem;

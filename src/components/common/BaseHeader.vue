@@ -1,6 +1,6 @@
 <template>
   <header class="relative w-full h-14 bg-white flex items-center justify-center px-5 border-b border-border">
-    <!-- Back Button (좌측 절대 위치) -->
+    
     <div v-if="showBackButton || showBack" class="absolute left-5 flex items-center">
       <button
         class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary-50 transition-colors"
@@ -11,7 +11,7 @@
       </button>
     </div>
 
-    <!-- Title or Logo (중앙) -->
+    
     <template v-if="title">
       <h1 class="text-lg font-bold text-textPrimary">{{ title }}</h1>
     </template>
@@ -81,23 +81,20 @@ const props = defineProps({
 
 const emit = defineEmits(['back', 'login'])
 
-// Computed properties
 const isAuthenticated = computed(() => {
-  // 테스트용 강제 상태가 있으면 그것을 사용
+
   if (props.forceAuthState !== null) {
     return props.forceAuthState
   }
-  // 아니면 실제 인증 상태 사용
+
   return authStore.isAuthenticated
 })
 
-// 뒤로가기 핸들러
 const handleBack = () => {
   emit('back')
   router.back()
 }
 
-// 로그인 핸들러
 const handleLogin = () => {
   emit('login')
   router.push('/login')

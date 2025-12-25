@@ -1,6 +1,6 @@
 <template>
   <div class="passport-detail-view">
-    <!-- 상단 커버 영역 -->
+    
     <div class="cover-section">
       <img
 v-if="passportStore.currentPassport?.coverImageUrl" :src="passportStore.currentPassport.coverImageUrl"
@@ -9,22 +9,22 @@ v-if="passportStore.currentPassport?.coverImageUrl" :src="passportStore.currentP
         <div class="cover-pattern"></div>
       </div>
 
-      <!-- 그라데이션 오버레이 -->
+      
       <div class="cover-overlay"></div>
 
-      <!-- 뒤로가기 버튼 -->
+      
       <button class="back-button" @click="goBack">
         <span class="back-icon">←</span>
       </button>
 
-      <!-- 월 타이틀 -->
+      
       <div class="cover-title">
         <h1 class="month-title">{{ monthLabel }}</h1>
         <p class="year-subtitle">{{ passportStore.currentPassport?.year }}년 커피 여정</p>
       </div>
     </div>
 
-    <!-- 로딩 상태 -->
+    
     <div v-if="passportStore.isLoading" class="loading-container">
       <div class="skeleton-stats skeleton"></div>
       <div class="skeleton-timeline">
@@ -32,18 +32,18 @@ v-if="passportStore.currentPassport?.coverImageUrl" :src="passportStore.currentP
       </div>
     </div>
 
-    <!-- 에러 상태 -->
+    
     <div v-else-if="passportStore.error" class="error-container">
       <p class="error-message">{{ passportStore.error }}</p>
       <button class="retry-button" @click="loadPassportDetail">다시 시도</button>
     </div>
 
-    <!-- 콘텐츠 -->
+    
     <template v-else-if="passportStore.currentPassport">
-      <!-- 요약 통계 -->
+      
       <PassportStats :info="passportStore.currentPassport.info" />
 
-      <!-- 타임라인 -->
+      
       <section class="timeline-section">
         <div class="section-header">
           <h2 class="section-title">방문 기록</h2>
@@ -79,7 +79,9 @@ import BaseIcon from '@/components/common/BaseIcon.vue'
 import PassportStats from '@/components/passport/PassportStats.vue'
 import PassportTimeline from '@/components/passport/PassportTimeline.vue'
 import TimelineMapMode from '@/components/passport/TimelineMapMode.vue'
+import { createLogger } from '@/utils/logger'
 
+const logger = createLogger('PassportDetailView')
 const route = useRoute()
 const router = useRouter()
 const passportStore = usePassportStore()
@@ -91,7 +93,6 @@ const monthLabel = computed(() => {
   return month ? `${month}월` : ''
 })
 
-// 지도 모드 상태
 const isMapMode = ref(false)
 const mapModeIndex = ref(0)
 
@@ -99,7 +100,7 @@ const loadPassportDetail = async () => {
   try {
     await passportStore.fetchPassportDetail(passportId.value)
   } catch (error) {
-    console.error('Failed to load passport detail:', error)
+    logger.error('Failed to load passport detail', error)
   }
 }
 
@@ -111,20 +112,16 @@ const goToMap = () => {
   router.push('/map')
 }
 
-// 타임라인 아이템 클릭 → 지도 모드 진입
 const handleTimelineItemClick = (record) => {
-  // sortedRecords에서 해당 record의 인덱스 찾기
   const index = passportStore.sortedRecords.findIndex(r => r.visitId === record.visitId)
   mapModeIndex.value = index >= 0 ? index : 0
   isMapMode.value = true
 }
 
-// 지도 모드 닫기
 const closeMapMode = () => {
   isMapMode.value = false
 }
 
-// 지도 모드 인덱스 변경
 const handleMapIndexChange = (index) => {
   mapModeIndex.value = index
 }

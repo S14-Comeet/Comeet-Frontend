@@ -1,6 +1,6 @@
 <template>
   <div class="hierarchical-flavor-selector">
-    <!-- Selected Flavors Display (always visible) -->
+    
     <div class="selected-display">
       <div class="selected-chips">
         <span
@@ -22,16 +22,16 @@
       </div>
     </div>
 
-    <!-- Main Selection Area -->
+    
     <div class="selection-area">
-      <!-- Level 1: Categories (vertical list, each row expands horizontally) -->
+      
       <div class="category-list">
         <div
           v-for="cat in FLAVOR_WHEEL"
           :key="cat.id"
           class="category-row"
         >
-          <!-- Category chip + Subcategories in same row -->
+          
           <div class="category-line">
             <button
               type="button"
@@ -49,7 +49,7 @@
               </svg>
             </button>
 
-            <!-- Level 2: Subcategories (each with its own detail dropdown) -->
+            
             <TransitionGroup name="chip-expand" tag="div" class="subcategory-chips">
               <div
                 v-for="sub in (expandedLevel1?.id === cat.id ? cat.children : [])"
@@ -72,7 +72,7 @@
                   </svg>
                 </button>
 
-                <!-- Level 3: Detail Flavors (vertical under this subcategory) -->
+                
                 <Transition name="slide-down">
                   <div
                     v-if="expandedLevel2?.id === sub.id && sub.children?.length"
@@ -125,11 +125,9 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
-// State
 const expandedLevel1 = ref(null)
 const expandedLevel2 = ref(null)
 
-// Methods
 const getFlavorName = (code) => {
   const found = findFlavorInWheel(code)
   return found?.name || code
@@ -144,24 +142,17 @@ const isSelected = (code) => {
   return props.modelValue.includes(code)
 }
 
-// Check if this code should be excluded
-// - Direct match: excluded
-// - Ancestor of excluded code: NOT excluded (can still select parent even if child is liked)
-// - Descendant of excluded code: excluded (if parent is liked, children should be too)
 const isExcluded = (code) => {
   if (props.excludeCodes.length === 0) return false
 
-  // Direct match
   if (props.excludeCodes.includes(code)) return true
 
-  // Check if any ancestor is in excludeCodes (this item is a descendant of liked item)
   const ancestors = getAncestorCodes(code)
   if (ancestors.some(c => props.excludeCodes.includes(c))) return true
 
   return false
 }
 
-// Check if color is light (needs dark text)
 const isLightColor = (hex) => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
   if (!result) return false
@@ -178,7 +169,6 @@ const getChipStyle = (item) => {
   const color = item.colorHex
   const isLight = isLightColor(color)
 
-  // Excluded state - greyed out
   if (excluded) {
     return {
       '--chip-color': '#ccc',
@@ -205,7 +195,6 @@ const getChipStyle = (item) => {
     }
   }
 
-  // Unselected state - enhance light colors
   if (isLight) {
     return {
       '--chip-color': color,
@@ -227,13 +216,11 @@ const getChipStyle = (item) => {
   }
 }
 
-// Get all ancestor codes for a given code
 const getAncestorCodes = (code) => {
   const path = getFlavorPath(code)
   return path.slice(0, -1).map(item => item.code)
 }
 
-// Get all descendant codes for a given code
 const getDescendantCodes = (code) => {
   const found = findFlavorInWheel(code)
   if (!found) return []
@@ -255,10 +242,10 @@ const toggleFlavor = (code) => {
   let newValue = [...props.modelValue]
 
   if (newValue.includes(code)) {
-    // Deselect
+
     newValue = newValue.filter(c => c !== code)
   } else {
-    // Select - remove ancestors and descendants
+
     const ancestorCodes = getAncestorCodes(code)
     const descendantCodes = getDescendantCodes(code)
     const codesToRemove = new Set([...ancestorCodes, ...descendantCodes])
@@ -279,12 +266,11 @@ const removeFlavor = (code) => {
 }
 
 const handleLevel1Click = (cat) => {
-  // Don't allow selection if excluded, but allow expand
+
   if (!isExcluded(cat.code)) {
     toggleFlavor(cat.code)
   }
 
-  // Toggle expand (close if same, open if different)
   if (expandedLevel1.value?.id === cat.id) {
     expandedLevel1.value = null
     expandedLevel2.value = null
@@ -295,12 +281,11 @@ const handleLevel1Click = (cat) => {
 }
 
 const handleLevel2Click = (sub) => {
-  // Don't allow selection if excluded, but allow expand
+
   if (!isExcluded(sub.code)) {
     toggleFlavor(sub.code)
   }
 
-  // Toggle expand if has children
   if (sub.children?.length) {
     if (expandedLevel2.value?.id === sub.id) {
       expandedLevel2.value = null

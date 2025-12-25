@@ -1,13 +1,13 @@
 <template>
   <div class="flavor-explorer">
-    <!-- Loading State -->
+    
     <div v-if="isLoading" class="loading-state">
       <div class="loading-spinner"></div>
       <p>플레이버 로딩 중...</p>
     </div>
 
     <template v-else>
-      <!-- Selected Flavors Summary (Top) -->
+      
       <div class="selection-summary" :class="{ 'has-items': modelValue.length > 0 }">
         <div class="summary-header">
           <span class="summary-label">선택한 향미</span>
@@ -30,14 +30,14 @@
         <p v-else class="empty-hint">아래에서 향미를 선택해주세요</p>
       </div>
 
-      <!-- Flavor Categories -->
+      
       <div class="categories-container">
         <div
           v-for="category in flavors"
           :key="category.id"
           class="category-section"
         >
-          <!-- L1 Header (Main Category) -->
+          
           <div
             class="category-header"
             :style="{ backgroundColor: category.colorHex || category.color }"
@@ -48,7 +48,7 @@
               <span class="subcategory-count">{{ getSubcategoryCount(category) }}개 하위 분류</span>
             </div>
             <div class="header-right">
-              <!-- L1 Direct Select Button -->
+              
               <button
                 class="direct-select-btn"
                 :class="{ 'selected': isSelected(category.id) }"
@@ -57,14 +57,14 @@
                 <span v-if="isSelected(category.id)">✓</span>
                 <span v-else>선택</span>
               </button>
-              <!-- Expand/Collapse Icon -->
+              
               <span class="expand-icon" :class="{ 'expanded': expandedCategories.includes(category.id) }">
                 ▼
               </span>
             </div>
           </div>
 
-          <!-- L2 Subcategories (Expandable) -->
+          
           <transition name="expand">
             <div
               v-if="expandedCategories.includes(category.id)"
@@ -75,7 +75,7 @@
                 :key="subcat.id"
                 class="subcategory-item"
               >
-                <!-- L2 Header -->
+                
                 <div
                   class="subcategory-header"
                   :class="{ 'selected': isSelected(subcat.id), 'has-children': subcat.flavors?.length > 0 }"
@@ -85,7 +85,7 @@
                   <span class="subcat-color" :style="{ backgroundColor: category.colorHex || category.color }"></span>
                   <span class="subcat-name">{{ subcat.name }}</span>
 
-                  <!-- L2 선택 표시 또는 확장 아이콘 -->
+                  
                   <span v-if="isSelected(subcat.id)" class="check-mark">✓</span>
                   <span v-else-if="subcat.flavors?.length > 0" class="expand-hint">
                     {{ expandedSubcategories.includes(subcat.id) ? '접기' : `${subcat.flavors.length}개` }}
@@ -93,7 +93,7 @@
                   <span v-else class="tap-hint">탭하여 선택</span>
                 </div>
 
-                <!-- L3 Flavors -->
+                
                 <transition name="expand">
                   <div
                     v-if="subcat.flavors?.length > 0 && expandedSubcategories.includes(subcat.id)"
@@ -114,7 +114,7 @@
                 </transition>
               </div>
 
-              <!-- L1에 직접 속한 하위 항목이 없는 경우 안내 -->
+              
               <div v-if="!category.subCategories?.length" class="no-subcategories">
                 <button
                   class="flavor-chip large"
@@ -146,7 +146,7 @@ const props = defineProps({
   },
   maxSelection: {
     type: Number,
-    default: 0  // 0 = 무제한
+    default: 0
   }
 })
 
@@ -155,26 +155,24 @@ const emit = defineEmits(['update:modelValue'])
 const flavorStore = useFlavorStore()
 const { flavors, isLoading } = storeToRefs(flavorStore)
 
-// Expanded states
 const expandedCategories = ref([])
 const expandedSubcategories = ref([])
 
 onMounted(async () => {
   await flavorStore.fetchFlavors()
-  // Auto-expand first category for better UX
+
   if (flavors.value.length > 0) {
     expandedCategories.value = [flavors.value[0].id]
   }
 })
 
-// Toggle category expand/collapse
 const toggleCategory = (categoryId) => {
   const index = expandedCategories.value.indexOf(categoryId)
   if (index === -1) {
     expandedCategories.value.push(categoryId)
   } else {
     expandedCategories.value.splice(index, 1)
-    // Also collapse all subcategories in this category
+
     const category = flavors.value.find(c => c.id === categoryId)
     if (category?.subCategories) {
       category.subCategories.forEach(sub => {
@@ -187,13 +185,12 @@ const toggleCategory = (categoryId) => {
   }
 }
 
-// Handle subcategory click
 const handleSubcategoryClick = (subcat) => {
-  // L3가 없으면 바로 선택
+
   if (!subcat.flavors || subcat.flavors.length === 0) {
     toggleSelection(subcat.id)
   } else {
-    // L3가 있으면 확장/접기
+
     const index = expandedSubcategories.value.indexOf(subcat.id)
     if (index === -1) {
       expandedSubcategories.value.push(subcat.id)
@@ -203,7 +200,6 @@ const handleSubcategoryClick = (subcat) => {
   }
 }
 
-// Selection logic
 const isSelected = (id) => props.modelValue.includes(id)
 
 const toggleSelection = (id) => {
@@ -212,9 +208,9 @@ const toggleSelection = (id) => {
   if (isSelected(id)) {
     newSelection = newSelection.filter(item => item !== id)
   } else {
-    // maxSelection이 0이면 무제한
+
     if (props.maxSelection > 0 && newSelection.length >= props.maxSelection) {
-      // Could show toast here
+
       return
     }
     newSelection.push(id)
@@ -223,7 +219,6 @@ const toggleSelection = (id) => {
   emit('update:modelValue', newSelection)
 }
 
-// Helpers
 const getFlavorById = (id) => flavorStore.getFlavorById(id)
 const getFlavorName = (id) => getFlavorById(id)?.name || ''
 const getFlavorColor = (id) => {

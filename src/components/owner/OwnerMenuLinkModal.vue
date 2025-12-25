@@ -7,7 +7,7 @@
         @click.self="$emit('close')"
       >
         <div class="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md max-h-[60vh] flex flex-col shadow-xl mb-16 sm:mb-0">
-          <!-- 헤더 -->
+          
           <div class="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
             <div>
               <h3 class="text-lg font-bold text-textPrimary">메뉴 연결</h3>
@@ -23,21 +23,21 @@
             </button>
           </div>
 
-          <!-- 메뉴 목록 -->
+          
           <div class="flex-1 overflow-y-auto p-4 min-h-0">
-            <!-- 로딩 -->
+            
             <div v-if="isLoading" class="flex justify-center py-8">
               <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
             </div>
 
-            <!-- 빈 상태 -->
+            
             <div v-else-if="menus.length === 0" class="text-center py-8">
               <BaseIcon name="list" :size="48" class="text-textSecondary mx-auto mb-4" />
               <p class="text-textSecondary">등록된 메뉴가 없습니다</p>
               <p class="text-sm text-textSecondary mt-1">먼저 메뉴를 추가해주세요</p>
             </div>
 
-            <!-- 메뉴 체크박스 목록 -->
+            
             <div v-else class="space-y-3">
               <div
                 v-for="menu in menus"
@@ -61,7 +61,7 @@
             </div>
           </div>
 
-          <!-- 하단 버튼 -->
+          
           <div class="p-4 border-t border-border safe-bottom flex-shrink-0">
             <BaseButton
               variant="primary"
@@ -105,17 +105,14 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'updated'])
 
-// 카테고리 라벨 맵
 const categoryLabelMap = Object.fromEntries(
   MENU_CATEGORIES.map(cat => [cat.value, cat.label])
 )
 
-// 상태
 const menus = ref([])
 const isLoading = ref(true)
 const isSaving = ref(false)
 
-// 연결 상태: { [menuId]: { linked: boolean, original: { linked } } }
 const linkState = ref({})
 
 /**
@@ -128,10 +125,9 @@ const loadMenus = async () => {
     const data = response.data || response
     menus.value = data.content || data || []
 
-    // 연결 상태 초기화
     const state = {}
     menus.value.forEach(menu => {
-      // menu.beanBadges에서 현재 원두가 연결되어 있는지 확인
+
       const linkedBean = menu.beanBadges?.find(b => b.beanId === props.bean.id)
       const linked = !!linkedBean
 
@@ -180,7 +176,7 @@ const handleSave = async () => {
       const isLinked = state.linked
 
       if (!wasLinked && isLinked) {
-        // 새로 연결
+
         promises.push(
           linkBeanToMenu(menuId, {
             beanId: props.bean.id,
@@ -188,7 +184,7 @@ const handleSave = async () => {
           })
         )
       } else if (wasLinked && !isLinked) {
-        // 연결 해제
+
         promises.push(
           unlinkBeanFromMenu(menuId, props.bean.id)
         )

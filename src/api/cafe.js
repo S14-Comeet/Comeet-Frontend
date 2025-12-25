@@ -39,7 +39,6 @@ export const getStoreReviews = async (storeId, params = {}) => {
     const response = await api.get(`/stores/${storeId}/reviews`, { params })
     return response.data
   } catch {
-    // API가 아직 구현되지 않은 경우 빈 배열 반환
     logger.warn('Store reviews API not available, returning empty')
     return []
   }

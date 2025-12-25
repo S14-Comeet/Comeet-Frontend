@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col gap-4 p-4">
-    <!-- 카페 목록 헤더 -->
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
         <button
@@ -24,12 +23,10 @@
       </BaseButton>
     </div>
 
-    <!-- 로딩 상태 -->
     <div v-if="isLoading" class="flex justify-center items-center py-12">
       <BaseIcon name="spinner" :size="32" class="text-primary animate-spin" />
     </div>
 
-    <!-- 카페 목록 -->
     <div v-else-if="cafes.length > 0" class="flex flex-col gap-3">
       <StoreCard
         v-for="cafe in cafes"
@@ -44,7 +41,6 @@
       />
     </div>
 
-    <!-- 빈 상태 -->
     <div v-else class="flex flex-col items-center justify-center py-12 text-center">
       <BaseIcon name="bookmark-line" :size="48" class="text-textSecondary mb-4" />
       <p class="text-textPrimary text-lg font-medium mb-2">이 폴더에 저장된 카페가 없습니다</p>
@@ -78,7 +74,6 @@ const emit = defineEmits(['back', 'select', 'show-on-map', 'delete'])
 const router = useRouter()
 
 const handleSelectCafe = (cafe) => {
-  // 상세 페이지로 이동
   router.push({
     name: 'store-detail',
     params: { storeId: cafe.storeId || cafe.id }
@@ -86,7 +81,6 @@ const handleSelectCafe = (cafe) => {
   emit('select', cafe)
 }
 
-// 삭제 핸들러
 const handleDelete = (cafe) => {
   emit('delete', cafe)
 }

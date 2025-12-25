@@ -33,7 +33,6 @@ const emit = defineEmits(['change'])
 
 const isOpen = ref(false)
 
-// 2020년부터 현재 연도까지
 const currentYear = new Date().getFullYear()
 const years = computed(() => {
   const result = []

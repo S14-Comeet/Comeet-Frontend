@@ -6,13 +6,13 @@
       :style="popupStyle"
       @click="handleClick"
     >
-      <!-- 말풍선 꼬리 -->
+      
       <div class="popup-tail"></div>
 
-      <!-- 컨텐츠 -->
+      
       <div class="popup-content">
         <div class="popup-header">
-          <!-- 카테고리 태그들 -->
+          
           <div class="category-tags">
             <span
               v-for="(category, idx) in categories"
@@ -39,23 +39,23 @@
           {{ truncateAddress(store.address) }}
         </p>
 
-        <!-- 별점 · 리뷰수 · 방문수 · 거리 -->
+        
         <div class="store-stats">
-          <!-- 별점 -->
+          
           <div class="stat-item">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" class="star-icon">
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
             </svg>
             <span class="stat-value">{{ store.averageRating?.toFixed(1) || '-' }}</span>
           </div>
-          <!-- 리뷰수 -->
+          
           <div class="stat-item">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
             </svg>
             <span class="stat-value">{{ store.reviewCount ?? 0 }}</span>
           </div>
-          <!-- 방문수 -->
+          
           <div class="stat-item">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -65,7 +65,7 @@
             </svg>
             <span class="stat-value">{{ store.visitCount ?? 0 }}</span>
           </div>
-          <!-- 거리 -->
+          
           <div v-if="store.distanceText" class="stat-item">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
@@ -88,7 +88,6 @@ import { computed } from 'vue'
 import { MENU_CATEGORIES } from '@/constants'
 import RatingBadge from '@/components/common/RatingBadge.vue'
 
-// enum 값을 한글 라벨로 변환하는 맵
 const categoryLabelMap = Object.fromEntries(
   MENU_CATEGORIES.map(cat => [cat.value, cat.label])
 )
@@ -106,7 +105,6 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'detail'])
 
-// 팝업 위치 스타일 계산 (커스텀 마커 높이 40px 고려하여 위에 배치)
 const MARKER_HEIGHT_OFFSET = 44
 
 const popupStyle = computed(() => {
@@ -119,18 +117,16 @@ const popupStyle = computed(() => {
   }
 })
 
-// 카테고리 파싱 (쉼표로 구분된 enum을 한글 라벨 배열로 변환)
 const categories = computed(() => {
   if (!props.store?.category) return []
   return props.store.category
     .split(',')
     .map(c => c.trim())
     .filter(c => c)
-    .map(c => categoryLabelMap[c] || c) // enum → 한글 라벨 변환
+    .map(c => categoryLabelMap[c] || c)
     .slice(0, 3)
 })
 
-// 주소 줄임 처리
 const truncateAddress = (address) => {
   if (!address) return ''
   if (address.length > 25) {
@@ -139,7 +135,6 @@ const truncateAddress = (address) => {
   return address
 }
 
-// 팝업 클릭 시 상세 페이지로 이동
 const handleClick = () => {
   emit('detail', props.store)
 }

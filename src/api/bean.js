@@ -7,7 +7,6 @@ import api from './axios'
  */
 export const getBeanById = async (beanId) => {
   const response = await api.get(`/beans/${beanId}`)
-  // BaseResponse 래퍼에서 data 추출
   return response.data?.data || response.data
 }
 

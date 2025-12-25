@@ -1,6 +1,6 @@
 <template>
   <div class="recommendation-skeleton">
-    <!-- Bean skeleton -->
+    
     <template v-if="type === 'bean'">
       <div class="skeleton-card bean-skeleton">
         <div class="skeleton-header">
@@ -42,7 +42,7 @@
 defineProps({
   type: {
     type: String,
-    default: 'bean', // 'bean' | 'menu'
+    default: 'bean',
     validator: (value) => ['bean', 'menu'].includes(value)
   }
 })

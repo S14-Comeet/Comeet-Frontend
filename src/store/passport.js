@@ -13,29 +13,20 @@ const logger = createLogger("PassportStore");
 export const usePassportStore = defineStore(
   "passport",
   () => {
-    // ============ State ============
-    /** 선택된 연도 */
     const selectedYear = ref(new Date().getFullYear());
 
-    /** 여권 목록 (12개월) */
     const passports = ref([]);
 
-    /** 현재 조회 중인 여권 상세 */
     const currentPassport = ref(null);
 
-    /** 로딩 상태 */
     const isLoading = ref(false);
 
-    /** 에러 상태 */
     const error = ref(null);
 
-    // ============ Getters ============
-    /** 사용 가능한 여권 (방문 기록 있는 월) */
     const availablePassports = computed(() =>
       passports.value.filter((p) => p.isAvailable)
     );
 
-    /** 사용 불가능한 여권 (방문 기록 없는 월) */
     const unavailablePassports = computed(() =>
       passports.value.filter((p) => !p.isAvailable)
     );
@@ -54,7 +45,6 @@ export const usePassportStore = defineStore(
       return new Date(visitDate);
     };
 
-    /** 현재 여권의 방문 기록 (날짜 역순) */
     const sortedRecords = computed(() => {
       if (!currentPassport.value?.records) return [];
       return [...currentPassport.value.records].sort(
@@ -69,20 +59,16 @@ export const usePassportStore = defineStore(
      */
     const formatVisitDateToString = (visitDate) => {
       if (!visitDate) return "";
-      // 배열 형식: [2025, 12, 1, 10, 30] -> "2025-12-01"
       if (Array.isArray(visitDate) && visitDate.length >= 3) {
         const [year, month, day] = visitDate;
         return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
       }
-      // Date 객체
       if (visitDate instanceof Date) {
         return visitDate.toISOString().split("T")[0];
       }
-      // 문자열 (ISO 형식)
       return String(visitDate).split("T")[0];
     };
 
-    /** 현재 여권의 날짜별 그룹화된 기록 */
     const groupedRecords = computed(() => {
       const groups = {};
       sortedRecords.value.forEach((record) => {
@@ -95,7 +81,6 @@ export const usePassportStore = defineStore(
       return groups;
     });
 
-    // ============ Actions ============
     /**
      * 연도별 여권 목록 조회
      * @param {number} year - 조회할 연도
@@ -162,18 +147,15 @@ export const usePassportStore = defineStore(
     };
 
     return {
-      // State
       selectedYear,
       passports,
       currentPassport,
       isLoading,
       error,
-      // Getters
       availablePassports,
       unavailablePassports,
       sortedRecords,
       groupedRecords,
-      // Actions
       fetchPassportList,
       fetchPassportDetail,
       setYear,

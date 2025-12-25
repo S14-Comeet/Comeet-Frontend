@@ -8,7 +8,7 @@
         class="flavor-wheel"
         :class="{ 'has-selection': selectedFlavor }"
       >
-        <!-- Background circle -->
+        
         <circle
           :cx="center"
           :cy="center"
@@ -18,7 +18,7 @@
           stroke-width="1"
         />
 
-        <!-- Level 3 (Outer ring) - Specific flavors -->
+        
         <g class="level-3">
           <template v-for="segment in level3Segments" :key="segment.id">
             <path
@@ -153,10 +153,8 @@ const props = defineProps({
 
 const emit = defineEmits(['select'])
 
-// Selected flavor state
 const selectedFlavor = ref(null)
 
-// Check if color is light (needs dark text)
 const isLightColor = (hex) => {
   if (!hex) return false
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
@@ -168,29 +166,25 @@ const isLightColor = (hex) => {
   return luminance > 0.55
 }
 
-// Center text color based on selected flavor
 const centerTextColor = computed(() => {
   if (!selectedFlavor.value) return 'var(--color-accent)'
   return isLightColor(selectedFlavor.value.color) ? '#3d3d3d' : 'white'
 })
 
-// Dimensions
 const center = computed(() => props.size / 2)
 const outerRadius = computed(() => props.size / 2 - 2)
 const innerRadius = computed(() => props.size * 0.12)
 const level1OuterRadius = computed(() => props.size * 0.28)
 const level2OuterRadius = computed(() => props.size * 0.40)
 
-// Check if a flavor code/id should be highlighted
 const isHighlighted = (idOrCode) => {
-  if (!props.highlightedFlavors.length) return true // If no highlights, show all
+  if (!props.highlightedFlavors.length) return true
   return props.highlightedFlavors.some(f => {
     const fId = typeof f === 'object' ? (f.flavorId || f.id || f.code) : f
     return fId === idOrCode || fId === String(idOrCode)
   })
 }
 
-// Check if any child is highlighted (for parent highlighting)
 const hasHighlightedChild = (item) => {
   if (isHighlighted(item.id) || isHighlighted(item.code)) return true
   if (item.children?.length) {
@@ -199,7 +193,6 @@ const hasHighlightedChild = (item) => {
   return false
 }
 
-// Handle segment click (toggle)
 const handleSegmentClick = (segment) => {
   if (segment.isHighlighted) {
     if (selectedFlavor.value?.id === segment.id) {
@@ -211,20 +204,17 @@ const handleSegmentClick = (segment) => {
   }
 }
 
-// Clear selection
 const clearSelection = () => {
   selectedFlavor.value = null
 }
 
-// Select flavor by ID (from legend click, toggle)
 const selectFlavorById = (id) => {
-  // Toggle off if same flavor clicked
+
   if (selectedFlavor.value?.id === id) {
     selectedFlavor.value = null
     return
   }
 
-  // Find the segment in all levels
   const allSegments = [...level1Segments.value, ...level2Segments.value, ...level3Segments.value]
   const segment = allSegments.find(s => s.id === id)
   if (segment && segment.isHighlighted) {
@@ -233,7 +223,6 @@ const selectFlavorById = (id) => {
   }
 }
 
-// Create arc path
 const createArcPath = (startAngle, endAngle, innerR, outerR) => {
   const startAngleRad = (startAngle - 90) * Math.PI / 180
   const endAngleRad = (endAngle - 90) * Math.PI / 180
@@ -257,7 +246,6 @@ const createArcPath = (startAngle, endAngle, innerR, outerR) => {
           Z`
 }
 
-// Calculate total leaf count for proportional sizing
 const countLeaves = (item) => {
   if (!item.children?.length) return 1
   return item.children.reduce((sum, child) => sum + countLeaves(child), 0)
@@ -267,7 +255,6 @@ const totalLeaves = computed(() => {
   return FLAVOR_WHEEL.reduce((sum, cat) => sum + countLeaves(cat), 0)
 })
 
-// Level 1 segments (main categories)
 const level1Segments = computed(() => {
   const segments = []
   let currentAngle = 0
@@ -295,7 +282,6 @@ const level1Segments = computed(() => {
   return segments
 })
 
-// Level 2 segments (sub-categories)
 const level2Segments = computed(() => {
   const segments = []
   let currentAngle = 0
@@ -326,7 +312,7 @@ const level2Segments = computed(() => {
         currentAngle += angleSpan
       })
     } else {
-      // No children, extend to level 2
+
       const highlighted = isHighlighted(category.id) || isHighlighted(category.code)
       const fill = highlighted ? category.colorHex : hexWithOpacity(category.colorHex, props.dimOpacity)
 
@@ -347,7 +333,6 @@ const level2Segments = computed(() => {
   return segments
 })
 
-// Level 3 segments (specific flavors)
 const level3Segments = computed(() => {
   const segments = []
   let currentAngle = 0
@@ -382,7 +367,7 @@ const level3Segments = computed(() => {
             currentAngle += flavorAngleSpan
           })
         } else {
-          // No level 3, extend subcat to outer
+
           const highlighted = isHighlighted(subcat.id) || isHighlighted(subcat.code)
           const color = subcat.colorHex || category.colorHex
           const fill = highlighted ? color : hexWithOpacity(color, props.dimOpacity)
@@ -401,7 +386,7 @@ const level3Segments = computed(() => {
         }
       })
     } else {
-      // No children at all, extend to outer
+
       const highlighted = isHighlighted(category.id) || isHighlighted(category.code)
       const fill = highlighted ? category.colorHex : hexWithOpacity(category.colorHex, props.dimOpacity)
 
@@ -422,7 +407,6 @@ const level3Segments = computed(() => {
   return segments
 })
 
-// Get details of highlighted flavors for legend
 const highlightedFlavorDetails = computed(() => {
   if (!props.highlightedFlavors.length) return []
 
@@ -441,9 +425,8 @@ const highlightedFlavorDetails = computed(() => {
   }).filter(Boolean)
 })
 
-// Convert hex color to hex with opacity
 const hexWithOpacity = (hex, opacity) => {
-  // Convert hex to rgba
+
   const r = parseInt(hex.slice(1, 3), 16)
   const g = parseInt(hex.slice(3, 5), 16)
   const b = parseInt(hex.slice(5, 7), 16)

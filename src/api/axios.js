@@ -10,10 +10,9 @@ const api = axios.create({
   baseURL: config.api.baseURL,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
-  timeout: 30000 // 30초 타임아웃
+  timeout: 30000
 });
 
-// 요청 인터셉터 - 액세스 토큰 자동 주입
 api.interceptors.request.use(
   (requestConfig) => {
     const accessToken = getAccessToken();
@@ -31,7 +30,7 @@ api.interceptors.request.use(
 
 let isRefreshing = false;
 let failedQueue = [];
-const MAX_QUEUE_SIZE = 10; // 큐 크기 제한 (메모리 누수 방지)
+const MAX_QUEUE_SIZE = 10;
 
 const processQueue = (error, token = null) => {
   failedQueue.forEach(prom => {
@@ -42,7 +41,7 @@ const processQueue = (error, token = null) => {
 
 /** 재발급 중일 때 요청을 큐에 추가하고 대기 */
 const waitForTokenRefresh = (originalRequest) => {
-  // 큐 크기 제한 체크 - 초과 시 즉시 에러 반환
+
   if (failedQueue.length >= MAX_QUEUE_SIZE) {
     logger.warn('토큰 재발급 대기 큐 초과');
     return Promise.reject(new Error('Too many pending requests'));
@@ -93,7 +92,6 @@ const handleTokenReissue = async (originalRequest) => {
   }
 };
 
-// 응답 인터셉터 - 401 에러 처리 및 토큰 재발급
 api.interceptors.response.use(
   (response) => {
     const newAccessToken = response.headers['authorization'];
@@ -106,7 +104,6 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // 네트워크 에러 처리 (서버 응답 없음)
     if (!error.response) {
       const isTimeout = error.code === 'ECONNABORTED' || error.message?.includes('timeout');
       const isNetworkError = error.message?.includes('Network Error');
@@ -128,10 +125,8 @@ api.interceptors.response.use(
 
     logger.info(`응답 에러: ${error.response.status} ${originalRequest?.url}`);
 
-    // 401이 아닌 에러는 Toast로 표시 (특정 케이스 제외)
     if (!isUnauthorized && error.response.status >= 400) {
       const isSilent = originalRequest?.url?.includes('/reissue') ||
-        // 커핑노트 404는 정상 케이스 (커핑노트 없음)
         (originalRequest?.url?.includes('/cupping-note') && error.response.status === 404)
 
       if (!isSilent) {
@@ -143,8 +138,6 @@ api.interceptors.response.use(
       throw error;
     }
 
-    // 토큰이 없는 경우(비로그인 상태)는 재발급 시도 없이 에러 throw
-    // 이렇게 하면 비로그인 사용자도 공개 페이지(지도 등)를 볼 수 있음
     const currentToken = getAccessToken();
     if (!currentToken) {
       logger.debug('토큰 없음 - 재발급 시도 생략');
@@ -156,7 +149,6 @@ api.interceptors.response.use(
       logger.debug('재발급 스킵 대상 URL - 재발급 시도 생략');
       throw error;
     }
-
 
     if (isRefreshing) {
       return waitForTokenRefresh(originalRequest);

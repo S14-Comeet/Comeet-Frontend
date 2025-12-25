@@ -7,7 +7,7 @@
         @click.self="$emit('close')"
       >
         <div class="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md max-h-[60vh] flex flex-col shadow-xl mb-16 sm:mb-0">
-          <!-- 헤더 -->
+          
           <div class="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
             <div>
               <h3 class="text-lg font-bold text-textPrimary">원두 선택</h3>
@@ -23,7 +23,7 @@
             </button>
           </div>
 
-          <!-- 탭 -->
+          
           <div class="flex border-b border-border flex-shrink-0">
             <button
               class="flex-1 py-3 text-sm font-medium transition-colors"
@@ -41,32 +41,32 @@
             </button>
           </div>
 
-          <!-- 탭 내용 -->
+          
           <div class="flex-1 overflow-y-auto min-h-0">
-            <!-- 우리 로스터리 원두 탭 -->
+            
             <div v-if="activeTab === 'roastery'" class="p-4">
-              <!-- 로딩 -->
+              
               <div v-if="isLoadingRoastery && roasteryBeans.length === 0" class="flex justify-center py-8">
                 <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
               </div>
 
-              <!-- 빈 상태 -->
+              
               <div v-else-if="roasteryBeans.length === 0" class="text-center py-6">
                 <p class="text-textSecondary text-sm">등록된 원두가 없습니다</p>
                 <p class="text-xs text-textSecondary mt-1">원두 탭에서 원두를 등록해보세요</p>
               </div>
 
-              <!-- 원두 목록 -->
+              
               <div v-else class="space-y-2">
                 <BeanCard
-                  v-for="bean in roasteryBeans"
-                  :key="bean.id"
-                  :bean="bean"
-                  :is-selected="isSelected(bean.id)"
-                  @select="handleSelectBean(bean)"
+                  v-for="beanItem in roasteryBeans"
+                  :key="beanItem.id"
+                  :bean="beanItem"
+                  :is-selected="isSelected(beanItem.id)"
+                  @select="handleSelectBean(beanItem)"
                 />
 
-                <!-- 더 보기 -->
+                
                 <button
                   v-if="hasMoreRoastery"
                   type="button"
@@ -79,9 +79,9 @@
               </div>
             </div>
 
-            <!-- 전체 검색 탭 -->
+            
             <div v-else class="flex flex-col h-full">
-              <!-- 검색 바 -->
+              
               <div class="p-4 border-b border-border flex-shrink-0">
                 <div class="relative">
                   <BaseInput
@@ -95,32 +95,32 @@
                 </div>
               </div>
 
-              <!-- 원두 목록 -->
+              
               <div class="flex-1 overflow-y-auto p-4">
-                <!-- 로딩 -->
+                
                 <div v-if="isLoadingAll && allBeans.length === 0" class="flex justify-center py-8">
                   <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
                 </div>
 
-                <!-- 빈 상태 -->
+                
                 <div v-else-if="allBeans.length === 0" class="text-center py-8">
                   <p class="text-textSecondary">
                     {{ searchKeyword ? '검색 결과가 없습니다' : '검색어를 입력하세요' }}
                   </p>
                 </div>
 
-                <!-- 목록 -->
+                
                 <div v-else class="space-y-2">
                   <BeanCard
-                    v-for="bean in allBeans"
-                    :key="bean.id"
-                    :bean="bean"
-                    :is-selected="isSelected(bean.id)"
+                    v-for="beanItem in allBeans"
+                    :key="beanItem.id"
+                    :bean="beanItem"
+                    :is-selected="isSelected(beanItem.id)"
                     :show-roastery="true"
-                    @select="handleSelectBean(bean)"
+                    @select="handleSelectBean(beanItem)"
                   />
 
-                  <!-- 더 보기 -->
+                  
                   <button
                     v-if="hasMoreAll"
                     type="button"
@@ -163,16 +163,13 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'select'])
 
-// 상태
 const activeTab = ref('roastery')
 
-// 로스터리 원두 상태
 const roasteryBeans = ref([])
 const isLoadingRoastery = ref(false)
 const roasteryPage = ref(1)
 const hasMoreRoastery = ref(false)
 
-// 전체 검색 상태
 const allBeans = ref([])
 const searchKeyword = ref('')
 const isLoadingAll = ref(false)
@@ -180,7 +177,6 @@ const isSearching = ref(false)
 const allPage = ref(1)
 const hasMoreAll = ref(false)
 
-// 디바운스 타이머
 let searchTimer = null
 
 /**

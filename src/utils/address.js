@@ -22,22 +22,20 @@ export const openAddressSearch = () => {
 
     new window.daum.Postcode({
       oncomplete: (data) => {
-        // 도로명 주소 우선, 없으면 지번 주소
         const address = data.roadAddress || data.jibunAddress
 
         resolve({
           address,
           roadAddress: data.roadAddress,
           jibunAddress: data.jibunAddress,
-          zonecode: data.zonecode, // 우편번호
+          zonecode: data.zonecode,
           buildingName: data.buildingName,
           sido: data.sido,
           sigungu: data.sigungu,
-          bname: data.bname // 법정동/법정리
+          bname: data.bname
         })
       },
       onclose: (state) => {
-        // 강제 닫기 (사용자가 X 버튼 클릭)
         if (state === 'FORCE_CLOSE') {
           reject(new Error('주소 검색이 취소되었습니다'))
         }
@@ -56,8 +54,6 @@ export const getCoordinatesFromAddress = async (address) => {
     throw new Error('카카오 REST API 키가 설정되지 않았습니다. VITE_KAKAO_REST_API_KEY를 확인하세요.')
   }
 
-  // 개발환경: Vite 프록시 사용 (CORS 우회)
-  // 프로덕션: 직접 호출 또는 백엔드 프록시 필요
   const isDev = import.meta.env.DEV
   const baseUrl = isDev ? '/kakao-api' : 'https://dapi.kakao.com'
   const url = `${baseUrl}/v2/local/search/address.json?query=${encodeURIComponent(address)}`
@@ -98,10 +94,8 @@ export const getCoordinatesFromAddress = async (address) => {
  * @returns {Promise<Object>} { address, latitude, longitude, ... }
  */
 export const searchAddressWithCoordinates = async () => {
-  // 1. 다음 우편번호 서비스로 주소 검색
   const addressData = await openAddressSearch()
 
-  // 2. 카카오 API로 좌표 변환
   const coordinates = await getCoordinatesFromAddress(addressData.address)
 
   return {

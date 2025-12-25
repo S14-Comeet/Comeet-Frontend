@@ -1,6 +1,6 @@
 <template>
   <div class="menu-recommendation-card" @click="handleClick">
-    <!-- Thumbnail -->
+    
     <div class="menu-thumbnail">
       <img
         v-if="hasValidImage"
@@ -13,7 +13,7 @@
       <span v-if="showRank && menu.rank" class="rank-overlay">#{{ menu.rank }}</span>
     </div>
 
-    <!-- Content -->
+    
     <div class="menu-content">
       <div class="menu-header">
         <h3 class="menu-name">{{ menu.menuName }}</h3>
@@ -29,7 +29,7 @@
         <span v-if="menu.price" class="price">{{ formatPrice(menu.price) }}</span>
       </div>
 
-      <!-- Flavor chips -->
+      
       <div v-if="menu.flavors?.length" class="flavor-list">
         <FlavorChip
           v-for="flavor in menu.flavors.slice(0, 3)"
@@ -42,7 +42,7 @@
       </div>
     </div>
 
-    <!-- AI Reason (below) -->
+    
     <RecommendationReason
       v-if="showReason && menu.reason"
       :reason="menu.reason"
@@ -62,8 +62,7 @@ const props = defineProps({
   menu: {
     type: Object,
     required: true
-    // { menuId, menuName, menuDescription, price, menuImageUrl, storeId, storeName, storeAddress,
-    //   storeLatitude, storeLongitude, distanceKm, beans, flavors, rank, reason, similarityScore }
+
   },
   showRank: {
     type: Boolean,

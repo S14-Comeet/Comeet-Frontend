@@ -4,17 +4,17 @@
     :class="[`variant-${variant}`, { 'is-closed': store.isClosed }]"
     @click="handleClick"
   >
-    <!-- Compact variant (for StoreListSheet - 지도) -->
+    
     <template v-if="variant === 'compact'">
       <div class="store-info">
-        <!-- 1줄: 가게명 + 커슐랭 배지 -->
+        
         <div class="store-header-row">
           <h4 class="store-name">{{ store.name }}</h4>
           <RatingBadge :rating="store.averageRating" />
           <span v-if="store.isClosed" class="closed-badge">영업종료</span>
         </div>
 
-        <!-- 2줄: 별점 · 리뷰 수 · 방문 수 · 카테고리 -->
+        
         <div class="store-meta-row">
           <div v-if="store.averageRating" class="rating-inline">
             <BaseIcon name="star-fill" :size="12" class="text-accent" />
@@ -36,10 +36,10 @@
           />
         </div>
 
-        <!-- 3줄: 주소 -->
+        
         <p class="store-address">{{ store.address || '주소 정보 없음' }}</p>
 
-        <!-- 4줄: 거리 (있으면) -->
+        
         <div v-if="store.distanceText" class="store-distance">
           <BaseIcon name="map-marker" :size="12" />
           <span>{{ store.distanceText }}</span>
@@ -130,7 +130,6 @@ import BaseChip from '@/components/common/BaseChip.vue'
 import RatingBadge from '@/components/common/RatingBadge.vue'
 import { formatDate } from '@/utils/date'
 
-// enum 값을 한글 라벨로 변환하는 맵
 const categoryLabelMap = Object.fromEntries(
   MENU_CATEGORIES.map(cat => [cat.value, cat.label])
 )
@@ -142,7 +141,7 @@ const props = defineProps({
   },
   variant: {
     type: String,
-    default: 'detailed', // 'compact' | 'detailed'
+    default: 'detailed',
     validator: (value) => ['compact', 'detailed'].includes(value)
   },
   showAddedDate: {
@@ -169,7 +168,6 @@ const hasValidThumbnail = computed(() => {
          !imageError.value
 })
 
-// 카테고리를 한글로 변환 (첫 번째 카테고리만 표시)
 const displayCategory = computed(() => {
   if (!props.store.category) return '카페'
 

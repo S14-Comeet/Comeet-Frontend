@@ -4,7 +4,6 @@ import { createLogger } from '@/utils/logger'
 
 const logger = createLogger('useGeolocation')
 
-// 에러 코드별 메시지 정의
 const ERROR_MESSAGES = {
     PERMISSION_DENIED: '위치 권한을 허용하면 주변 카페를 추천받을 수 있어요',
     POSITION_UNAVAILABLE: '현재 위치 정보를 가져올 수 없습니다. 잠시 후 다시 시도해주세요',
@@ -25,11 +24,11 @@ export function useGeolocation() {
         if (!err || !err.code) return ERROR_MESSAGES.UNKNOWN
 
         switch (err.code) {
-            case 1: // PERMISSION_DENIED
+            case 1:
                 return ERROR_MESSAGES.PERMISSION_DENIED
-            case 2: // POSITION_UNAVAILABLE
+            case 2:
                 return ERROR_MESSAGES.POSITION_UNAVAILABLE
-            case 3: // TIMEOUT
+            case 3:
                 return ERROR_MESSAGES.TIMEOUT
             default:
                 return ERROR_MESSAGES.UNKNOWN

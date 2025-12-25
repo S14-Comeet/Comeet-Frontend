@@ -1,19 +1,15 @@
 <template>
   <div class="flex flex-col min-h-full bg-background">
-    <!-- 페이지 헤더 -->
     <div class="bg-white px-4 py-5 border-b border-border">
       <h1 class="text-xl font-bold text-textPrimary">내 가게 관리</h1>
       <p class="text-sm text-textSecondary mt-1">등록한 가맹점을 관리하세요</p>
     </div>
 
-    <!-- 컨텐츠 영역 -->
     <div class="flex-1 p-4">
-      <!-- 로딩 상태 -->
       <div v-if="isLoading" class="flex justify-center items-center py-12">
         <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
       </div>
 
-      <!-- 에러 상태 -->
       <div v-else-if="error" class="text-center py-12">
         <BaseIcon name="notice" :size="48" class="text-error mx-auto mb-4" />
         <p class="text-textSecondary mb-4">가맹점 목록을 불러오지 못했습니다</p>
@@ -22,7 +18,6 @@
         </BaseButton>
       </div>
 
-      <!-- 빈 상태 -->
       <div v-else-if="stores.length === 0" class="text-center py-12">
         <BaseIcon name="coffee" :size="48" class="text-textSecondary mx-auto mb-4" />
         <p class="text-textPrimary text-lg font-medium mb-2">등록된 가맹점이 없습니다</p>
@@ -32,9 +27,7 @@
         </BaseButton>
       </div>
 
-      <!-- 가맹점 목록 -->
       <template v-else>
-        <!-- 가맹점 추가 버튼 -->
         <button
           class="w-full flex items-center justify-center gap-2 p-4 mb-4 bg-white rounded-xl border-2 border-dashed border-primary-300 text-primary hover:bg-primary-50 transition-colors"
           @click="goToAddStore"
@@ -43,7 +36,6 @@
           <span class="font-medium">새 가맹점 등록</span>
         </button>
 
-        <!-- 가맹점 카드 목록 -->
         <div class="space-y-3">
           <OwnerStoreCard
             v-for="store in stores"
@@ -57,7 +49,6 @@
       </template>
     </div>
 
-    <!-- 삭제 확인 모달 -->
     <Teleport to="body">
       <Transition name="fade">
         <div
@@ -111,12 +102,10 @@ import OwnerStoreCard from '@/components/owner/OwnerStoreCard.vue'
 const logger = createLogger('OwnerStoreList')
 const router = useRouter()
 
-// 상태
 const stores = ref([])
 const isLoading = ref(true)
 const error = ref(null)
 
-// 삭제 모달 상태
 const showDeleteModal = ref(false)
 const deletingStore = ref(null)
 const isDeleting = ref(false)
@@ -181,7 +170,6 @@ const confirmDelete = async () => {
     await deleteStore(deletingStore.value.id)
     showSuccess('가맹점이 삭제되었습니다')
 
-    // 목록에서 제거
     stores.value = stores.value.filter(s => s.id !== deletingStore.value.id)
     showDeleteModal.value = false
     deletingStore.value = null

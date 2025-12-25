@@ -1,7 +1,7 @@
 <template>
   <div class="passport-timeline">
     <div v-for="(records, date) in groupedRecords" :key="date" class="date-group">
-      <!-- 날짜 헤더 -->
+      
       <div class="date-header">
         <div class="date-marker">
           <span class="date-dot"></span>
@@ -13,7 +13,7 @@
         </div>
       </div>
 
-      <!-- 방문 기록 카드들 -->
+      
       <div class="records-container">
         <div v-for="record in records" :key="record.visitId" class="timeline-card" @click="handleItemClick(record)">
           <div class="card-content">
@@ -57,7 +57,7 @@ const emit = defineEmits(['item-click'])
 
 const formatDay = (dateString) => {
   if (!dateString) return '-'
-  // YYYY-MM-DD 형식 직접 파싱
+
   const parts = String(dateString).split('-')
   if (parts.length >= 3) {
     const month = parseInt(parts[1], 10)
@@ -66,7 +66,7 @@ const formatDay = (dateString) => {
       return `${month}/${day}`
     }
   }
-  // fallback: Date 객체 사용
+
   const date = new Date(dateString)
   if (isNaN(date.getTime())) return '-'
   return `${date.getMonth() + 1}/${date.getDate()}`
@@ -75,7 +75,7 @@ const formatDay = (dateString) => {
 const formatWeekday = (dateString) => {
   if (!dateString) return ''
   const weekdays = ['일', '월', '화', '수', '목', '금', '토']
-  // YYYY-MM-DD 형식 직접 파싱
+
   const parts = String(dateString).split('-')
   if (parts.length >= 3) {
     const year = parseInt(parts[0], 10)
@@ -86,7 +86,7 @@ const formatWeekday = (dateString) => {
       return weekdays[date.getDay()]
     }
   }
-  // fallback
+
   const date = new Date(dateString)
   if (isNaN(date.getTime())) return ''
   return weekdays[date.getDay()]

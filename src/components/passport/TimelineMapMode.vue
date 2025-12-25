@@ -1,6 +1,5 @@
 <template>
     <div class="timeline-map-mode">
-        <!-- 헤더 -->
         <header class="map-header">
             <button class="back-button" @click="handleClose">
                 <BaseIcon name="chevron-left" :size="20" />
@@ -9,15 +8,12 @@
             <div class="header-spacer"></div>
         </header>
 
-        <!-- 지도 영역 -->
         <div ref="mapContainer" class="map-container">
-            <!-- 마커 클릭 팝업 (MarkerPopup 재사용) -->
             <MarkerPopup
 :store="popupStore" :position="popupPosition" @close="showMarkerPopup = false"
                 @detail="goToStoreDetail" />
         </div>
 
-        <!-- 페이지네이션 (지도 위에 플로팅) -->
         <div class="floating-pagination">
             <button class="nav-button" :disabled="currentIndex === 0" @click="goToPrev">
                 <BaseIcon name="chevron-left" :size="20" />
@@ -28,12 +24,10 @@
             </button>
         </div>
 
-        <!-- 하단 기록 카드 -->
         <div class="bottom-info">
             <TimelineRecordCard :record="currentRecord" @detail="goToStoreDetail" @close="handleClose" />
         </div>
 
-        <!-- 상세 정보 모달 -->
         <MapPlaceDetail v-if="showDetailSheet" :place="detailPlace" @close="showDetailSheet = false" />
     </div>
 </template>
@@ -47,6 +41,9 @@ import TimelineRecordCard from '@/components/passport/TimelineRecordCard.vue'
 import MapPlaceDetail from '@/components/map/MapPlaceDetail.vue'
 import MarkerPopup from '@/components/map/MarkerPopup.vue'
 import { useMapPopup } from '@/composables/useMapPopup'
+import { createLogger } from '@/utils/logger'
+
+const logger = createLogger('TimelineMapMode')
 
 const props = defineProps({
     records: {
@@ -66,7 +63,6 @@ const props = defineProps({
 const emit = defineEmits(['close', 'index-change'])
 const router = useRouter()
 
-// 상태
 const mapContainer = ref(null)
 const map = ref(null)
 const marker = ref(null)
@@ -74,21 +70,17 @@ const polylines = ref([])
 const currentIndex = ref(props.initialIndex)
 const showDetailSheet = ref(false)
 
-// useMapPopup composable 사용
 const {
     popupStore,
     popupPosition,
     updatePopupPosition,
     throttledUpdatePopupPosition,
     showPopupOnly,
-    closePopup,
-    cleanup: cleanupPopup
+    closePopup
 } = useMapPopup(map)
 
-// 현재 기록
 const currentRecord = computed(() => props.records[currentIndex.value])
 
-// MapPlaceDetail용 장소 데이터
 const detailPlace = computed(() => {
     if (!currentRecord.value) return null
     return {
@@ -99,12 +91,8 @@ const detailPlace = computed(() => {
     }
 })
 
-// 월 라벨
 const monthLabel = computed(() => props.month ? `${props.month}월` : '')
 
-// ============================================================
-// 베지어 곡선 경로 생성
-// ============================================================
 const createBezierCurve = (from, to, numPoints = 30) => {
     const points = []
 
@@ -133,7 +121,6 @@ const createBezierCurve = (from, to, numPoints = 30) => {
     return points
 }
 
-// 모든 경로 그리기
 const drawAllPaths = () => {
     if (!map.value || props.records.length < 2) return
 
@@ -159,9 +146,6 @@ const drawAllPaths = () => {
     }
 }
 
-// ============================================================
-// 지도 초기화 및 마커
-// ============================================================
 const initMap = async () => {
     try {
         await waitForNaverMaps()
@@ -182,26 +166,21 @@ const initMap = async () => {
             scaleControl: false
         })
 
-        // 지도 이동/확대 시 팝업 위치 업데이트
         window.naver.maps.Event.addListener(map.value, 'idle', updatePopupPosition)
         window.naver.maps.Event.addListener(map.value, 'zoom_changed', throttledUpdatePopupPosition)
         window.naver.maps.Event.addListener(map.value, 'drag', throttledUpdatePopupPosition)
         window.naver.maps.Event.addListener(map.value, 'center_changed', throttledUpdatePopupPosition)
 
-        // 모든 경로 그리기
         drawAllPaths()
 
-        // 현재 위치 마커 생성
         createMarker()
 
-        // 경계에 맞게 지도 조정
         fitBounds()
     } catch (error) {
-        console.error('Failed to initialize map:', error)
+        logger.error('Failed to initialize map', error)
     }
 }
 
-// 지도 경계 조정
 const fitBounds = () => {
     if (!map.value || props.records.length === 0) return
 
@@ -218,7 +197,6 @@ const fitBounds = () => {
     })
 }
 
-// 마커 생성 (기존 커피 아이콘 + 깜빡임)
 const createMarker = () => {
     if (!currentRecord.value || !map.value) return
 
@@ -243,13 +221,10 @@ const createMarker = () => {
             zIndex: 100
         })
 
-        // 마커 클릭 이벤트
         window.naver.maps.Event.addListener(marker.value, 'click', () => {
-            // 팝업이 열려있으면 닫기, 아니면 열기
             if (popupStore.value) {
                 closePopup()
             } else {
-                // 현재 기록을 store 형식으로 변환하여 팝업 표시
                 const storeData = {
                     storeId: currentRecord.value.storeId,
                     name: currentRecord.value.storeName,
@@ -264,7 +239,6 @@ const createMarker = () => {
     }
 }
 
-// 현재 기록으로 이동
 const moveToCurrentRecord = () => {
     if (!currentRecord.value || !map.value) return
 
@@ -277,9 +251,6 @@ const moveToCurrentRecord = () => {
     createMarker()
 }
 
-// ============================================================
-// 네비게이션
-// ============================================================
 const goToPrev = () => {
     if (currentIndex.value > 0) {
         currentIndex.value--
@@ -294,19 +265,16 @@ const goToNext = () => {
     }
 }
 
-// 상세 페이지 이동
 const goToStoreDetail = () => {
     if (currentRecord.value?.storeId) {
         router.push(`/store/${currentRecord.value.storeId}`)
     }
 }
 
-// 닫기
 const handleClose = () => {
     emit('close')
 }
 
-// 인덱스 변경 감시
 watch(currentIndex, moveToCurrentRecord)
 
 onMounted(initMap)
@@ -327,7 +295,6 @@ onUnmounted(() => {
     flex-direction: column;
 }
 
-/* 헤더 */
 .map-header {
     display: flex;
     align-items: center;
@@ -368,13 +335,11 @@ onUnmounted(() => {
     width: 40px;
 }
 
-/* 지도 */
 .map-container {
     flex: 1;
     position: relative;
 }
 
-/* 플로팅 페이지네이션 */
 .floating-pagination {
     position: absolute;
     bottom: 300px;
@@ -421,7 +386,6 @@ onUnmounted(() => {
     text-align: center;
 }
 
-/* 하단 정보 */
 .bottom-info {
     position: absolute;
     bottom: 0;
@@ -432,7 +396,6 @@ onUnmounted(() => {
 </style>
 
 <style>
-/* 타임라인 마커 (커피 아이콘 + 깜빡임) */
 .timeline-marker {
     position: relative;
     width: 40px;

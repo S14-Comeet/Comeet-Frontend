@@ -6,14 +6,14 @@
       class="star-item"
       :style="{ width: `${size}px`, height: `${size}px` }"
     >
-      <!-- 배경 별 (빈 별) -->
+      
       <BaseIcon
         name="star-line"
         :size="size"
         color="#E5E5E5"
         class="absolute inset-0"
       />
-      <!-- 채워진 별 -->
+      
       <div
         class="absolute inset-0 overflow-hidden"
         :style="{ width: getFillWidth(i) }"
@@ -25,7 +25,7 @@
           class="transition-colors duration-200"
         />
       </div>
-      <!-- 클릭 영역 (allowHalf일 때만 반으로 나눔) -->
+      
       <template v-if="!readonly">
         <template v-if="allowHalf">
           <button
@@ -106,9 +106,9 @@ const getFillWidth = (index) => {
 const getColor = (index) => {
   const rating = getCurrentRating()
   if (rating >= index - 0.5) {
-    return '#FFD700' // Gold
+    return '#FFD700'
   }
-  return '#E5E5E5' // Gray
+  return '#E5E5E5'
 }
 </script>
 

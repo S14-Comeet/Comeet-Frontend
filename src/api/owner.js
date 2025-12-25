@@ -3,10 +3,6 @@ import { createLogger } from '@/utils/logger'
 
 const logger = createLogger('API:Owner')
 
-// ============================================================
-// 가맹점 관련 API
-// ============================================================
-
 /**
  * 내 가맹점 목록 조회
  * @returns {Promise<Array>} 가맹점 목록
@@ -49,7 +45,6 @@ export const createStore = async (storeData) => {
 export const updateStore = async (storeId, storeData) => {
   const payload = {}
 
-  // 전달된 필드만 포함 (부분 업데이트)
   if (storeData.name !== undefined) payload.name = storeData.name
   if (storeData.description !== undefined) payload.description = storeData.description
   if (storeData.address !== undefined) payload.address = storeData.address
@@ -74,10 +69,6 @@ export const deleteStore = async (storeId) => {
   logger.debug('가맹점 삭제', { storeId })
   await api.delete(`/stores/${storeId}`)
 }
-
-// ============================================================
-// 메뉴 관련 API
-// ============================================================
 
 /**
  * 메뉴 추가
@@ -127,10 +118,6 @@ export const deleteMenu = async (menuId) => {
   await api.delete(`/menus/${menuId}`)
 }
 
-// ============================================================
-// 원두 연결 API
-// ============================================================
-
 /**
  * 메뉴에 원두 연결
  * @param {number|string} menuId - 메뉴 ID
@@ -156,10 +143,6 @@ export const unlinkBeanFromMenu = async (menuId, beanId) => {
   logger.debug('원두 연결 해제', { menuId, beanId })
   await api.delete(`/menus/${menuId}/beans/${beanId}`)
 }
-
-// ============================================================
-// 로스터리 관련 API
-// ============================================================
 
 /**
  * 로스터리 목록 조회
@@ -215,10 +198,6 @@ export const createRoastery = async (roasteryData) => {
   const response = await api.post('/roasteries', payload)
   return response.data
 }
-
-// ============================================================
-// 원두 관련 API
-// ============================================================
 
 /**
  * 원두 목록 조회
@@ -278,7 +257,6 @@ export const getBeanById = async (beanId) => {
  * @returns {Promise<Object>} 생성된 원두 정보
  */
 export const createBean = async (beanData) => {
-  // name이 없으면 자동 생성: "국가 농장" 또는 "국가"
   const name = beanData.name || (
     beanData.farm
       ? `${beanData.country} ${beanData.farm}`
@@ -299,10 +277,6 @@ export const createBean = async (beanData) => {
   return response.data?.data || response.data
 }
 
-// ============================================================
-// 이미지 업로드 API
-// ============================================================
-
 /**
  * 이미지 업로드
  * @param {File} file - 업로드할 이미지 파일
@@ -320,6 +294,5 @@ export const uploadImage = async (file) => {
     }
   })
 
-  // API 응답: { success, data: { url }, error }
   return response.data?.data?.url || response.data?.url || response.data
 }

@@ -1,84 +1,62 @@
-/* Pretendard 폰트 - @import는 최상단에 위치 */
+
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
-/* Tailwind CSS */
 @import "tailwindcss";
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- * Comeet Design System - Warm Brown Theme
- * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- * Tailwind CSS v4 Native Theme Definition
- * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-/* Workaround for Tailwind v4 @theme issue with 400 and 950 shades */
 :root {
     --color-primary-400: #b7947b;
     --color-primary-950: #17110d;
 }
 
 @theme {
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Primary Palette - Warm Brown (11-step grayscale)
-     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    --color-primary-50: #f6f2ef;           /* Lightest - Page background */
-    --color-primary-100: #ede4de;          /* Light - Card background */
-    --color-primary-200: #dbcabd;          /* Soft beige - Borders, dividers */
-    --color-primary-300: #c9af9c;          /* Beige - Disabled text, icons */
-    --color-primary-400: #b7947b;          /* Medium - Tag background, secondary buttons */
-    --color-primary-500: #a4795b;          /* Warm brown - Accent elements, hover states */
-    --color-primary-600: #846148;          /* Main brown - Primary buttons, links (DEFAULT) */
-    --color-primary-700: #634936;          /* Dark brown - Body text (WCAG AAA) */
-    --color-primary-800: #423124;          /* Darker - Headings, strong emphasis */
-    --color-primary-900: #211812;          /* Almost black - Dark mode bg, headlines */
-    --color-primary-950: #17110d;          /* Deepest - Highest contrast text */
-    --color-primary: var(--color-primary-600);  /* Alias for default primary */
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Neutral Colors
-     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    --color-neutral-900: #323232;          /* Neutral dark text */
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Semantic Colors - Cafe & Accent (Orange)
-     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    --color-cafe: #ff9800;                 /* Cafe marker (PRD requirement) */
-    --color-accent: #ff9800;               /* Positive emphasis (save success, favorites) */
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Status Colors - Clear Semantic Distinction
-     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    --color-success: #66bb6a;              /* Green - Success messages */
+    
+    --color-primary-50: #f6f2ef;           
+    --color-primary-100: #ede4de;          
+    --color-primary-200: #dbcabd;          
+    --color-primary-300: #c9af9c;          
+    --color-primary-400: #b7947b;          
+    --color-primary-500: #a4795b;          
+    --color-primary-600: #846148;          
+    --color-primary-700: #634936;          
+    --color-primary-800: #423124;          
+    --color-primary-900: #211812;          
+    --color-primary-950: #17110d;          
+    --color-primary: var(--color-primary-600);  
+    
+    --color-neutral-900: #323232;          
+    
+    --color-cafe: #ff9800;                 
+    --color-accent: #ff9800;               
+    
+    --color-success: #66bb6a;              
     --color-success-light: #81c784;
     --color-success-dark: #4caf50;
 
-    --color-error: #d32f2f;                /* Red - Errors, validation failures */
+    --color-error: #d32f2f;                
     --color-error-light: #ef5350;
     --color-error-dark: #c62828;
 
-    --color-warning: #ffa726;              /* Amber - Warnings, cautions */
+    --color-warning: #ffa726;              
     --color-warning-light: #ffb74d;
     --color-warning-dark: #f57c00;
 
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Text Colors - WCAG Compliant
-     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    --color-textPrimary: var(--color-primary-700);              /* Body text (8.52:1 - WCAG AAA) */
-    --color-textSecondary: rgba(132, 97, 72, 0.7);              /* Secondary text (4.2:1 - WCAG AA) */
-    --color-textDisabled: var(--color-primary-300);             /* Disabled state */
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Background & Surface
-     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    --color-background: var(--color-primary-50);                /* Warm beige page background */
-    --color-surface: #ffffff;                                   /* White cards */
-    --color-surface-light: var(--color-primary-100);           /* Light card variant */
-    --color-border: var(--color-primary-200);                   /* Subtle borders */
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Dark Mode Theme (Future Enhancement)
-     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    --color-dark-background: var(--color-primary-900);          /* Dark mode page bg */
-    --color-dark-surface: var(--color-primary-800);             /* Dark mode cards */
-    --color-dark-textPrimary: var(--color-primary-50);         /* Dark mode text (inverted) */
-    --color-dark-textSecondary: rgba(219, 202, 189, 0.7);       /* Dark mode secondary text */
-    --color-dark-border: var(--color-primary-700);              /* Dark mode borders */
+    
+    --color-textPrimary: var(--color-primary-700);              
+    --color-textSecondary: rgba(132, 97, 72, 0.7);              
+    --color-textDisabled: var(--color-primary-300);             
+    
+    --color-background: var(--color-primary-50);                
+    --color-surface: #ffffff;                                   
+    --color-surface-light: var(--color-primary-100);           
+    --color-border: var(--color-primary-200);                   
+    
+    --color-dark-background: var(--color-primary-900);          
+    --color-dark-surface: var(--color-primary-800);             
+    --color-dark-textPrimary: var(--color-primary-50);         
+    --color-dark-textSecondary: rgba(219, 202, 189, 0.7);       
+    --color-dark-border: var(--color-primary-700);              
 }
 
-/* 기본 스타일 */
 * {
     box-sizing: border-box;
 }
@@ -96,39 +74,26 @@ a {
     text-decoration: none;
 }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- * 2025 Responsive Design System
- * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- * Mobile-First Approach with Content-Driven Breakpoints
- * Based on 2025 Best Practices
- * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
 :root {
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Responsive Spacing Variables (Default: Small Mobile 320px)
-     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    --space-xs: 0.25rem;   /* 4px */
-    --space-sm: 0.5rem;    /* 8px */
-    --space-md: 0.75rem;   /* 12px */
-    --space-lg: 1rem;      /* 16px */
-    --space-xl: 1.25rem;   /* 20px */
-    --space-2xl: 1.5rem;   /* 24px */
-    --space-3xl: 2rem;     /* 32px */
     
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Responsive Typography Variables (Mobile-First Base)
-     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-    --text-xs: 0.625rem;   /* 10px */
-    --text-sm: 0.6875rem;  /* 11px */
-    --text-base: 0.8125rem;/* 13px */
-    --text-lg: 0.9375rem;  /* 15px */
-    --text-xl: 1.125rem;   /* 18px */
-    --text-2xl: 1.375rem;  /* 22px */
-    --text-3xl: 1.5rem;    /* 24px */
+    --space-xs: 0.25rem;   
+    --space-sm: 0.5rem;    
+    --space-md: 0.75rem;   
+    --space-lg: 1rem;      
+    --space-xl: 1.25rem;   
+    --space-2xl: 1.5rem;   
+    --space-3xl: 2rem;     
     
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Page Layout Variables
-     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    
+    --text-xs: 0.625rem;   
+    --text-sm: 0.6875rem;  
+    --text-base: 0.8125rem;
+    --text-lg: 0.9375rem;  
+    --text-xl: 1.125rem;   
+    --text-2xl: 1.375rem;  
+    --text-3xl: 1.5rem;    
+    
+    
     --page-padding: 1rem;
     --card-padding: 0.75rem;
     --card-radius: 12px;
@@ -136,29 +101,23 @@ a {
     --gap-md: 0.75rem;
     --gap-lg: 1rem;
     
-    /* Navigation Bar Height */
+    
     --nav-height: 4rem;
 }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- * Breakpoint: 375px+ (Standard Mobile - iPhone SE, etc.)
- * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 @media (min-width: 375px) {
     :root {
-        --text-sm: 0.75rem;    /* 12px */
-        --text-base: 0.875rem; /* 14px */
-        --text-lg: 1rem;       /* 16px */
-        --text-xl: 1.25rem;    /* 20px */
-        --text-2xl: 1.5rem;    /* 24px */
+        --text-sm: 0.75rem;    
+        --text-base: 0.875rem; 
+        --text-lg: 1rem;       
+        --text-xl: 1.25rem;    
+        --text-2xl: 1.5rem;    
         
         --card-padding: 1rem;
         --card-radius: 14px;
     }
 }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- * Breakpoint: 400px+ (Large Mobile - iPhone 14Pro, etc.)
- * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 @media (min-width: 400px) {
     :root {
         --page-padding: 1.25rem;
@@ -168,48 +127,37 @@ a {
     }
 }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- * Utility Classes for Responsive Design
- * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
-/* Touch-Friendly Interactive Elements (min 44x44px) */
 .touch-target {
     min-width: 44px;
     min-height: 44px;
 }
 
-/* Safe Bottom Padding for Navigation */
 .safe-bottom {
     padding-bottom: calc(var(--nav-height) + 1rem);
 }
 
-/* Responsive Card */
 .responsive-card {
     padding: var(--card-padding);
     border-radius: var(--card-radius);
 }
 
-/* Responsive Page Container */
 .responsive-page {
     padding: var(--page-padding);
     padding-bottom: calc(var(--nav-height) + 1rem);
 }
 
-/* Responsive Text */
 .text-responsive-sm { font-size: var(--text-sm); }
 .text-responsive-base { font-size: var(--text-base); }
 .text-responsive-lg { font-size: var(--text-lg); }
 .text-responsive-xl { font-size: var(--text-xl); }
 .text-responsive-2xl { font-size: var(--text-2xl); }
 
-/* Truncate Text with Ellipsis */
 .truncate-text {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* Multi-line Truncate (2 lines) */
 .truncate-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -217,9 +165,6 @@ a {
     overflow: hidden;
 }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- * Skeleton Loading Animation
- * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 @keyframes shimmer {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }

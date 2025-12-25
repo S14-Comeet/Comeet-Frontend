@@ -5,10 +5,8 @@
 
 import { STORAGE_KEYS } from '@/constants'
 
-/** 메모리 폴백 스토리지 */
 const memoryStorage = new Map()
 
-/** 스토리지 접근 가능 여부 캐시 */
 let storageAvailable = null
 
 /**

@@ -6,16 +6,13 @@ import { calculateDistance } from "@/utils/geo";
  * @param {Object} map - Naver Maps 인스턴스 ref
  */
 export function useMapControls(map) {
-  // 줌 중심으로 사용할 포커스된 위치
   const focusedLocation = ref(null);
 
-  // 바텀시트 상태 (StoreListSheet 초기값과 동일하게 'half'로 시작)
   const sheetState = ref("half");
 
-  // 시트 상태에 따른 컨트롤 버튼 위치 (바텀시트 위 16px)
   const controlsBottomStyle = computed(() => {
     const bottomValues = {
-      collapsed: "calc(100px + 16px)", // COLLAPSED_HEIGHT(100px) + 간격
+      collapsed: "calc(100px + 16px)",
       half: "calc(33vh + 16px)",
       full: "calc(85vh + 16px)",
     };

@@ -9,7 +9,6 @@ import { useToast } from 'vue-toastification'
 
 let toast = null
 
-// 토스트 활성화 여부 (개발 환경에서는 항상 활성화)
 const isToastEnabled = import.meta.env.DEV || import.meta.env.VITE_ENABLE_TOAST === 'true'
 
 const getToast = () => {

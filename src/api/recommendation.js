@@ -10,7 +10,6 @@ const logger = createLogger('RecommendationAPI')
 export const getBeanRecommendations = async () => {
   try {
     const response = await api.get('/recommendations/beans')
-    // BaseResponse 래퍼에서 data 추출
     return response.data?.data || response.data || []
   } catch (error) {
     logger.error('원두 추천 조회 실패', error)
@@ -25,7 +24,6 @@ export const getBeanRecommendations = async () => {
 export const getMenuRecommendations = async () => {
   try {
     const response = await api.get('/recommendations/menus')
-    // BaseResponse 래퍼에서 data 추출
     return response.data?.data || response.data || []
   } catch (error) {
     logger.error('메뉴 추천 조회 실패', error)
@@ -45,7 +43,6 @@ export const getNearbyMenuRecommendations = async (latitude, longitude, radiusKm
     const response = await api.get('/recommendations/menus/nearby', {
       params: { latitude, longitude, radiusKm }
     })
-    // BaseResponse 래퍼에서 data 추출
     const data = response.data?.data || response.data || {}
     return data
   } catch (error) {
@@ -62,7 +59,6 @@ export const getNearbyMenuRecommendations = async (latitude, longitude, radiusKm
 export const getMenusByBean = async (beanId) => {
   try {
     const response = await api.get(`/recommendations/beans/${beanId}/menus`)
-    // BaseResponse 래퍼에서 data 추출
     return response.data?.data || response.data || []
   } catch (error) {
     logger.error(`원두(${beanId}) 메뉴 조회 실패`, error)
@@ -83,17 +79,12 @@ export const getNearbyMenusByBean = async (beanId, latitude, longitude, radiusKm
     const response = await api.get(`/recommendations/beans/${beanId}/menus/nearby`, {
       params: { latitude, longitude, radiusKm }
     })
-    // BaseResponse 래퍼에서 data 추출
     return response.data?.data || response.data || []
   } catch (error) {
     logger.error(`원두(${beanId}) 근거리 메뉴 조회 실패`, error)
     throw error
   }
 }
-
-// ===================================================================
-// 유틸리티 함수
-// ===================================================================
 
 /**
  * 로스팅 레벨 한글 변환

@@ -11,7 +11,7 @@ export const waitForNaverMaps = () => {
     }
 
     let attempts = 0;
-    const maxAttempts = 50; // 5초 (100ms * 50)
+    const maxAttempts = 50;
 
     const checkInterval = setInterval(() => {
       attempts++;
@@ -35,7 +35,6 @@ export function useNaverMap() {
    * 네이버 지도 초기화
    */
   const initMap = async (container, options = {}) => {
-    // Naver Maps API 로드 대기
     await waitForNaverMaps();
 
     const { center = { lat: 37.5665, lng: 126.978 }, zoom = 15 } = options;
@@ -45,7 +44,7 @@ export function useNaverMap() {
       zoom: zoom,
       minZoom: 10,
       maxZoom: 19,
-      zoomControl: false, // 줌 컨트롤 비활성화
+      zoomControl: false,
     });
 
     return map.value;

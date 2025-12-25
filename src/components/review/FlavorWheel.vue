@@ -1,13 +1,13 @@
 <template>
   <div class="flavor-wheel-container">
-    <!-- Wheel View -->
+    
     <div class="wheel-wrapper" :class="{ 'wheel-collapsed': selectedCategory }">
       <svg
         viewBox="0 0 300 300"
         class="wheel-svg"
         @click.self="clearSelection"
       >
-        <!-- Center Circle -->
+        
         <circle
           cx="150"
           cy="150"
@@ -29,7 +29,7 @@
           {{ selectedCategory ? '뒤로' : 'Flavor' }}
         </text>
 
-        <!-- Level 1 Segments -->
+        
         <g v-for="(l1, idx) in flavors" :key="l1.id">
           <path
             :d="getArcPath(idx, flavors.length, 45, 100)"
@@ -52,7 +52,7 @@
           </text>
         </g>
 
-        <!-- Level 2 Segments (shown when L1 selected) -->
+        
         <template v-if="selectedCategory && selectedCategory.subCategories">
           <g v-for="(l2, idx) in selectedCategory.subCategories" :key="l2.id">
             <path
@@ -172,18 +172,17 @@ const emit = defineEmits(['update:modelValue'])
 const flavorStore = useFlavorStore()
 const { flavors } = storeToRefs(flavorStore)
 
-const selectedCategory = ref(null) // L1 category
-const selectedL2 = ref(null) // L2 subcategory
+const selectedCategory = ref(null)
+const selectedL2 = ref(null)
 
 onMounted(async () => {
   await flavorStore.fetchFlavors()
 })
 
-// SVG Arc Path calculation
 const getArcPath = (index, total, innerR, outerR) => {
   const startAngle = (index / total) * 360 - 90
   const endAngle = ((index + 1) / total) * 360 - 90
-  const gap = 1 // degree gap between segments
+  const gap = 1
 
   const start = polarToCartesian(150, 150, outerR, startAngle + gap/2)
   const end = polarToCartesian(150, 150, outerR, endAngle - gap/2)
@@ -221,7 +220,7 @@ const truncateText = (text, maxLen) => {
 
 const handleL1Click = (l1) => {
   if (selectedCategory.value?.id === l1.id) {
-    // Toggle L1 selection
+
     toggleFlavor(l1)
   } else {
     selectedCategory.value = l1
@@ -242,7 +241,7 @@ const clearSelection = () => {
 }
 
 const isL1Selected = (l1) => {
-  // L1 is selected if it or any of its children are in modelValue
+
   if (props.modelValue.includes(l1.id)) return true
   return false
 }
@@ -259,7 +258,7 @@ const toggleFlavor = (flavor) => {
     newSelection = newSelection.filter(item => item !== id)
   } else {
     if (newSelection.length >= props.maxSelection) {
-      return // Max reached
+      return
     }
     newSelection.push(id)
   }

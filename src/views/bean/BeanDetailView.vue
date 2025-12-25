@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-col min-h-full h-full bg-background">
-    <!-- Content -->
+    
     <div class="flex-1 overflow-y-auto safe-bottom">
-      <!-- Loading Bean -->
+      
       <div v-if="isLoadingBean" class="p-4 space-y-4">
         <div class="skeleton-card">
           <div class="skeleton h-6 w-3/4 mb-3" />
@@ -12,7 +12,7 @@
         <div class="skeleton h-64 rounded-xl" />
       </div>
 
-      <!-- Error -->
+      
       <div v-else-if="beanError" class="p-4">
         <div class="empty-state">
           <p>{{ beanError }}</p>
@@ -20,13 +20,13 @@
         </div>
       </div>
 
-      <!-- Bean Detail -->
+      
       <template v-else-if="bean">
-        <!-- Bean Info Card -->
+        
         <div class="bean-detail-card mx-4 mt-4">
           <h1 class="bean-name">{{ bean.name }}</h1>
 
-          <!-- Origin & Processing Info -->
+          
           <div class="bean-info-grid">
             <div v-if="displayCountry" class="info-item">
               <span class="info-label">원산지</span>
@@ -50,23 +50,23 @@
             </div>
           </div>
 
-          <!-- Description -->
+          
           <p v-if="bean.description" class="bean-description">
             {{ bean.description }}
           </p>
 
-          <!-- AI Reason (if from recommendation) -->
+          
           <RecommendationReason v-if="recommendationReason" :reason="recommendationReason" />
         </div>
 
-        <!-- Flavor Wheel Section -->
+        
         <section v-if="bean.flavors?.length" class="px-4 py-4">
           <h2 class="section-title mb-3">
             <span class="section-icon">🎨</span>
             향미 프로필
           </h2>
           <div class="flavor-wheel-wrapper">
-            <FlavorWheel
+            <BeanFlavorWheel
               :size="280"
               :highlighted-flavors="bean.flavors"
               :show-legend="true"
@@ -75,7 +75,7 @@
           </div>
         </section>
 
-        <!-- Menus using this bean -->
+        
         <section class="px-4 py-4">
           <div class="section-header">
             <h2 class="section-title">
@@ -85,18 +85,18 @@
             <LocationModeToggle v-model="menuLocationMode" @update:model-value="onLocationModeChange" />
           </div>
 
-          <!-- Loading Menus -->
+          
           <div v-if="isLoadingMenus" class="space-y-3">
             <RecommendationSkeleton v-for="i in 3" :key="i" type="menu" />
           </div>
 
-          <!-- Error -->
+          
           <div v-else-if="menuError" class="empty-state">
             <p>{{ menuError }}</p>
             <button class="retry-btn" @click="loadMenus">다시 시도</button>
           </div>
 
-          <!-- Empty -->
+          
           <div v-else-if="!menus.length" class="empty-state">
             <p>이 원두를 사용하는 메뉴가 없습니다</p>
             <p v-if="menuLocationMode === 'nearby'" class="text-sm mt-1">
@@ -104,7 +104,7 @@
             </p>
           </div>
 
-          <!-- Menu List -->
+          
           <div v-else class="space-y-3">
             <MenuRecommendationCard
               v-for="menu in menus"
@@ -134,7 +134,7 @@ import {
   formatRoastingLevel
 } from '@/api/recommendation'
 
-import FlavorWheel from '@/components/bean/FlavorWheel.vue'
+import BeanFlavorWheel from '@/components/bean/BeanFlavorWheel.vue'
 import RecommendationReason from '@/components/recommendation/RecommendationReason.vue'
 import LocationModeToggle from '@/components/recommendation/LocationModeToggle.vue'
 import MenuRecommendationCard from '@/components/recommendation/MenuRecommendationCard.vue'
@@ -145,7 +145,6 @@ const route = useRoute()
 const router = useRouter()
 const { location, requestLocation } = useGeolocation()
 
-// State
 const bean = ref(null)
 const menus = ref([])
 const isLoadingBean = ref(false)
@@ -155,11 +154,8 @@ const menuError = ref(null)
 const menuLocationMode = ref('nearby')
 const recommendationReason = ref(null)
 
-// Computed
 const beanId = computed(() => Number(route.params.beanId))
-const pageTitle = computed(() => bean.value?.name || '원두 상세')
 
-// Format multiple values (comma separated or array)
 const formatMultiValue = (value) => {
   if (!value) return null
   if (Array.isArray(value)) {
@@ -173,38 +169,29 @@ const displayFarm = computed(() => formatMultiValue(bean.value?.farm))
 const displayVariety = computed(() => formatMultiValue(bean.value?.variety))
 const displayProcessingMethod = computed(() => formatMultiValue(bean.value?.processingMethod))
 
-// Methods
 const loadBeanDetail = async () => {
   isLoadingBean.value = true
   beanError.value = null
 
   try {
-    // Check if recommendation reason was passed
     if (route.query.reason) {
       try {
         recommendationReason.value = route.query.reason
-      } catch {
-        // Ignore parse error
-      }
+      } catch { /* empty */ }
     }
 
-    // Try to get bean from query params first (for quick display)
     if (route.query.bean) {
       try {
         const queryBean = JSON.parse(route.query.bean)
         bean.value = normalizeBean(queryBean)
-      } catch {
-        // Ignore parse error
-      }
+      } catch { /* empty */ }
     }
 
-    // Fetch from API for complete data
     const apiBean = await getBeanById(beanId.value)
     bean.value = normalizeBean(apiBean)
 
     logger.info('Bean detail loaded', { beanId: beanId.value, name: bean.value?.name })
 
-    // Also load menus
     await loadMenus()
   } catch (error) {
     logger.error('Failed to load bean detail', error)
@@ -216,7 +203,6 @@ const loadBeanDetail = async () => {
   }
 }
 
-// Normalize bean data from different sources
 const normalizeBean = (data) => {
   if (!data) return null
   return {
@@ -280,7 +266,6 @@ const goToStore = (menu) => {
   router.push(`/store/${menu.storeId}`)
 }
 
-// Watch for route changes
 watch(() => route.params.beanId, () => {
   if (route.params.beanId) {
     bean.value = null
@@ -290,7 +275,6 @@ watch(() => route.params.beanId, () => {
   }
 })
 
-// Lifecycle
 onMounted(() => {
   loadBeanDetail()
 })

@@ -4,12 +4,12 @@
     :class="{ clickable: clickable }"
     @click="handleClick"
   >
-    <!-- Header: Rank + Bean Info -->
+    
     <div class="card-header">
-      <!-- Rank Badge (optional) -->
+      
       <span v-if="rank" class="rank-badge">#{{ rank }}</span>
 
-      <!-- Bean Info -->
+      
       <div class="bean-info">
         <h3 class="bean-name">{{ displayName }}</h3>
         <p class="bean-meta">

@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import HomeView from '@/views/HomeView.vue';
-import LoginView from '@/views/LoginView.vue';
-import NicknameRegistrationView from '@/views/NicknameRegistrationView.vue';
+import HomeView from '@/views/main/HomeView.vue';
+import LoginView from '@/views/auth/LoginView.vue';
+import NicknameRegistrationView from '@/views/auth/NicknameRegistrationView.vue';
 import { getAccessToken, removeAccessToken } from '@/utils/storage';
 import { createLogger } from '@/utils/logger';
 
@@ -20,22 +20,17 @@ const routes = [
   {
     path: '/map',
     name: 'map',
-    component: () => import('@/views/MapView.vue'),
+    component: () => import('@/views/main/MapView.vue'),
   },
   {
     path: '/saved',
     name: 'saved',
-    component: () => import('@/views/SavedView.vue'),
+    component: () => import('@/views/main/SavedView.vue'),
   },
   {
     path: '/profile',
     name: 'profile',
-    component: () => import('@/views/ProfileView.vue'),
-  },
-  {
-    path: '/notifications',
-    name: 'notifications',
-    component: () => import('@/views/NotificationView.vue'),
+    component: () => import('@/views/profile/ProfileView.vue'),
   },
   {
     path: '/login',
@@ -50,81 +45,78 @@ const routes = [
   {
     path: '/test-components',
     name: 'test-components',
-    component: () => import('@/views/ComponentTestView.vue')
+    component: () => import('@/views/dev/ComponentTestView.vue')
   },
   {
     path: '/oauth/callback',
     name: 'oauth-callback',
-    component: () => import('@/views/OAuthCallbackView.vue')
+    component: () => import('@/views/auth/OAuthCallbackView.vue')
   },
   {
     path: '/review/write',
     name: 'review-write',
-    component: () => import('@/views/ReviewWriteView.vue')
+    component: () => import('@/views/review/ReviewWriteView.vue')
   },
   {
     path: '/my-reviews',
     name: 'my-reviews',
-    component: () => import('@/views/MyReviewsView.vue')
+    component: () => import('@/views/review/MyReviewsView.vue')
   },
   {
     path: '/reviews/:reviewId',
     name: 'review-detail',
-    component: () => import('@/views/ReviewDetailView.vue')
+    component: () => import('@/views/review/ReviewDetailView.vue')
   },
   {
     path: '/reviews/:reviewId/edit',
     name: 'review-edit',
-    component: () => import('@/views/ReviewEditView.vue')
+    component: () => import('@/views/review/ReviewEditView.vue')
   },
   {
     path: '/my-preference',
     name: 'my-preference',
-    component: () => import('@/views/MyPreferenceView.vue')
+    component: () => import('@/views/profile/MyPreferenceView.vue')
   },
   {
     path: '/my-profile/edit',
     name: 'my-profile-edit',
-    component: () => import('@/views/MyProfileEditView.vue')
+    component: () => import('@/views/profile/MyProfileEditView.vue')
   },
   {
     path: '/store/:storeId',
     name: 'store-detail',
-    component: () => import('@/views/StoreDetailView.vue')
+    component: () => import('@/views/store/StoreDetailView.vue')
   },
-  // 커피여권 라우트
   {
     path: '/passport',
     name: 'passport',
-    component: () => import('@/views/PassportView.vue')
+    component: () => import('@/views/passport/PassportView.vue')
   },
-  // 추천 시스템 라우트
   {
     path: '/recommendation',
     name: 'recommendation',
-    component: () => import('@/views/RecommendationView.vue')
+    component: () => import('@/views/main/RecommendationView.vue')
   },
   {
     path: '/preference-onboarding',
     name: 'preference-onboarding',
-    component: () => import('@/views/PreferenceOnboardingView.vue')
+    component: () => import('@/views/profile/PreferenceOnboardingView.vue')
   },
   {
     path: '/bean/:beanId',
     name: 'bean-detail',
-    component: () => import('@/views/BeanDetailView.vue')
+    component: () => import('@/views/bean/BeanDetailView.vue')
   },
   {
     path: '/menus/:menuId',
     name: 'menu-detail',
-    component: () => import('@/views/MenuDetailView.vue')
+    component: () => import('@/views/store/MenuDetailView.vue')
   },
   {
     path: '/passport/:passportId',
     name: 'passport-detail',
-    component: () => import('@/views/PassportDetailView.vue')
+    component: () => import('@/views/passport/PassportDetailView.vue')
   },
-  // 점주 전용 라우트
   {
     path: '/owner/stores',
     name: 'owner-stores',
@@ -174,15 +166,13 @@ const router = createRouter({
   routes
 });
 
-/** 공개 페이지 목록 (인증 불필요) */
 const PUBLIC_PAGES = new Set(['/login', '/oauth/callback', '/test-components', '/map', '/saved', '/passport']);
 
-/** 동적 경로 패턴 체크 함수 */
 const PUBLIC_PATH_PATTERNS = [
-  /^\/store\/\d+$/,   // /store/:storeId
-  /^\/menus\/\d+$/,   // /menus/:menuId (menu detail)
-  /^\/bean\/\d+$/,    // /bean/:beanId
-  /^\/reviews\/\d+$/  // /reviews/:reviewId (review detail)
+  /^\/store\/\d+$/,
+  /^\/menus\/\d+$/,
+  /^\/bean\/\d+$/,
+  /^\/reviews\/\d+$/
 ];
 
 /**
@@ -204,7 +194,6 @@ const tryAuthWithToken = async (authStore, targetPath) => {
   try {
     await authStore.fetchUser();
 
-    // 닉네임이 없으면 닉네임 등록 페이지로
     if (!authStore.user?.nickName && targetPath !== '/nickname') {
       return { success: true, redirect: '/nickname' };
     }
@@ -212,9 +201,7 @@ const tryAuthWithToken = async (authStore, targetPath) => {
   } catch {
     try {
       removeAccessToken();
-    } catch {
-      // storage 접근 불가 무시
-    }
+    } catch { /* empty */ }
     return { success: false, redirect: '/login' };
   }
 };
@@ -270,14 +257,7 @@ router.beforeEach(async (to, from, next) => {
 
   logger.debug(`네비게이션: ${from.path} → ${to.path}`);
 
-  // ============================================================
-  // 1단계: 공개 페이지 처리 (/map, /saved, /notifications 등)
-  // - 비로그인 사용자: 접근 허용 (페이지 내부에서 로그인 유도)
-  // - GUEST 사용자: 닉네임 설정 페이지로 강제 이동
-  // - 정상 로그인 사용자: 접근 허용
-  // ============================================================
   if (isPublicPage(to.path)) {
-    // 인증된 사용자는 추가 검증 (로그인 페이지 리다이렉트, GUEST 체크)
     if (authStore.isAuthenticated) {
       const redirect = handleAuthenticatedUser(authStore, to.path);
       if (redirect) {
@@ -287,19 +267,10 @@ router.beforeEach(async (to, from, next) => {
       }
     }
 
-    // 비인증 사용자는 접근 허용
     next();
     return;
   }
 
-  // ============================================================
-  // 2단계: 비공개 페이지 처리 (/home, /profile 등)
-  // - 비로그인 사용자: 토큰으로 재인증 시도 → 실패 시 로그인 페이지로
-  // - GUEST 사용자: 닉네임 설정 페이지로 강제 이동
-  // - 정상 로그인 사용자: 접근 허용
-  // ============================================================
-
-  // 비인증 상태: 토큰으로 재인증 시도 (페이지 새로고침 등의 경우)
   if (!authStore.isAuthenticated) {
     const redirect = await handleUnauthenticatedUser(authStore, to.path);
     if (redirect) {
@@ -309,7 +280,6 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  // 인증 완료 후 추가 검증 (GUEST 체크 등)
   const redirect = handleAuthenticatedUser(authStore, to.path);
   if (redirect) {
     logger.info(`인증된 사용자 추가 검증 → ${redirect}로 리다이렉트`);
@@ -317,16 +287,12 @@ router.beforeEach(async (to, from, next) => {
     return;
   }
 
-  // ============================================================
-  // 3단계: 점주 전용 페이지 권한 체크
-  // ============================================================
   if (to.meta?.requiresOwner && !authStore.isOwner) {
     logger.warn('점주 권한 없음 - 접근 거부', { path: to.path })
     next('/')
     return
   }
 
-  // 모든 검증 통과: 접근 허용
   next();
 });
 

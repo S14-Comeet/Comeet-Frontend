@@ -1,13 +1,13 @@
 <template>
   <div class="flex flex-col min-h-full bg-background">
-    <!-- Content -->
+    
     <div class="flex-1 overflow-y-auto">
-      <!-- Loading -->
+      
       <div v-if="isLoading" class="flex justify-center items-center py-20">
         <BaseIcon name="spinner" class="animate-spin text-primary" :size="32" />
       </div>
 
-      <!-- Error / No Preference -->
+      
       <div v-else-if="error || !hasPreference" class="flex flex-col items-center justify-center py-20 px-4">
         <div class="w-20 h-20 rounded-full bg-primary-100 flex items-center justify-center mb-4">
           <BaseIcon name="coffee" :size="40" class="text-primary" />
@@ -21,17 +21,17 @@
         </BaseButton>
       </div>
 
-      <!-- Preference Data -->
+      
       <div v-else class="p-4 space-y-4">
-        <!-- Taste Profile Card -->
+        
         <div class="bg-white rounded-xl p-4 shadow-sm">
           <h3 class="font-bold text-textPrimary mb-4">맛 선호도</h3>
 
-          <!-- Radar Chart -->
+          
           <div class="flex justify-center mb-4">
             <div class="radar-chart">
               <svg viewBox="0 0 200 200">
-                <!-- Background Polygons -->
+                
                 <polygon
                   v-for="level in [10, 7.5, 5, 2.5]"
                   :key="level"
@@ -41,7 +41,7 @@
                   stroke-width="1"
                 />
 
-                <!-- Axis Lines -->
+                
                 <line
                   v-for="(_, idx) in tasteFields"
                   :key="'line-' + idx"
@@ -53,7 +53,7 @@
                   stroke-width="1"
                 />
 
-                <!-- Score Polygon -->
+                
                 <polygon
                   :points="getScorePolygonPoints()"
                   fill="rgba(132, 97, 72, 0.25)"
@@ -61,7 +61,7 @@
                   stroke-width="2"
                 />
 
-                <!-- Score Points -->
+                
                 <circle
                   v-for="(field, idx) in tasteFields"
                   :key="'point-' + idx"
@@ -73,7 +73,7 @@
                   stroke-width="2"
                 />
 
-                <!-- Labels -->
+                
                 <text
                   v-for="(field, idx) in tasteFields"
                   :key="'label-' + idx"
@@ -88,7 +88,7 @@
             </div>
           </div>
 
-          <!-- Score List -->
+          
           <div class="grid grid-cols-2 gap-3">
             <div
               v-for="field in tasteFields"
@@ -101,7 +101,7 @@
           </div>
         </div>
 
-        <!-- Roasting Preference -->
+        
         <div class="bg-white rounded-xl p-4 shadow-sm">
           <h3 class="font-bold text-textPrimary mb-3">선호 로스팅</h3>
           <div class="flex flex-wrap gap-2">
@@ -119,7 +119,7 @@
           </div>
         </div>
 
-        <!-- Liked Flavors -->
+        
         <div class="bg-white rounded-xl p-4 shadow-sm">
           <h3 class="font-bold text-textPrimary mb-3">좋아하는 향미</h3>
           <div v-if="preference.likedTags?.length" class="flex flex-wrap gap-2">
@@ -132,7 +132,7 @@
           <p v-else class="text-sm text-textSecondary">설정된 선호 향미가 없습니다</p>
         </div>
 
-        <!-- Disliked Flavors -->
+        
         <div class="bg-white rounded-xl p-4 shadow-sm">
           <h3 class="font-bold text-textPrimary mb-3">피하고 싶은 향미</h3>
           <div v-if="preference.dislikedTags?.length" class="flex flex-wrap gap-2">
@@ -147,7 +147,7 @@
           <p v-else class="text-sm text-textSecondary">설정된 비선호 향미가 없습니다</p>
         </div>
 
-        <!-- Reset Button -->
+        
         <div class="pt-2 pb-4">
           <BaseButton
             variant="secondary"
@@ -162,7 +162,7 @@
       </div>
     </div>
 
-    <!-- Reset Confirmation Modal -->
+    
     <Teleport to="body">
       <Transition name="fade">
         <div
@@ -218,7 +218,6 @@ const logger = createLogger('MyPreferenceView')
 const router = useRouter()
 const recommendationStore = useRecommendationStore()
 
-// State
 const isLoading = ref(true)
 const error = ref(null)
 const hasPreference = ref(false)
@@ -235,7 +234,6 @@ const preference = ref({
 const showResetModal = ref(false)
 const isResetting = ref(false)
 
-// Taste fields for radar chart
 const tasteFields = [
   { key: 'prefAcidity', label: '산미' },
   { key: 'prefBody', label: '바디감' },
@@ -243,7 +241,6 @@ const tasteFields = [
   { key: 'prefBitterness', label: '쓴맛' }
 ]
 
-// Fetch preference on mount
 onMounted(async () => {
   await fetchPreference()
 })
@@ -272,7 +269,6 @@ const fetchPreference = async () => {
   }
 }
 
-// Radar Chart Calculations
 const getPolygonPoints = (maxValue) => {
   const center = 100
   const points = []
@@ -343,7 +339,6 @@ const getLabelPosition = (index) => {
   }
 }
 
-// Roasting helpers
 const getRoastingLabel = (value) => {
   const found = ROASTING_LEVELS.find(r => r.value === value)
   return found?.label || value
@@ -358,13 +353,11 @@ const getRoastingClass = (value) => {
   return classes[value] || 'bg-gray-200 text-gray-700'
 }
 
-// Flavor helpers
 const getFlavorName = (code) => {
   const found = findFlavorInWheel(code)
   return found?.name || code
 }
 
-// Actions
 const goToOnboarding = () => {
   router.push('/preference-onboarding')
 }

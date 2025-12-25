@@ -1,13 +1,13 @@
 <template>
   <div class="bg-white rounded-xl p-4 shadow-sm border border-border">
-    <!-- 원두 정보 -->
+    
     <div class="flex gap-4">
-      <!-- 아이콘 -->
+      
       <div class="w-12 h-12 rounded-lg bg-accent/10 flex-shrink-0 flex items-center justify-center">
         <BaseIcon name="coffee" :size="24" class="text-accent" />
       </div>
 
-      <!-- 정보 -->
+      
       <div class="flex-1 min-w-0">
         <div class="flex items-start justify-between gap-2">
           <h3 class="font-bold text-textPrimary">
@@ -21,7 +21,7 @@
         </p>
 
         <div class="flex items-center gap-2 mt-2">
-          <!-- 로스팅 레벨 -->
+          
           <span
             v-if="bean.roastingLevel"
             class="px-2 py-0.5 text-xs font-medium bg-primary-50 text-primary rounded"
@@ -29,7 +29,7 @@
             {{ roastingLabel }}
           </span>
 
-          <!-- 연결된 메뉴 수 -->
+          
           <span
             v-if="linkedMenuCount > 0"
             class="px-2 py-0.5 text-xs font-medium bg-accent/10 text-accent rounded"
@@ -40,7 +40,7 @@
       </div>
     </div>
 
-    <!-- 액션 버튼들 -->
+    
     <div class="flex gap-2 mt-4 pt-4 border-t border-border">
       <BaseButton
         variant="secondary"

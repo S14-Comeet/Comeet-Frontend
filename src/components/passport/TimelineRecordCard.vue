@@ -1,20 +1,20 @@
 <template>
     <transition name="slide-up">
         <div v-if="record" class="timeline-record-card" @click.stop>
-            <!-- 드래그 핸들 -->
+            
             <div class="w-12 h-1 bg-primary-200 rounded-full mx-auto mb-4"></div>
 
-            <!-- 상단: 날짜 + 태그 -->
+            
             <div class="card-header">
                 <span class="visit-date">{{ formatDate(record.visitDate) }}</span>
                 <span class="cafe-tag">카페</span>
             </div>
 
-            <!-- 가게 정보 -->
+            
             <h3 class="store-name">{{ record.storeName }}</h3>
             <p class="store-address">{{ record.storeAddress }}</p>
 
-            <!-- 커피 정보 (원산지, 메뉴) -->
+            
             <div class="coffee-info">
                 <div class="info-item origin">
                     <BaseIcon name="globe" :size="16" color="var(--color-primary-600)" />
@@ -32,7 +32,7 @@
                 </div>
             </div>
 
-            <!-- 액션 버튼 -->
+            
             <div class="action-buttons">
                 <button class="btn-primary" @click="$emit('detail')">
                     상세보기

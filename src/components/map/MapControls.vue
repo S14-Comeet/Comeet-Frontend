@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col gap-2">
-    <!-- 내 위치 버튼 -->
+    
     <button
         class="bg-white rounded-full p-3 shadow-lg hover:shadow-xl transition"
         title="내 위치로 이동"

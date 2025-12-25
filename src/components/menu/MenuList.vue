@@ -1,6 +1,6 @@
 <template>
   <div class="menu-list">
-    <!-- 로딩 상태 -->
+    
     <div v-if="isLoadingBeans" class="loading-indicator">
       <BaseIcon name="spinner" :size="20" class="animate-spin text-primary" />
       <span>메뉴 정보 불러오는 중...</span>
@@ -16,7 +16,7 @@
       }"
       @click="handleCardClick(menu)"
     >
-      <!-- 메뉴 기본 정보 -->
+      
       <div class="menu-item">
         <div class="menu-image-wrapper">
           <img
@@ -34,7 +34,7 @@
           <p v-if="menu.description" class="menu-description">{{ menu.description }}</p>
           <p class="menu-price">{{ formatPrice(menu.price) }}원</p>
 
-          <!-- 원두 칩 (항상 표시) -->
+          
           <div v-if="getMenuBeans(menu.id).length > 0" class="bean-chips">
             <button
               v-for="bean in getMenuBeans(menu.id)"
@@ -86,8 +86,7 @@ const props = defineProps({
 
 const emit = defineEmits(['select-menu'])
 
-// 원두 정보 상태
-const menuBeans = ref({}) // { menuId: [{ id, name }, ...] }
+const menuBeans = ref({})
 const isLoadingBeans = ref(false)
 
 const formatPrice = (price) => {
@@ -98,16 +97,15 @@ const getMenuBeans = (menuId) => {
   return menuBeans.value[menuId] || []
 }
 
-// 모든 메뉴의 원두 정보 미리 로드
 const preloadAllBeans = async () => {
   if (!props.menus?.length) return
 
   isLoadingBeans.value = true
 
   try {
-    // 병렬로 모든 메뉴 상세 정보 fetch
+
     const promises = props.menus.map(async (menu) => {
-      // 이미 로드된 정보는 스킵
+
       if (menuBeans.value[menu.id]) return
 
       try {
@@ -127,13 +125,11 @@ const preloadAllBeans = async () => {
   }
 }
 
-// 카드 클릭 핸들러 (원두 칩 영역 제외)
 const handleCardClick = (menu) => {
   if (props.disabled) return
   emit('select-menu', menu)
 }
 
-// 원두 상세 페이지로 이동
 const goToBeanDetail = (bean) => {
   router.push({
     name: 'bean-detail',
@@ -141,7 +137,6 @@ const goToBeanDetail = (bean) => {
   })
 }
 
-// menus가 변경되면 원두 정보 로드
 watch(() => props.menus, (newMenus) => {
   if (newMenus?.length) {
     preloadAllBeans()

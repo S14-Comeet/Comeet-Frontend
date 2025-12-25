@@ -20,21 +20,20 @@ const logger = createLogger('API:Review');
  */
 export const createReview = async (reviewData) => {
   const payload = {
-    storeId: Number(reviewData.storeId), // Ensure numeric
+    storeId: Number(reviewData.storeId),
     content: reviewData.content,
     isPublic: reviewData.isPublic ?? true,
     flavorIdList: reviewData.flavorIds || [],
     imageUrl: reviewData.imageUrl || null,
-    // 필수값이지만 UI 흐름상 누락될 수 있는 값들은 임시로 처리하거나 상위에서 전달받아야 함
-    visitId: reviewData.visitId ? Number(reviewData.visitId) : 1, // TODO: 실제 방문 인증 ID 연동 필요 (임시값 1)
-    menuId: reviewData.menuId ? Number(reviewData.menuId) : 1,    // TODO: 실제 메뉴 선택 연동 필요 (임시값 1)
-    rating: reviewData.rating ?? null // 별점 (선택)
+    visitId: reviewData.visitId ? Number(reviewData.visitId) : 1,
+    menuId: reviewData.menuId ? Number(reviewData.menuId) : 1,
+    rating: reviewData.rating ?? null
   };
 
   logger.debug('Creating review with payload:', payload);
 
   const response = await api.post('/reviews', payload);
-  return response.data; // BaseResponseReviewedResDto
+  return response.data;
 };
 
 /**
@@ -51,7 +50,7 @@ export const getMyReviews = async ({ page = 1, size = 10 } = {}) => {
   const response = await api.get('/reviews', {
     params: { page, size }
   });
-  return response.data; // PageResponseReviewPageDto
+  return response.data;
 };
 
 /**

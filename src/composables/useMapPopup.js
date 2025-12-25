@@ -12,7 +12,6 @@ export function useMapPopup(map) {
   const popupStore = ref(null)
   const popupPosition = ref({ x: 0, y: 0 })
 
-  // 쓰로틀 유틸리티 (RAF 기반)
   let rafId = null
 
   /**

@@ -1,16 +1,26 @@
 <template>
   <div class="flex flex-col h-full bg-white relative">
-    <BaseHeader show-back-button />
+    
+    <div v-if="isLoading" class="flex-1 flex justify-center items-center">
+      <BaseIcon name="spinner" :size="40" class="animate-spin text-primary" />
+    </div>
 
-    <div class="flex-1 overflow-y-auto pb-24">
+    
+    <div v-else-if="error" class="flex-1 flex flex-col items-center justify-center px-6">
+      <BaseIcon name="alert-circle" :size="48" class="text-error mb-4" />
+      <p class="text-neutral-700 text-center mb-4">{{ error }}</p>
+      <BaseButton label="뒤로 가기" variant="secondary" @click="router.back()" />
+    </div>
+
+    
+    <div v-else class="flex-1 overflow-y-auto pb-40">
       <div class="px-5 py-6">
-        <h1 class="text-2xl font-bold mb-2 text-neutral-900">리뷰 작성</h1>
-
-        <!-- Review Mode Toggle -->
+        
         <div class="mode-toggle mb-6">
           <button
             class="mode-btn"
             :class="{ 'active': reviewMode === 'simple' }"
+            type="button"
             @click="reviewMode = 'simple'"
           >
             <BaseIcon name="coffee" :size="18" />
@@ -19,6 +29,7 @@
           <button
             class="mode-btn"
             :class="{ 'active': reviewMode === 'professional' }"
+            type="button"
             @click="reviewMode = 'professional'"
           >
             <BaseIcon name="edit" :size="18" />
@@ -26,31 +37,18 @@
           </button>
         </div>
 
-        <!-- Store & Menu Info -->
-        <div class="mb-6 p-4 bg-neutral-50 rounded-xl border border-border">
-          <div class="flex items-start gap-3">
-            <div class="flex-1">
-              <p class="text-sm text-textSecondary mb-1">방문한 카페</p>
-              <p class="text-lg font-bold text-neutral-900 mb-3">{{ cafeName }}</p>
-
-              <div class="pt-3 border-t border-border">
-                <p class="text-sm text-textSecondary mb-1">선택한 메뉴</p>
-                <div class="flex items-center justify-between">
-                  <p class="font-bold text-neutral-900">{{ menuName }}</p>
-                  <p class="text-sm text-primary-700 font-medium">{{ formatPrice(menuPrice) }}원</p>
-                </div>
-              </div>
-            </div>
-            <div class="px-2 py-1 bg-primary-100 text-primary-700 text-xs font-bold rounded-lg flex items-center gap-1 flex-shrink-0">
-              <BaseIcon name="check" :size="12" />
-              인증됨
-            </div>
+        
+        <section class="mb-6">
+          <h2 class="text-lg font-bold mb-3">별점</h2>
+          <div class="flex items-center gap-3">
+            <StarRating v-model="rating" :size="36" allow-half />
+            <span v-if="rating > 0" class="text-lg font-semibold text-primary">{{ rating }}점</span>
+            <span v-else class="text-sm text-textSecondary">(선택)</span>
           </div>
-        </div>
+        </section>
 
-        <!-- Simple Review Mode -->
+        
         <template v-if="reviewMode === 'simple'">
-          <!-- Flavor Selection -->
           <section class="mb-6">
             <h2 class="text-lg font-bold mb-4">어떤 향미가 느껴졌나요?</h2>
             <p class="text-sm text-textSecondary mb-3">
@@ -62,12 +60,10 @@
 
         <!-- Professional Review Mode -->
         <template v-else>
-          <!-- Cupping Note Form -->
           <section class="mb-6">
             <CuppingNoteForm v-model="cuppingNote" />
           </section>
 
-          <!-- Flavor Selection (collapsed in pro mode) -->
           <section class="mb-6">
             <details class="flavor-accordion">
               <summary class="accordion-header">
@@ -87,17 +83,7 @@
           </section>
         </template>
 
-        <!-- Rating (both modes) -->
-        <section class="mb-6">
-          <h2 class="text-lg font-bold mb-3">별점</h2>
-          <div class="flex items-center gap-3">
-            <StarRating v-model="rating" :size="36" allow-half />
-            <span v-if="rating > 0" class="text-lg font-semibold text-primary">{{ rating }}점</span>
-            <span v-else class="text-sm text-textSecondary">(선택)</span>
-          </div>
-        </section>
-
-        <!-- Content (both modes) -->
+        <!-- Content -->
         <section class="mb-4">
           <h2 class="text-lg font-bold mb-4">리뷰 내용</h2>
           <textarea
@@ -136,9 +122,12 @@
     </div>
 
     <!-- Bottom Action -->
-    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-border p-4 max-w-[448px] mx-auto z-10 safe-bottom">
+    <div
+      v-if="!isLoading && !error"
+      class="fixed bottom-0 left-0 right-0 bg-white border-t border-border p-4 max-w-[448px] mx-auto z-10 safe-bottom"
+    >
       <BaseButton
-        label="등록하기"
+        label="수정 완료"
         size="large"
         class="w-full"
         :disabled="!isValid"
@@ -153,42 +142,35 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { createLogger } from '@/utils/logger'
-import BaseHeader from '@/components/common/BaseHeader.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import StarRating from '@/components/common/StarRating.vue'
 import HierarchicalFlavorSelector from '@/components/common/HierarchicalFlavorSelector.vue'
 import CuppingNoteForm from '@/components/review/CuppingNoteForm.vue'
 import OwnerImageUploader from '@/components/owner/OwnerImageUploader.vue'
-import { createReview, createCuppingNote } from '@/api/review'
+import { getReviewDetail, getCuppingNote, updateReview, updateCuppingNote, createCuppingNote } from '@/api/review'
 import { findFlavorInWheel } from '@/constants'
 import { showSuccess, showError } from '@/utils/toast'
 
-const logger = createLogger('ReviewWriteView')
-
+const logger = createLogger('ReviewEditView')
 const route = useRoute()
 const router = useRouter()
 
-// Route params
-const storeId = route.query.storeId
-const cafeName = route.query.name || '카페'
-const menuId = route.query.menuId
-const menuName = route.query.menuName || '메뉴'
-const menuPrice = Number(route.query.menuPrice) || 0
-const visitId = route.query.visitId
+const reviewId = computed(() => route.params.reviewId)
 
-// Review mode
-const reviewMode = ref('simple') // 'simple' | 'professional'
+const isLoading = ref(true)
+const error = ref(null)
+const isSubmitting = ref(false)
+const originalReview = ref(null)
+const hasCuppingNote = ref(false)
 
-// Form state
+const reviewMode = ref('simple')
 const content = ref('')
 const selectedFlavors = ref([])
 const isPublic = ref(true)
-const isSubmitting = ref(false)
-const rating = ref(0) // 별점 (0-5, 선택)
-const imageUrl = ref('') // 이미지 URL
+const rating = ref(0)
+const imageUrl = ref('')
 
-// Cupping note state
 const DEFAULT_CUPPING_SCORE = 6.5
 const cuppingNote = ref({
   roastLevel: null,
@@ -207,13 +189,10 @@ const cuppingNote = ref({
   overallNotes: ''
 })
 
-// Validation
 const isValid = computed(() => {
   if (reviewMode.value === 'simple') {
-    // Simple: need content and at least one flavor
     return content.value.trim().length > 0 && selectedFlavors.value.length > 0
   } else {
-    // Professional: need at least some scores
     const hasScores = cuppingNote.value.fragranceScore > 0 ||
                       cuppingNote.value.flavorScore > 0 ||
                       cuppingNote.value.acidityScore > 0
@@ -221,68 +200,118 @@ const isValid = computed(() => {
   }
 })
 
-const formatPrice = (price) => {
-  return price?.toLocaleString('ko-KR') || '0'
+const flavorIdToCode = (id) => {
+  const found = findFlavorInWheel(id)
+  return found?.code || null
 }
 
-// flavor code를 ID로 변환
 const flavorCodesToIds = (codes) => {
   return codes
     .map(code => findFlavorInWheel(code)?.id)
     .filter(id => id != null)
 }
 
-// Redirect if no menu selected
-onMounted(() => {
-  if (!menuId || !visitId) {
-    showError('메뉴 선택 정보가 없습니다.')
-    if (storeId) {
-      router.replace({
-        name: 'store-detail',
-        params: { storeId }
-      })
-    } else {
-      router.replace({ name: 'map' })
+const loadReviewData = async () => {
+  isLoading.value = true
+  error.value = null
+
+  try {
+
+    const response = await getReviewDetail(reviewId.value)
+    const review = response.data || response
+    originalReview.value = review
+
+    const reviewInfo = review.reviewInfo || review
+    content.value = reviewInfo.content || ''
+    isPublic.value = reviewInfo.isPublic ?? true
+    rating.value = reviewInfo.rating || 0
+    imageUrl.value = reviewInfo.imageUrl || ''
+
+    if (review.flavorBadges && review.flavorBadges.length > 0) {
+      selectedFlavors.value = review.flavorBadges
+        .map(f => flavorIdToCode(f.flavorId))
+        .filter(code => code != null)
     }
+
+    try {
+      const cuppingResponse = await getCuppingNote(reviewId.value)
+      const cuppingData = cuppingResponse.data || cuppingResponse
+      hasCuppingNote.value = true
+      reviewMode.value = 'professional'
+
+      cuppingNote.value = {
+        roastLevel: cuppingData.roastingLevel || cuppingData.roastLevel || null,
+        fragranceScore: cuppingData.fragranceScore ?? DEFAULT_CUPPING_SCORE,
+        aromaScore: cuppingData.aromaScore ?? DEFAULT_CUPPING_SCORE,
+        flavorScore: cuppingData.flavorScore ?? DEFAULT_CUPPING_SCORE,
+        aftertasteScore: cuppingData.aftertasteScore ?? DEFAULT_CUPPING_SCORE,
+        acidityScore: cuppingData.acidityScore ?? DEFAULT_CUPPING_SCORE,
+        sweetnessScore: cuppingData.sweetnessScore ?? DEFAULT_CUPPING_SCORE,
+        mouthfeelScore: cuppingData.mouthfeelScore ?? DEFAULT_CUPPING_SCORE,
+        fragranceAromaDetail: cuppingData.fragranceAromaDetail || '',
+        flavorAftertasteDetail: cuppingData.flavorAftertasteDetail || '',
+        acidityNotes: cuppingData.acidityNotes || '',
+        sweetnessNotes: cuppingData.sweetnessNotes || '',
+        mouthfeelNotes: cuppingData.mouthfeelNotes || '',
+        overallNotes: cuppingData.overallNotes || ''
+      }
+    } catch {
+
+      hasCuppingNote.value = false
+      reviewMode.value = 'simple'
+    }
+
+  } catch (e) {
+    logger.error('Failed to load review data', e)
+    error.value = '리뷰 정보를 불러오는데 실패했습니다.'
+  } finally {
+    isLoading.value = false
   }
-})
+}
 
 const handleSubmit = async () => {
   if (!isValid.value) return
 
   isSubmitting.value = true
   try {
-    // 1. Create base review (flavor code를 ID로 변환)
-    const reviewResponse = await createReview({
-      storeId,
+
+    await updateReview(reviewId.value, {
       content: content.value,
       flavorIds: flavorCodesToIds(selectedFlavors.value),
-      visitId,
-      menuId,
       isPublic: isPublic.value,
-      rating: rating.value > 0 ? rating.value : null, // 별점 (선택)
-      imageUrl: imageUrl.value || null // 이미지 URL
+      rating: rating.value > 0 ? rating.value : null,
+      imageUrl: imageUrl.value || null
     })
 
-    // 2. If professional mode, create cupping note
-    if (reviewMode.value === 'professional' && reviewResponse?.data?.reviewInfo?.reviewId) {
+    if (reviewMode.value === 'professional') {
       try {
-        await createCuppingNote(reviewResponse.data.reviewInfo.reviewId, cuppingNote.value)
+        if (hasCuppingNote.value) {
+          await updateCuppingNote(reviewId.value, cuppingNote.value)
+        } else {
+          await createCuppingNote(reviewId.value, cuppingNote.value)
+        }
       } catch (cuppingError) {
         logger.warn('Failed to save cupping note', cuppingError)
-        // Don't fail the whole review if cupping note fails
+        showError('커핑노트 저장에 실패했습니다.')
       }
     }
 
-    showSuccess('리뷰가 등록되었습니다.')
-    router.push({ name: 'map' })
-  } catch (error) {
-    showError('리뷰 등록에 실패했습니다.')
-    logger.error('리뷰 등록 실패', error)
+    showSuccess('리뷰가 수정되었습니다.')
+    router.replace({
+      name: 'review-detail',
+      params: { reviewId: reviewId.value }
+    })
+  } catch (e) {
+    showError('리뷰 수정에 실패했습니다.')
+    logger.error('리뷰 수정 실패', e)
   } finally {
     isSubmitting.value = false
   }
 }
+
+onMounted(() => {
+  loadReviewData()
+})
 </script>
 
 <style scoped>
@@ -408,15 +437,5 @@ details[open] .accordion-icon {
 /* Safe Area */
 .safe-bottom {
   padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
-}
-
-/* Animations */
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 </style>

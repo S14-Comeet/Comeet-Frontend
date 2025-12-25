@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-3">
-    <!-- 이미지 미리보기 -->
+    
     <div v-if="previewUrl" class="relative inline-block">
       <img
         :src="previewUrl"
@@ -17,7 +17,7 @@
       </button>
     </div>
 
-    <!-- 업로드 버튼 -->
+    
     <div class="flex gap-2">
       <label
         class="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary hover:bg-primary-50 transition-colors"
@@ -39,7 +39,7 @@
       </label>
     </div>
 
-    <!-- URL 직접 입력 (옵션) -->
+    
     <div v-if="allowUrlInput" class="flex gap-2">
       <BaseInput
         v-model="urlInput"
@@ -50,7 +50,7 @@
       />
     </div>
 
-    <!-- 도움말 -->
+    
     <p class="text-xs text-textSecondary">
       {{ helperText || 'JPG, PNG 파일을 업로드하세요 (최대 5MB)' }}
     </p>
@@ -85,19 +85,17 @@ const props = defineProps({
   },
   maxSize: {
     type: Number,
-    default: 5 * 1024 * 1024 // 5MB
+    default: 5 * 1024 * 1024
   }
 })
 
 const emit = defineEmits(['update:modelValue', 'uploaded'])
 
-// 상태
 const fileInput = ref(null)
 const isUploading = ref(false)
 const urlInput = ref('')
 const previewError = ref(false)
 
-// 미리보기 URL
 const previewUrl = computed(() => {
   if (previewError.value) return ''
   return props.modelValue || ''
@@ -110,13 +108,11 @@ const handleFileSelect = async (event) => {
   const file = event.target.files?.[0]
   if (!file) return
 
-  // 파일 타입 검증
   if (!file.type.startsWith('image/')) {
     showError('이미지 파일만 업로드할 수 있습니다')
     return
   }
 
-  // 파일 크기 검증
   if (file.size > props.maxSize) {
     showError(`파일 크기가 ${props.maxSize / 1024 / 1024}MB를 초과합니다`)
     return
@@ -135,7 +131,7 @@ const handleFileSelect = async (event) => {
     showError('이미지 업로드에 실패했습니다')
   } finally {
     isUploading.value = false
-    // 파일 입력 초기화 (같은 파일 다시 선택 가능하도록)
+
     if (fileInput.value) {
       fileInput.value.value = ''
     }
@@ -168,7 +164,6 @@ const handleImageError = () => {
   previewError.value = true
 }
 
-// modelValue 변경 시 URL 입력 초기화
 watch(() => props.modelValue, () => {
   urlInput.value = ''
   previewError.value = false

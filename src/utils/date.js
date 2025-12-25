@@ -14,13 +14,11 @@
 export const formatDate = (dateInput) => {
   if (!dateInput) return ''
 
-  // [year, month, day, ...] 배열 형식 처리
   if (Array.isArray(dateInput)) {
     const [year, month, day] = dateInput
     return `${year}.${String(month).padStart(2, '0')}.${String(day).padStart(2, '0')}`
   }
 
-  // ISO 문자열 또는 기타 형식
   const date = new Date(dateInput)
   if (isNaN(date.getTime())) return ''
 
@@ -41,7 +39,6 @@ export const formatDateWithWeekday = (dateInput) => {
   const weekdays = ['일', '월', '화', '수', '목', '금', '토']
   let date
 
-  // [year, month, day, ...] 배열 형식 처리
   if (Array.isArray(dateInput)) {
     const [year, month, day] = dateInput
     date = new Date(year, month - 1, day)
@@ -50,7 +47,6 @@ export const formatDateWithWeekday = (dateInput) => {
     return `${year}년 ${month}월 ${day}일 (${weekday})`
   }
 
-  // ISO 문자열 또는 기타 형식
   date = new Date(dateInput)
   if (isNaN(date.getTime())) return ''
 
@@ -69,13 +65,11 @@ export const formatDateWithWeekday = (dateInput) => {
 export const formatDateShort = (dateInput) => {
   if (!dateInput) return ''
 
-  // [year, month, day, ...] 배열 형식 처리
   if (Array.isArray(dateInput)) {
     const [, month, day] = dateInput
     return `${String(month).padStart(2, '0')}.${String(day).padStart(2, '0')}`
   }
 
-  // ISO 문자열 또는 기타 형식
   const date = new Date(dateInput)
   if (isNaN(date.getTime())) return ''
 
@@ -94,7 +88,6 @@ export const formatRelativeTime = (dateInput) => {
 
   let date
 
-  // [year, month, day, hour, minute, second] 배열 형식 처리
   if (Array.isArray(dateInput)) {
     const [year, month, day, hour = 0, minute = 0, second = 0] = dateInput
     date = new Date(year, month - 1, day, hour, minute, second)
@@ -117,6 +110,5 @@ export const formatRelativeTime = (dateInput) => {
   if (diffDay === 1) return '어제'
   if (diffDay < 7) return `${diffDay}일 전`
 
-  // 일주일 이상이면 날짜로 표시
   return formatDate(dateInput)
 }

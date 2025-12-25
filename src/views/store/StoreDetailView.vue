@@ -1,11 +1,9 @@
 <template>
   <div class="flex flex-col min-h-full bg-background">
-    <!-- Loading State -->
     <div v-if="isLoading" class="flex-1 flex items-center justify-center">
       <BaseIcon name="spinner" :size="32" class="text-primary animate-spin" />
     </div>
 
-    <!-- Error State -->
     <div v-else-if="error" class="flex-1 flex flex-col items-center justify-center p-6 text-center">
       <BaseIcon name="x" :size="48" class="text-error mb-4" />
       <p class="text-textPrimary font-medium mb-2">정보를 불러올 수 없습니다</p>
@@ -13,9 +11,7 @@
       <BaseButton label="다시 시도" variant="primary" @click="fetchStoreDetail" />
     </div>
 
-    <!-- Content - 하단 바와 네비게이션 바를 고려한 패딩 -->
     <div v-else-if="store" class="flex-1 overflow-y-auto" :class="selectedMenu ? 'pb-48' : 'pb-24'">
-      <!-- Hero Section -->
       <div class="store-hero">
         <div class="hero-image">
           <img
@@ -32,12 +28,9 @@
         </div>
       </div>
 
-      <!-- Store Info -->
       <div class="store-info-section">
-        <!-- 평점 배지 (미슐랭 스타 스타일) -->
         <RatingBadge :rating="store.averageRating" class="mb-2" />
-        
-        <!-- 1줄: 가게이름 + 평점 + 북마크 -->
+
         <div class="flex items-center justify-between gap-3">
           <div class="flex items-center gap-3 min-w-0 flex-1">
             <h1 class="text-xl font-bold text-textPrimary truncate">{{ store.name }}</h1>
@@ -55,7 +48,6 @@
           </button>
         </div>
 
-        <!-- 2줄: 리뷰·방문 + 카테고리 태그 -->
         <div class="flex items-center gap-3 mt-2 flex-wrap">
           <span class="text-sm text-textSecondary">
             리뷰 <span class="font-semibold text-textPrimary">{{ store.reviewCount || 0 }}</span>
@@ -74,7 +66,6 @@
           </div>
         </div>
 
-        <!-- 3줄: 설명 -->
         <div v-if="store.description" class="mt-3">
           <p
             class="text-textSecondary text-sm leading-relaxed"
@@ -92,17 +83,15 @@
         </div>
       </div>
 
-      <!-- Detail Info -->
       <div class="detail-section">
         <div class="detail-list">
-          <!-- Address -->
           <div class="detail-item" @click="copyAddress">
             <BaseIcon name="map-marker" :size="16" class="text-primary shrink-0" />
             <span class="detail-value">{{ store.address || '정보 없음' }}</span>
             <BaseIcon name="file-copy" :size="14" class="text-textSecondary shrink-0" />
           </div>
 
-          <!-- Phone -->
+          
           <a
             v-if="store.phoneNumber"
             :href="`tel:${store.phoneNumber}`"
@@ -113,21 +102,19 @@
             <BaseIcon name="chevron-right" :size="14" class="text-textSecondary shrink-0" />
           </a>
 
-          <!-- Business Hours -->
+          
           <div class="detail-item no-action">
             <BaseIcon name="time" :size="16" class="text-primary shrink-0" />
             <span class="detail-value">{{ formatBusinessHours(store.openTime, store.closeTime) }}</span>
           </div>
         </div>
 
-        <!-- Map Button -->
         <button class="map-link" @click="showOnMap">
           <BaseIcon name="map-fill" :size="14" class="shrink-0" />
           <span>지도에서 보기</span>
         </button>
       </div>
 
-      <!-- Menu Section -->
       <div class="menu-section">
         <div class="section-header">
           <h2 class="section-title">메뉴 {{ menus.length }}개</h2>
@@ -157,7 +144,6 @@
         />
       </div>
 
-      <!-- Reviews Section -->
       <div class="reviews-section">
         <div class="section-header">
           <h2 class="section-title">리뷰 {{ reviews.length }}개</h2>
@@ -176,8 +162,6 @@
           <BaseIcon name="spinner" :size="24" class="text-primary animate-spin" />
         </div>
 
-        <!-- 리뷰가 없을 때는 빈 공백 표시 -->
-
         <div v-else class="reviews-list">
           <div
             v-for="review in displayedReviews"
@@ -195,7 +179,6 @@
               <span class="review-date">{{ formatDate(review.createdAt) }}</span>
             </div>
 
-            <!-- Rating -->
             <div v-if="review.rating > 0" class="review-rating">
               <StarRating :model-value="review.rating" :size="16" readonly />
               <span class="rating-value">{{ review.rating }}점</span>
@@ -228,7 +211,6 @@
       </div>
     </div>
 
-    <!-- 북마크 폴더 선택 모달 -->
     <BookmarkFolderSelectModal
       :is-open="showBookmarkModal"
       :store-id="storeId"
@@ -238,7 +220,6 @@
       @update="handleBookmarkUpdate"
     />
 
-    <!-- 하단 고정 버튼: 메뉴 선택 시 표시 -->
     <div v-if="selectedMenu && !isVerified" class="fixed-bottom-bar">
       <div class="selected-menu-info">
         <span class="selected-label">선택한 메뉴</span>
@@ -256,7 +237,6 @@
       </p>
     </div>
 
-    <!-- 인증 완료 후: 리뷰 작성 버튼 -->
     <div v-if="isVerified" class="fixed-bottom-bar verified">
       <div class="verified-info">
         <BaseIcon name="check" :size="20" class="text-primary" />
@@ -288,7 +268,7 @@ import BaseChip from '@/components/common/BaseChip.vue'
 import StarRating from '@/components/common/StarRating.vue'
 import RatingBadge from '@/components/common/RatingBadge.vue'
 import BookmarkFolderSelectModal from '@/components/saved/BookmarkFolderSelectModal.vue'
-import MenuList from '@/components/MenuList.vue'
+import MenuList from '@/components/menu/MenuList.vue'
 import { getStoreById, getStoreReviews } from '@/api/cafe'
 import { getMenusByStoreId } from '@/api/menu'
 import { getStoreBookmarkStatus } from '@/api/bookmark'
@@ -300,7 +280,6 @@ import { formatDate } from '@/utils/date'
 
 const logger = createLogger('StoreDetailView')
 
-// enum 값을 한글 라벨로 변환하는 맵
 const categoryLabelMap = Object.fromEntries(
   MENU_CATEGORIES.map(cat => [cat.value, cat.label])
 )
@@ -327,13 +306,12 @@ const showAllReviews = ref(false)
 const showAllMenus = ref(false)
 const isDescriptionExpanded = ref(false)
 
-// 방문 인증 관련
 const selectedMenu = ref(null)
 const isVerifying = ref(false)
 const isVerified = ref(false)
 const visitId = ref(null)
 const verificationMessage = ref('')
-const verificationStatus = ref('default') // 'default' | 'success' | 'error'
+const verificationStatus = ref('default')
 
 const hasValidThumbnail = computed(() => {
   return store.value?.thumbnailUrl &&
@@ -341,7 +319,6 @@ const hasValidThumbnail = computed(() => {
          !imageError.value
 })
 
-// 카테고리를 한글로 변환
 const displayCategories = computed(() => {
   if (!store.value?.category) return []
   return store.value.category
@@ -374,17 +351,14 @@ const formatBusinessHours = (open, close) => {
   if (!open && !close) return '정보 없음'
   const formatTime = (time) => {
     if (!time) return ''
-    // Handle string format "HH:mm:ss" or "HH:mm"
     if (typeof time === 'string') {
       const parts = time.split(':')
       if (parts.length < 2) return time
       return `${parts[0]}:${parts[1]}`
     }
-    // Handle array format [hour, minute, second]
     if (Array.isArray(time)) {
       return `${String(time[0]).padStart(2, '0')}:${String(time[1] || 0).padStart(2, '0')}`
     }
-    // Handle object format {hour, minute, second}
     if (typeof time === 'object' && time.hour !== undefined) {
       return `${String(time.hour).padStart(2, '0')}:${String(time.minute || 0).padStart(2, '0')}`
     }
@@ -407,7 +381,6 @@ const fetchStoreDetail = async () => {
     const response = await getStoreById(storeId.value)
     let storeData = response.data || response
 
-    // API가 mock 데이터를 반환한 경우, query params로 보완
     if (storeData.name === 'Unknown Cafe' && route.query.name) {
       storeData = {
         ...storeData,
@@ -421,7 +394,6 @@ const fetchStoreDetail = async () => {
 
     store.value = storeData
 
-    // Fetch reviews, menus, and bookmark status
     fetchReviews()
     fetchMenus()
     fetchBookmarkStatus()
@@ -439,15 +411,12 @@ const fetchReviews = async () => {
   isLoadingReviews.value = true
   try {
     const response = await getStoreReviews(storeId.value)
-    // API 응답 구조에 따라 유연하게 처리
-    // { reviews: [...] } 또는 [...] 둘 다 지원
     const data = response?.data ?? response
     if (Array.isArray(data)) {
       reviews.value = data
     } else if (data?.reviews && Array.isArray(data.reviews)) {
       reviews.value = data.reviews
     } else if (data?.content && Array.isArray(data.content)) {
-      // 페이징 응답 구조
       reviews.value = data.content
     } else {
       reviews.value = []
@@ -468,7 +437,6 @@ const fetchMenus = async () => {
   try {
     const response = await getMenusByStoreId(storeId.value, { page: 1, size: 10 })
     const data = response?.data ?? response
-    // 페이지네이션 응답 처리: content 필드 또는 배열 직접 반환
     menus.value = data?.content ?? (Array.isArray(data) ? data : [])
   } catch (e) {
     logger.error('Failed to fetch menus', e)
@@ -489,9 +457,7 @@ const copyAddress = async () => {
   }
 }
 
-// 북마크 상태 조회
 const fetchBookmarkStatus = async () => {
-  // 비로그인 사용자는 북마크 상태 조회하지 않음
   if (!isAuthenticated.value || !storeId.value) return
 
   try {
@@ -500,11 +466,9 @@ const fetchBookmarkStatus = async () => {
     bookmarkedFolderIds.value = status.folders?.map(f => f.folderId) || []
   } catch (error) {
     logger.error('북마크 상태 조회 실패', error)
-    // 실패해도 UI에 영향 없이 기본값 유지
   }
 }
 
-// 북마크 버튼 클릭
 const toggleBookmark = () => {
   if (!isAuthenticated.value) {
     showError('로그인이 필요합니다')
@@ -512,11 +476,9 @@ const toggleBookmark = () => {
     return
   }
 
-  // 폴더 선택 모달 열기
   showBookmarkModal.value = true
 }
 
-// 북마크 상태 업데이트 핸들러
 const handleBookmarkUpdate = ({ folderIds, isBookmarked: newBookmarked }) => {
   bookmarkedFolderIds.value = folderIds
   isBookmarked.value = newBookmarked
@@ -535,12 +497,9 @@ const showOnMap = () => {
   })
 }
 
-// 메뉴 선택 처리
 const handleMenuSelect = (menu) => {
-  // 인증 완료 후에는 메뉴 변경 불가
   if (isVerified.value) return
 
-  // 같은 메뉴 선택 시 선택 해제
   if (selectedMenu.value?.id === menu.id) {
     selectedMenu.value = null
     verificationMessage.value = ''
@@ -550,11 +509,9 @@ const handleMenuSelect = (menu) => {
   }
 }
 
-// 방문 인증 처리
 const handleVerifyVisit = async () => {
   if (!selectedMenu.value || !store.value) return
 
-  // 로그인 확인
   if (!isAuthenticated.value) {
     showError('로그인이 필요합니다')
     router.push('/login')
@@ -566,7 +523,6 @@ const handleVerifyVisit = async () => {
   verificationMessage.value = '위치 확인 중...'
 
   try {
-    // 1. 가게 좌표 확인
     const storeLat = store.value.latitude
     const storeLng = store.value.longitude
 
@@ -577,7 +533,6 @@ const handleVerifyVisit = async () => {
       return
     }
 
-    // 2. 사용자 위치 요청
     await requestLocation()
 
     if (geoError.value || !geoLocation.value) {
@@ -597,14 +552,12 @@ const handleVerifyVisit = async () => {
       userLoc
     })
 
-    // 3. 인증 API 호출
     const result = await verifyVisit({
       menuId: selectedMenu.value.id,
       storeLocationDto: storeLoc,
       userLocationDto: userLoc
     })
 
-    // 4. 응답 처리
     const responseData = result?.data ?? result
     if (responseData) {
       const { visitId: newVisitId, isVerified: verified } = responseData
@@ -633,7 +586,6 @@ const handleVerifyVisit = async () => {
   }
 }
 
-// 리뷰 작성 페이지로 이동
 const goToReviewWrite = () => {
   if (!isVerified.value || !selectedMenu.value) return
 
@@ -650,7 +602,6 @@ const goToReviewWrite = () => {
   })
 }
 
-// 인증 상태 초기화 (다른 메뉴 인증)
 const resetVerification = () => {
   selectedMenu.value = null
   isVerified.value = false
@@ -677,7 +628,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Hero Section */
 .store-hero {
   position: relative;
 }
@@ -702,7 +652,6 @@ onMounted(() => {
   font-weight: 600;
 }
 
-/* Store Info Section */
 .store-info-section {
   padding: 1.25rem 1.5rem;
   background: white;
@@ -744,14 +693,12 @@ onMounted(() => {
   border-color: var(--color-primary-200);
 }
 
-/* Detail Section */
 .detail-section {
   padding: 0.75rem 1.5rem;
   background: white;
   border-bottom: 1px solid var(--color-border);
 }
 
-/* Menu Section */
 .menu-section {
   padding: 1rem 1.5rem;
   padding-top: 1.5rem;
@@ -852,7 +799,6 @@ onMounted(() => {
   text-decoration: underline;
 }
 
-/* Reviews Section */
 .reviews-section {
   padding: 1rem 1.5rem;
   padding-top: 1.5rem;
@@ -956,7 +902,6 @@ onMounted(() => {
   border-radius: 0.5rem;
 }
 
-/* Review Write Button */
 .review-write-btn {
   display: flex;
   align-items: center;
@@ -974,17 +919,15 @@ onMounted(() => {
   background-color: var(--color-primary-600);
 }
 
-/* Map Button */
 .map-button {
   border: none;
   width: 100%;
   text-align: left;
 }
 
-/* Fixed Bottom Bar - 네비게이션 바 위에 표시 (64px) */
 .fixed-bottom-bar {
   position: fixed;
-  bottom: 64px; /* 네비게이션 바 높이 */
+  bottom: 64px;
   left: 0;
   right: 0;
   max-width: 448px;
@@ -1041,7 +984,6 @@ onMounted(() => {
   color: var(--color-textSecondary);
 }
 
-/* Verified State */
 .fixed-bottom-bar.verified {
   background-color: var(--color-primary-50);
 }

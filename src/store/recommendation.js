@@ -11,7 +11,6 @@ import { safeStorage } from '@/utils/storage'
 const logger = createLogger('RecommendationStore')
 
 export const useRecommendationStore = defineStore('recommendation', () => {
-  // State
   const beanRecommendations = ref([])
   const menuRecommendations = ref([])
   const nearbyMenuRecommendations = ref([])
@@ -28,11 +27,9 @@ export const useRecommendationStore = defineStore('recommendation', () => {
   const menuError = ref(null)
   const nearbyMenuError = ref(null)
 
-  // 근거리 검색 관련
   const radiusExpanded = ref(false)
   const actualRadiusKm = ref(5)
 
-  // Actions
   const fetchBeanRecommendations = async (forceRefresh = false) => {
     if (hasFetchedBeans.value && !forceRefresh) {
       logger.debug('Using cached bean recommendations')
@@ -142,7 +139,6 @@ export const useRecommendationStore = defineStore('recommendation', () => {
   }
 
   return {
-    // State
     beanRecommendations,
     menuRecommendations,
     nearbyMenuRecommendations,
@@ -158,7 +154,6 @@ export const useRecommendationStore = defineStore('recommendation', () => {
     radiusExpanded,
     actualRadiusKm,
 
-    // Actions
     fetchBeanRecommendations,
     fetchMenuRecommendations,
     fetchNearbyMenuRecommendations,

@@ -9,24 +9,24 @@
         class="bg-white rounded-2xl max-w-sm w-full p-6"
         @click.stop
       >
-        <!-- 아이콘 (선택적) -->
+        
         <div v-if="icon" class="flex justify-center mb-4">
           <div class="w-12 h-12 rounded-full bg-error/10 flex items-center justify-center">
             <BaseIcon :name="icon" :size="24" color="var(--color-error)" />
           </div>
         </div>
 
-        <!-- 제목 -->
+        
         <h2 class="text-xl font-bold text-textPrimary text-center mb-2">
           {{ title }}
         </h2>
 
-        <!-- 메시지 -->
+        
         <p class="text-sm text-textSecondary text-center mb-6">
           {{ message }}
         </p>
 
-        <!-- 버튼 -->
+        
         <div class="flex gap-3">
           <BaseButton
             variant="secondary"

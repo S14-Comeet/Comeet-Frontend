@@ -1,6 +1,5 @@
 <template>
   <div class="review-card bg-white rounded-xl border border-border p-4 hover:shadow-md transition-shadow">
-    <!-- Review Header -->
     <div class="flex justify-between items-start mb-3">
       <div class="flex-1">
         <p class="text-sm text-textSecondary mb-1">{{ formattedDate }}</p>
@@ -8,7 +7,6 @@
         <p class="text-sm text-textSecondary">{{ menuName || `메뉴 #${review.menuId}` }}</p>
       </div>
       <div class="flex items-center gap-2">
-        <!-- Cupping Note Badge -->
         <BaseChip
           v-if="hasCuppingNote"
           label="커핑노트"
@@ -33,13 +31,11 @@
       </div>
     </div>
 
-    <!-- Rating -->
     <div v-if="displayRating > 0" class="flex items-center gap-2 mb-3">
       <StarRating :model-value="displayRating" :size="20" readonly />
       <span class="text-sm font-medium text-neutral-700">{{ displayRating }}점</span>
     </div>
 
-    <!-- Review Image -->
     <div v-if="review.imageUrl && !imageLoadError" class="mb-3 rounded-lg overflow-hidden">
       <img
         :src="review.imageUrl"
@@ -49,10 +45,8 @@
       />
     </div>
 
-    <!-- Review Content -->
     <p class="text-neutral-900 mb-3 whitespace-pre-wrap line-clamp-3">{{ review.content }}</p>
 
-    <!-- Flavor Badges -->
     <div v-if="review.flavorBadges && review.flavorBadges.length > 0" class="flex flex-wrap gap-2">
       <FlavorChip
         v-for="flavor in review.flavorBadges"
@@ -98,12 +92,9 @@ const formattedDate = computed(() => {
   const createdAt = props.review.createdAt
   if (!createdAt) return ''
 
-  // Date 객체 생성 시도
   const date = new Date(createdAt)
 
-  // Invalid Date 체크
   if (isNaN(date.getTime())) {
-    // Java LocalDateTime 배열 형식 [year, month, day, hour, minute, second] 처리
     if (Array.isArray(createdAt) && createdAt.length >= 3) {
       return `${createdAt[0]}년 ${createdAt[1]}월 ${createdAt[2]}일`
     }
@@ -117,7 +108,6 @@ const formattedDate = computed(() => {
   })
 })
 
-// rating은 review 객체 내부에서 가져옴
 const displayRating = computed(() => {
   return props.review.rating || 0
 })

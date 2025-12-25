@@ -2,14 +2,14 @@
   <div
 class="store-list-sheet" :class="sheetStateClass" :style="sheetStyle" @touchstart="handleTouchStart"
     @touchmove="handleTouchMove" @touchend="handleTouchEnd">
-    <!-- 드래그 핸들 -->
+    
     <div
 class="sheet-handle" role="button" tabindex="0" aria-label="시트 크기 조절" @click="toggleSheet"
       @keydown.enter="toggleSheet" @keydown.space.prevent="toggleSheet">
       <div class="handle-bar"></div>
     </div>
 
-    <!-- 카테고리 필터 -->
+    
     <div class="category-filter-row">
       <button
         v-for="cat in MENU_CATEGORIES"
@@ -21,7 +21,7 @@ class="sheet-handle" role="button" tabindex="0" aria-label="시트 크기 조절
       </button>
     </div>
 
-    <!-- 결과 헤더 -->
+    
     <div class="results-header">
       <div class="results-info">
         <span class="results-count">{{ stores.length }}개의 카페</span>
@@ -34,7 +34,7 @@ class="sheet-handle" role="button" tabindex="0" aria-label="시트 크기 조절
       </button>
     </div>
 
-    <!-- 가게 리스트 (확장 시에만 표시) -->
+    
     <div v-if="sheetState !== 'collapsed'" ref="listContainer" class="store-list scrollable">
       <div v-if="stores.length === 0 && !isSearching" class="empty-state">
         <BaseIcon name="coffee" :size="40" class="empty-icon" />
@@ -89,28 +89,22 @@ const props = defineProps({
 
 const emit = defineEmits(['select-store', 'state-change', 'search', 'search-area'])
 
-// 검색 상태
 const keyword = ref(props.initialKeyword)
 const selectedCategories = ref([...props.initialCategories])
 const isGlobalSearch = ref(props.initialGlobalSearch)
-const searchInput = ref(null)
 
-// 시트 상태
 const sheetState = ref('half')
 const listContainer = ref(null)
 
-// 드래그 관련
 const isDragging = ref(false)
 const startY = ref(0)
 const currentY = ref(0)
-const dragHeight = ref(0) // 드래그 중 실시간 높이
+const dragHeight = ref(0)
 
-// 시트 높이 설정값
-const COLLAPSED_HEIGHT = 0 // 완전히 숨김
-const HALF_HEIGHT_RATIO = 0.33 // 화면의 1/3
+const COLLAPSED_HEIGHT = 0
+const HALF_HEIGHT_RATIO = 0.33
 const FULL_HEIGHT_RATIO = 0.85
 
-// 활성 필터 여부
 const hasActiveFilters = computed(() => {
   return keyword.value || selectedCategories.value.length > 0
 })
@@ -122,7 +116,6 @@ const sheetStateClass = computed(() => ({
   'is-dragging': isDragging.value
 }))
 
-// 현재 상태의 높이 계산
 const getStateHeight = (state) => {
   const vh = window.innerHeight
   switch (state) {
@@ -143,15 +136,6 @@ const sheetStyle = computed(() => {
   return {}
 })
 
-// 검색 입력창 포커스 시 시트 확장
-const handleSearchFocus = () => {
-  if (sheetState.value === 'collapsed') {
-    sheetState.value = 'half'
-    emit('state-change', sheetState.value)
-  }
-}
-
-// 카테고리 토글 및 즉시 검색
 const toggleCategory = (category) => {
   const index = selectedCategories.value.indexOf(category)
   if (index === -1) {
@@ -160,36 +144,22 @@ const toggleCategory = (category) => {
     selectedCategories.value.splice(index, 1)
   }
 
-  // 카테고리 변경 시 즉시 검색 (위치 업데이트 없이)
   emit('search', {
     keyword: keyword.value.trim(),
     categories: selectedCategories.value.length > 0
       ? selectedCategories.value.join(',')
       : undefined,
     isGlobalSearch: isGlobalSearch.value,
-    searchType: 'category' // 카테고리 검색 구분
+    searchType: 'category'
   })
 }
 
-// 전역 검색 토글
-const toggleGlobalSearch = () => {
-  isGlobalSearch.value = !isGlobalSearch.value
-}
-
-// 검색어 지우기
-const clearKeyword = () => {
-  keyword.value = ''
-  searchInput.value?.focus()
-}
-
-// 모든 필터 초기화
 const clearAllFilters = () => {
   keyword.value = ''
   selectedCategories.value = []
   handleSearch()
 }
 
-// 검색 실행 (키워드 검색 - 위치 업데이트 필요)
 const handleSearch = () => {
   emit('search', {
     keyword: keyword.value.trim(),
@@ -197,11 +167,10 @@ const handleSearch = () => {
       ? selectedCategories.value.join(',')
       : undefined,
     isGlobalSearch: isGlobalSearch.value,
-    searchType: 'keyword' // 키워드 검색 구분
+    searchType: 'keyword'
   })
 }
 
-// 시트 토글
 const toggleSheet = () => {
   if (sheetState.value === 'collapsed') {
     sheetState.value = 'half'
@@ -213,25 +182,17 @@ const toggleSheet = () => {
   emit('state-change', sheetState.value)
 }
 
-// 시트 접기
 const collapseSheet = () => {
   sheetState.value = 'collapsed'
   emit('state-change', sheetState.value)
 }
 
-// 시트 확장 (collapsed → half)
-const expandSheet = () => {
-  sheetState.value = 'half'
-  emit('state-change', sheetState.value)
-}
-
-// 터치 이벤트 핸들러
 const handleTouchStart = (e) => {
-  // collapsed 상태에서는 드래그로 확장 불가 (목록보기 버튼 사용)
+
   if (sheetState.value === 'collapsed') {
     return
   }
-  // full 상태에서 리스트가 스크롤된 경우 드래그 시작 안함
+
   if (listContainer.value && listContainer.value.scrollTop > 0 && sheetState.value === 'full') {
     return
   }
@@ -245,9 +206,8 @@ const handleTouchMove = (e) => {
   if (!isDragging.value) return
 
   currentY.value = e.touches[0].clientY
-  const diff = startY.value - currentY.value // 양수면 위로 드래그 (확장)
+  const diff = startY.value - currentY.value
 
-  // full 상태에서 위로 더 드래그하려 하면 무시
   if (diff > 0 && sheetState.value === 'full') {
     if (listContainer.value && listContainer.value.scrollTop > 0) {
       isDragging.value = false
@@ -256,13 +216,11 @@ const handleTouchMove = (e) => {
     }
   }
 
-  // 드래그 중 높이 계산
   const baseHeight = getStateHeight(sheetState.value)
   const newHeight = baseHeight + diff
   const vh = window.innerHeight
 
-  // 최소/최대 높이 제한
-  const minHeight = 50 // 드래그 중 최소 높이 (스냅 시 0으로 됨)
+  const minHeight = 50
   const maxHeight = vh * FULL_HEIGHT_RATIO * 1.05
   dragHeight.value = Math.max(minHeight, Math.min(maxHeight, newHeight))
 }
@@ -273,12 +231,10 @@ const handleTouchEnd = () => {
   const vh = window.innerHeight
   const currentHeight = dragHeight.value
 
-  // 스냅 지점 계산
   const collapsedH = COLLAPSED_HEIGHT
   const halfH = vh * HALF_HEIGHT_RATIO
   const fullH = vh * FULL_HEIGHT_RATIO
 
-  // 가장 가까운 스냅 지점 찾기
   const distances = [
     { state: 'collapsed', dist: Math.abs(currentHeight - collapsedH) },
     { state: 'half', dist: Math.abs(currentHeight - halfH) },
@@ -297,12 +253,10 @@ const handleTouchEnd = () => {
   dragHeight.value = 0
 }
 
-// 가게 클릭
 const handleStoreClick = (store) => {
   emit('select-store', store)
 }
 
-// Props 동기화 및 상태 변경 통합 watch
 watch(
   () => ({
     stores: props.stores,
@@ -312,28 +266,24 @@ watch(
     forceState: props.forceState
   }),
   (newVal, oldVal) => {
-    // stores 업데이트 시 half 상태로
+
     if (newVal.stores !== oldVal?.stores && newVal.stores.length > 0 && sheetState.value === 'collapsed') {
       sheetState.value = 'half'
       emit('state-change', sheetState.value)
     }
 
-    // initialKeyword 동기화
     if (newVal.initialKeyword !== oldVal?.initialKeyword) {
       keyword.value = newVal.initialKeyword
     }
 
-    // initialCategories 동기화
     if (newVal.initialCategories !== oldVal?.initialCategories) {
       selectedCategories.value = [...newVal.initialCategories]
     }
 
-    // initialGlobalSearch 동기화
     if (newVal.initialGlobalSearch !== oldVal?.initialGlobalSearch) {
       isGlobalSearch.value = newVal.initialGlobalSearch
     }
 
-    // 외부에서 상태 강제 변경
     if (newVal.forceState && newVal.forceState !== sheetState.value) {
       sheetState.value = newVal.forceState
       emit('state-change', sheetState.value)

@@ -28,7 +28,7 @@ export const isValidCoordinate = (lat, lng) => {
  * @returns {number} 거리 (미터 단위)
  */
 export const calculateDistance = (lat1, lng1, lat2, lng2) => {
-  const R = 6371000 // 지구 반지름 (미터)
+  const R = 6371000
   const dLat = (lat2 - lat1) * Math.PI / 180
   const dLng = (lng2 - lng1) * Math.PI / 180
   const a =

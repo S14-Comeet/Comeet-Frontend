@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col gap-4 p-4">
-    <!-- 폴더 목록 헤더 -->
     <div class="flex items-center justify-between">
       <h2 class="text-xl font-bold text-textPrimary">즐겨찾기 목록</h2>
       <button
@@ -12,12 +11,10 @@
       </button>
     </div>
 
-    <!-- 로딩 상태 -->
     <div v-if="isLoading" class="flex justify-center items-center py-12">
       <BaseIcon name="spinner" :size="32" class="text-primary animate-spin" />
     </div>
 
-    <!-- 폴더 목록 (1열 레이아웃) -->
     <div v-else-if="folders.length > 0" class="flex flex-col gap-3">
       <div
         v-for="folder in folders"
@@ -29,12 +26,10 @@
             : 'bg-white border-border hover:border-primary-300 hover:bg-primary-25'
         ]"
       >
-        <!-- 클릭 가능한 영역 -->
         <div
           class="flex items-start gap-4 flex-1 min-w-0 cursor-pointer"
           @click="selectFolder(folder)"
         >
-          <!-- 아이콘 -->
           <div class="flex-shrink-0 pt-1">
             <BaseIcon
               :name="folder.icon || 'bookmark-fill'"
@@ -43,7 +38,6 @@
             />
           </div>
 
-          <!-- 폴더 정보 -->
           <div class="flex-1 min-w-0">
             <h3
               :class="[
@@ -65,7 +59,6 @@
             </div>
           </div>
 
-          <!-- 화살표 아이콘 -->
           <div class="flex-shrink-0 pt-1">
             <BaseIcon
               name="chevron-right"
@@ -75,7 +68,6 @@
           </div>
         </div>
 
-        <!-- More 버튼 -->
         <div class="flex-shrink-0 pt-1 relative">
           <button
             class="p-1 hover:bg-primary-100 rounded-full transition-colors"
@@ -88,7 +80,6 @@
             />
           </button>
 
-          <!-- 드롭다운 메뉴 -->
           <transition name="fade-scale">
             <div
               v-if="openMenuId === folder.id"
@@ -114,7 +105,6 @@
       </div>
     </div>
 
-    <!-- 빈 상태 -->
     <div v-else class="flex flex-col items-center justify-center py-12 text-center">
       <BaseIcon name="bookmark-line" :size="48" class="text-textSecondary mb-4" />
       <p class="text-textPrimary text-lg font-medium mb-2">즐겨찾기 목록이 없습니다</p>
@@ -157,29 +147,24 @@ const selectFolder = (folder) => {
   emit('select', folder)
 }
 
-// 메뉴 토글
 const toggleMenu = (folderId) => {
   openMenuId.value = openMenuId.value === folderId ? null : folderId
 }
 
-// 메뉴 외부 클릭 시 닫기
 const closeMenu = () => {
   openMenuId.value = null
 }
 
-// 수정 핸들러
 const handleEdit = (folder) => {
   emit('edit', folder)
   closeMenu()
 }
 
-// 삭제 핸들러
 const handleDelete = (folder) => {
   emit('delete', folder)
   closeMenu()
 }
 
-// 전역 클릭 이벤트 리스너 추가
 onMounted(() => {
   document.addEventListener('click', closeMenu)
 })
@@ -194,7 +179,6 @@ onUnmounted(() => {
   background-color: rgba(102, 126, 234, 0.05);
 }
 
-/* 드롭다운 애니메이션 */
 .fade-scale-enter-active,
 .fade-scale-leave-active {
   transition: all 0.2s ease;

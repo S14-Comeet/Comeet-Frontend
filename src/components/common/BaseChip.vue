@@ -12,7 +12,7 @@
     @click="handleClick"
     @keydown="handleKeyDown"
   >
-    <!-- Default variant -->
+    
     <p
       v-if="variant === 'default'"
       :class="['font-sans text-center text-neutral-900 leading-tight', textSizeClass]"
@@ -20,7 +20,7 @@
       {{ label }}
     </p>
 
-    <!-- Black/Selected variant -->
+    
     <p
       v-else-if="variant === 'black'"
       :class="['font-sans font-bold text-center text-white leading-tight', textSizeClass]"
@@ -28,7 +28,7 @@
       {{ label }}
     </p>
 
-    <!-- Primary variant (with optional dropdown) -->
+    
     <div
       v-else-if="variant === 'primary'"
       class="flex gap-1 items-center"
@@ -56,7 +56,7 @@
       />
     </div>
 
-    <!-- Primary Selected variant -->
+    
     <p
       v-else-if="variant === 'primary-selected'"
       :class="['font-sans font-bold text-center text-primary-700 leading-tight', textSizeClass]"
@@ -64,7 +64,7 @@
       {{ label }}
     </p>
 
-    <!-- Neutral variant -->
+    
     <p
       v-else-if="variant === 'neutral'"
       :class="['font-sans font-medium text-center text-neutral-600 leading-tight', textSizeClass]"
@@ -72,7 +72,7 @@
       {{ label }}
     </p>
 
-    <!-- Accent variant -->
+    
     <p
       v-else-if="variant === 'accent'"
       :class="['font-sans font-semibold text-center text-white leading-tight', textSizeClass]"
@@ -80,7 +80,7 @@
       {{ label }}
     </p>
 
-    <!-- Removable X button -->
+    
     <button
       v-if="removable"
       class="flex items-center justify-center w-5 h-5 rounded-full hover:bg-black/10 transition-colors"

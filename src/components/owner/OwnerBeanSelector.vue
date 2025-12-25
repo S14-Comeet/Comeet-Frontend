@@ -7,7 +7,7 @@
         @click.self="$emit('close')"
       >
         <div class="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md max-h-[60vh] flex flex-col shadow-xl mb-16 sm:mb-0">
-          <!-- 헤더 -->
+          
           <div class="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
             <div>
               <h3 class="text-lg font-bold text-textPrimary">원두 연결</h3>
@@ -21,7 +21,7 @@
             </button>
           </div>
 
-          <!-- 탭 -->
+          
           <div class="flex border-b border-border flex-shrink-0">
             <button
               class="flex-1 py-3 text-sm font-medium transition-colors"
@@ -39,9 +39,9 @@
             </button>
           </div>
 
-          <!-- 탭 내용 -->
+          
           <div class="flex-1 overflow-y-auto min-h-0">
-            <!-- 연결된 원두 탭 -->
+            
             <div v-if="activeTab === 'linked'" class="p-4">
               <div v-if="linkedBeans.length === 0" class="text-center py-8">
                 <p class="text-textSecondary text-sm">연결된 원두가 없습니다</p>
@@ -75,9 +75,9 @@
               </div>
             </div>
 
-            <!-- 원두 검색 탭 -->
+            
             <div v-else class="flex flex-col h-full">
-              <!-- 검색 바 -->
+              
               <div class="p-4 border-b border-border flex-shrink-0">
                 <div class="relative">
                   <BaseInput
@@ -91,21 +91,21 @@
                 </div>
               </div>
 
-              <!-- 원두 목록 -->
+              
               <div class="flex-1 overflow-y-auto p-4 min-h-0">
-                <!-- 로딩 -->
+                
                 <div v-if="isLoading && beans.length === 0" class="flex justify-center py-8">
                   <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
                 </div>
 
-                <!-- 빈 상태 -->
+                
                 <div v-else-if="beans.length === 0" class="text-center py-8">
                   <p class="text-textSecondary">
                     {{ searchKeyword ? '검색 결과가 없습니다' : '등록된 원두가 없습니다' }}
                   </p>
                 </div>
 
-                <!-- 목록 -->
+                
                 <div v-else class="space-y-2">
                   <div
                     v-for="bean in beans"
@@ -114,7 +114,7 @@
                   >
                     <div class="flex items-start justify-between">
                       <div class="flex-1 min-w-0">
-                        <!-- 원두 이름 -->
+                        
                         <p v-if="bean.name" class="font-medium text-textPrimary truncate">{{ bean.name }}</p>
                         <p class="text-xs text-textSecondary mt-0.5">
                           {{ bean.country }}{{ bean.farm ? ` / ${bean.farm}` : '' }}
@@ -122,9 +122,9 @@
                         <p class="text-xs text-textSecondary mt-0.5">
                           {{ bean.variety || '-' }} · {{ bean.processingMethod || '-' }} · {{ getRoastingLevelLabel(bean.roastingLevel) }}
                         </p>
-                        <!-- 로스터리 -->
+                        
                         <p v-if="bean.roasteryName" class="text-xs text-primary mt-1">{{ bean.roasteryName }}</p>
-                        <!-- 플레이버 -->
+                        
                         <div v-if="bean.flavors?.length" class="flex flex-wrap gap-1 mt-2">
                           <span
                             v-for="flavor in bean.flavors.slice(0, 3)"
@@ -151,7 +151,7 @@
                     </div>
                   </div>
 
-                  <!-- 더 보기 -->
+                  
                   <button
                     v-if="hasMore"
                     type="button"
@@ -166,7 +166,7 @@
             </div>
           </div>
 
-          <!-- 하단 버튼 -->
+          
           <div class="p-4 border-t border-border safe-bottom flex-shrink-0">
             <BaseButton
               variant="secondary"
@@ -204,7 +204,6 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'updated'])
 
-// 상태
 const activeTab = ref('linked')
 const linkedBeans = ref([])
 const beans = ref([])
@@ -216,10 +215,8 @@ const isUnlinking = ref(null)
 const currentPage = ref(1)
 const hasMore = ref(false)
 
-// 디바운스 타이머
 let searchTimer = null
 
-// 로스팅 레벨 라벨
 const ROASTING_LABELS = {
   LIGHT: '라이트',
   MEDIUM: '미디엄',
@@ -313,7 +310,6 @@ const handleLink = async (bean) => {
 
     showSuccess('원두가 연결되었습니다')
 
-    // 연결된 원두 목록 새로고침
     await loadLinkedBeans()
     emit('updated')
   } catch (err) {
@@ -333,7 +329,6 @@ const handleUnlink = async (bean) => {
     await unlinkBeanFromMenu(props.menu.id, bean.id)
     showSuccess('원두 연결이 해제되었습니다')
 
-    // 목록에서 제거
     linkedBeans.value = linkedBeans.value.filter(b => b.id !== bean.id)
     emit('updated')
   } catch (err) {
@@ -344,7 +339,6 @@ const handleUnlink = async (bean) => {
   }
 }
 
-// 메뉴가 변경되면 원두 목록 다시 로드
 watch(() => props.menu?.id, () => {
   if (props.menu?.id) {
     loadLinkedBeans()

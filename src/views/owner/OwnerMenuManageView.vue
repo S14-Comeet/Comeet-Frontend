@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col min-h-full bg-background">
-    <!-- 탭 바 -->
     <div class="bg-white border-b border-border flex">
       <button
         class="flex-1 py-3 text-sm font-medium transition-colors"
@@ -18,16 +17,12 @@
       </button>
     </div>
 
-    <!-- 컨텐츠 영역 -->
     <div class="flex-1 p-4">
-      <!-- ========== 메뉴 탭 ========== -->
       <template v-if="activeTab === 'menu'">
-        <!-- 로딩 상태 -->
         <div v-if="isLoadingMenus" class="flex justify-center items-center py-12">
           <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
         </div>
 
-        <!-- 에러 상태 -->
         <div v-else-if="menuError" class="text-center py-12">
           <BaseIcon name="notice" :size="48" class="text-error mx-auto mb-4" />
           <p class="text-textSecondary mb-4">메뉴 목록을 불러오지 못했습니다</p>
@@ -36,9 +31,7 @@
           </BaseButton>
         </div>
 
-        <!-- 메뉴 목록 -->
         <template v-else>
-          <!-- 메뉴 추가 버튼 -->
           <button
             class="w-full flex items-center justify-center gap-2 p-4 mb-4 bg-white rounded-xl border-2 border-dashed border-primary-300 text-primary hover:bg-primary-50 transition-colors"
             @click="goToAddMenu"
@@ -47,14 +40,12 @@
             <span class="font-medium">새 메뉴 추가</span>
           </button>
 
-          <!-- 빈 상태 -->
           <div v-if="menus.length === 0" class="text-center py-12">
             <BaseIcon name="list" :size="48" class="text-textSecondary mx-auto mb-4" />
             <p class="text-textPrimary text-lg font-medium mb-2">등록된 메뉴가 없습니다</p>
             <p class="text-textSecondary text-sm">첫 번째 메뉴를 추가해보세요</p>
           </div>
 
-          <!-- 메뉴 카드 목록 -->
           <div v-else class="space-y-3">
             <OwnerMenuCard
               v-for="menu in menus"
@@ -66,7 +57,6 @@
             />
           </div>
 
-          <!-- 페이지네이션 -->
           <div v-if="menuTotalPages > 1" class="flex justify-center gap-2 mt-6">
             <button
               v-for="page in menuTotalPages"
@@ -85,14 +75,11 @@
         </template>
       </template>
 
-      <!-- ========== 원두 탭 ========== -->
       <template v-else>
-        <!-- 로딩 상태 -->
         <div v-if="isLoadingBeans" class="flex justify-center items-center py-12">
           <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
         </div>
 
-        <!-- 에러 상태 -->
         <div v-else-if="beanError" class="text-center py-12">
           <BaseIcon name="notice" :size="48" class="text-error mx-auto mb-4" />
           <p class="text-textSecondary mb-4">원두 목록을 불러오지 못했습니다</p>
@@ -101,9 +88,7 @@
           </BaseButton>
         </div>
 
-        <!-- 원두 목록 -->
         <template v-else>
-          <!-- 새 원두 추가 버튼 -->
           <button
             class="w-full flex items-center justify-center gap-2 p-4 mb-4 bg-white rounded-xl border-2 border-dashed border-primary-300 text-primary hover:bg-primary-50 transition-colors"
             @click="goToAddBean"
@@ -112,14 +97,12 @@
             <span class="font-medium">새 원두 등록</span>
           </button>
 
-          <!-- 빈 상태 -->
           <div v-if="beans.length === 0" class="text-center py-12">
             <BaseIcon name="coffee" :size="48" class="text-textSecondary mx-auto mb-4" />
             <p class="text-textPrimary text-lg font-medium mb-2">등록된 원두가 없습니다</p>
             <p class="text-textSecondary text-sm">첫 번째 원두를 등록해보세요</p>
           </div>
 
-          <!-- 원두 카드 목록 -->
           <div v-else class="space-y-3">
             <BeanCard
               v-for="bean in beans"
@@ -133,7 +116,6 @@
             />
           </div>
 
-          <!-- 페이지네이션 -->
           <div v-if="beanTotalPages > 1" class="flex justify-center gap-2 mt-6">
             <button
               v-for="page in beanTotalPages"
@@ -153,7 +135,6 @@
       </template>
     </div>
 
-    <!-- 삭제 확인 모달 (메뉴) -->
     <Teleport to="body">
       <Transition name="fade">
         <div
@@ -191,7 +172,6 @@
       </Transition>
     </Teleport>
 
-    <!-- 삭제 확인 모달 (원두) -->
     <Teleport to="body">
       <Transition name="fade">
         <div
@@ -229,7 +209,6 @@
       </Transition>
     </Teleport>
 
-    <!-- 원두 연결 모달 (메뉴 탭에서 사용) -->
     <OwnerBeanSelector
       v-if="showBeanModal"
       :menu="selectedMenuForBeans"
@@ -237,7 +216,6 @@
       @updated="handleBeansUpdated"
     />
 
-    <!-- 메뉴 연결 모달 (원두 탭에서 사용) -->
     <OwnerMenuLinkModal
       v-if="showMenuLinkModal"
       :bean="selectedBeanForMenus"
@@ -268,14 +246,11 @@ const logger = createLogger('OwnerMenuManage')
 const route = useRoute()
 const router = useRouter()
 
-// 탭 상태
 const activeTab = ref('menu')
 
-// 공통 상태
 const storeId = computed(() => route.params.storeId)
 const storeInfo = ref(null)
 
-// 메뉴 탭 상태
 const menus = ref([])
 const isLoadingMenus = ref(true)
 const menuError = ref(null)
@@ -283,7 +258,6 @@ const menuCurrentPage = ref(1)
 const menuTotalPages = ref(1)
 const pageSize = 10
 
-// 원두 탭 상태
 const beans = ref([])
 const isLoadingBeans = ref(false)
 const beanError = ref(null)
@@ -291,21 +265,17 @@ const beanCurrentPage = ref(1)
 const beanTotalPages = ref(1)
 const beansLoaded = ref(false)
 
-// 메뉴 삭제 모달 상태
 const showDeleteModal = ref(false)
 const deletingMenu = ref(null)
 const isDeleting = ref(false)
 
-// 원두 삭제 모달 상태
 const showBeanDeleteModal = ref(false)
 const deletingBean = ref(null)
 const isDeletingBean = ref(false)
 
-// 원두 연결 모달 상태 (메뉴 탭에서)
 const showBeanModal = ref(false)
 const selectedMenuForBeans = ref(null)
 
-// 메뉴 연결 모달 상태 (원두 탭에서)
 const showMenuLinkModal = ref(false)
 const selectedBeanForMenus = ref(null)
 
@@ -521,7 +491,6 @@ const closeMenuLinkModal = () => {
  * 메뉴 연결 업데이트 후 처리
  */
 const handleMenuLinkUpdated = () => {
-  // 메뉴 목록 새로고침 (원두-메뉴 연결 수 갱신용)
   fetchMenus(menuCurrentPage.value)
 }
 
@@ -556,7 +525,6 @@ const confirmBeanDelete = async () => {
     showBeanDeleteModal.value = false
     deletingBean.value = null
 
-    // 목록 새로고침
     await fetchBeans(beanCurrentPage.value)
   } catch (err) {
     logger.error('원두 삭제 실패', err)
@@ -570,7 +538,6 @@ onMounted(async () => {
   await fetchStoreInfo()
   fetchMenus()
 
-  // URL 쿼리로 탭 지정 시 해당 탭으로 이동 (원두 등록 후 돌아올 때)
   if (route.query.tab === 'bean') {
     switchToBeanTab()
   }

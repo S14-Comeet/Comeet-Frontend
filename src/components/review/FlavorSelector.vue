@@ -6,28 +6,26 @@
 
     <transition name="slide-fade" mode="out-in">
       
-      <!-- Mode A: Root View (Grid) -->
-      <div 
-        v-if="!viewingLevel1" 
+      <div
+        v-if="!viewingLevel1"
         key="root"
         class="flex-1 overflow-y-auto p-4"
       >
         <div class="grid grid-cols-2 gap-3">
-          <div 
-            v-for="l1 in flavors" 
+          <div
+            v-for="l1 in flavors"
             :key="l1.id"
             class="relative rounded-2xl p-4 flex flex-col justify-between h-32 transition-all active:scale-95 shadow-sm cursor-pointer border"
             :class="[
               isSelected(l1.id) ? 'shadow-md' : 'hover:shadow-md'
             ]"
-            :style="{ 
-              backgroundColor: isSelected(l1.id) ? l1.color : `${l1.color}15`, 
+            :style="{
+              backgroundColor: isSelected(l1.id) ? l1.color : `${l1.color}15`,
               borderColor: l1.color,
               color: isSelected(l1.id) ? 'white' : l1.color
             }"
             @click="viewLevel1(l1)"
           >
-            <!-- Content -->
             <div class="z-10">
               <h3 class="font-bold text-lg leading-tight mb-1">{{ l1.name }}</h3>
               <p 
@@ -38,7 +36,6 @@
               </p>
             </div>
 
-            <!-- Selection Indicator / Toggle (Top Right) -->
             <button
               class="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full transition-colors z-20"
               :class="isSelected(l1.id) ? 'bg-white/25 hover:bg-white/40 text-white' : 'bg-white/60 hover:bg-white/80'"
@@ -52,7 +49,6 @@
               />
             </button>
 
-            <!-- Drill-down Hint (Bottom Right) -->
             <div class="absolute bottom-3 right-3 opacity-70">
                <BaseIcon name="chevron-right" :size="20" fill="currentColor" />
             </div>
@@ -64,13 +60,11 @@
         </p>
       </div>
 
-      <!-- Mode B: Detail View (Drill-down) -->
-      <div 
-        v-else 
+      <div
+        v-else
         key="detail"
         class="flex-1 flex flex-col h-full bg-white"
       >
-        <!-- Header -->
         <div 
           class="flex-none flex items-center justify-between px-4 py-4 border-b border-border sticky top-0 z-10"
           :style="{ backgroundColor: `${viewingLevel1.color}10` }"
@@ -102,15 +96,12 @@
           </button>
         </div>
 
-        <!-- Body -->
         <div class="flex-1 overflow-y-auto p-4">
-          <!-- L2 Subcategories -->
           <div 
             v-for="l2 in viewingLevel1.subCategories" 
             :key="l2.id"
             class="mb-8 last:mb-0"
           >
-            <!-- L2 Header -->
             <div class="flex items-center justify-between mb-3 border-b border-dashed pb-2" :style="{ borderColor: `${viewingLevel1.color}40` }">
               <h4 class="font-bold text-base pl-2 border-l-4" :style="{ borderColor: viewingLevel1.color, color: '#333' }">
                 {{ l2.name }}
@@ -124,7 +115,6 @@
               </button>
             </div>
             
-            <!-- L3 Flavors (Chips) -->
             <div class="flex flex-wrap gap-2.5">
               <button
                 v-for="l3 in l2.flavors"
@@ -136,16 +126,13 @@
                 :style="{
                   backgroundColor: isSelected(l3.id) ? l3.color : 'white',
                   borderColor: l3.color,
-                  color: isSelected(l3.id) ? 'white' : '#555' // Use generic dark text for unselected for readability, or use l3.color? l3.color might be too light. Let's use dark gray.
+                  color: isSelected(l3.id) ? 'white' : '#555'
                 }"
                 @click="toggleFlavor(l3)"
               >
                 {{ l3.name }}
               </button>
               
-              <!-- If no L3, show L2 as a standalone selectable chip-like option? 
-                   Actually, if L2 has no children, the 'Group Select' button above handles it.
-                   But users might miss it. Let's add a visual cue or a placeholder chip that acts as L2 select. -->
               <div v-if="(!l2.flavors || l2.flavors.length === 0)" class="w-full">
                  <button 
                     class="w-full text-left px-3 py-3 rounded-xl border border-dashed flex items-center gap-2 hover:bg-neutral-50 transition-colors"
@@ -214,7 +201,6 @@ const toggleFlavor = (flavor) => {
     newSelection = newSelection.filter(item => item !== id)
   } else {
     if (props.maxSelection && newSelection.length >= props.maxSelection) {
-      // TODO: Toast warning 'Up to N flavors'
       return
     }
     newSelection.push(id)

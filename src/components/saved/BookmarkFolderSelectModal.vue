@@ -9,7 +9,6 @@
         class="bg-white rounded-2xl max-w-md w-full max-h-[80vh] flex flex-col"
         @click.stop
       >
-        <!-- 헤더 -->
         <div class="flex items-center justify-between p-6 pb-4 border-b border-border">
           <h2 class="text-xl font-bold text-textPrimary">폴더에 저장</h2>
           <button
@@ -20,14 +19,11 @@
           </button>
         </div>
 
-        <!-- 폴더 목록 -->
         <div class="flex-1 overflow-y-auto p-4">
-          <!-- 로딩 상태 -->
           <div v-if="isLoading" class="flex items-center justify-center py-8">
             <BaseIcon name="spinner" :size="32" class="text-primary animate-spin" />
           </div>
 
-          <!-- 폴더가 없을 때 -->
           <div v-else-if="folders.length === 0" class="text-center py-8">
             <BaseIcon name="bookmark-fill" :size="48" class="text-primary-200 mx-auto mb-3" />
             <p class="text-textSecondary text-sm mb-4">저장 목록이 없습니다</p>
@@ -40,7 +36,6 @@
             </BaseButton>
           </div>
 
-          <!-- 폴더 목록 -->
           <div v-else class="space-y-2">
             <button
               v-for="folder in folders"
@@ -69,7 +64,6 @@
           </div>
         </div>
 
-        <!-- 하단 버튼 -->
         <div class="p-4 pt-2 border-t border-border">
           <button
             class="w-full flex items-center justify-center gap-2 py-3 text-primary font-medium hover:bg-primary-50 rounded-lg transition-colors"
@@ -83,7 +77,6 @@
     </div>
   </transition>
 
-  <!-- 새 폴더 추가 모달 -->
   <AddFolderModal
     :is-open="showAddFolder"
     @close="showAddFolder = false"
@@ -92,7 +85,7 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue'
+import { ref, watch } from 'vue'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import AddFolderModal from '@/components/saved/AddFolderModal.vue'
@@ -120,7 +113,6 @@ const props = defineProps({
     type: String,
     default: ''
   },
-  // 이미 저장된 폴더 ID 목록
   bookmarkedFolderIds: {
     type: Array,
     default: () => []
@@ -135,12 +127,10 @@ const isProcessing = ref(false)
 const showAddFolder = ref(false)
 const selectedFolderIds = ref([])
 
-// 선택 여부 확인
 const isSelected = (folderId) => {
   return selectedFolderIds.value.includes(folderId)
 }
 
-// 모달이 열릴 때 폴더 목록 로드
 watch(() => props.isOpen, async (newValue) => {
   if (newValue) {
     selectedFolderIds.value = [...props.bookmarkedFolderIds]
@@ -148,7 +138,6 @@ watch(() => props.isOpen, async (newValue) => {
   }
 })
 
-// bookmarkedFolderIds가 변경될 때 동기화
 watch(() => props.bookmarkedFolderIds, (newValue) => {
   selectedFolderIds.value = [...newValue]
 }, { deep: true })
@@ -181,30 +170,25 @@ const handleFolderClick = async (folder) => {
 
   try {
     if (wasSelected) {
-      // 폴더에서 제거
       await removeStoreFromFolder(folder.id, props.storeId)
       selectedFolderIds.value = selectedFolderIds.value.filter(id => id !== folder.id)
       folder.storeCount = Math.max(0, folder.storeCount - 1)
       showSuccess(`'${folder.name}'에서 제거했습니다`)
     } else {
-      // 폴더에 추가
       await addStoreToFolder(folder.id, props.storeId)
       selectedFolderIds.value.push(folder.id)
       folder.storeCount += 1
       showSuccess(`'${folder.name}'에 저장했습니다`)
     }
 
-    // 부모에게 업데이트 알림
     emit('update', {
       folderIds: [...selectedFolderIds.value],
       isBookmarked: selectedFolderIds.value.length > 0
     })
   } catch (error) {
     logger.error('북마크 처리 실패', error)
-    // 409 에러 (이미 저장됨)인 경우 처리
     if (error.response?.status === 409) {
       showError('이미 폴더에 저장된 카페입니다.')
-      // 상태 동기화
       if (!wasSelected) {
         selectedFolderIds.value.push(folder.id)
       }

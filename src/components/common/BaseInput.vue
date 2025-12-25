@@ -1,13 +1,13 @@
 <template>
   <div class="relative w-full">
-    <!-- Input Container -->
+    
     <div
       :class="[
         'flex items-center gap-3 rounded-xl',
         containerClasses
       ]"
     >
-      <!-- Left Icon (Search) -->
+      
       <BaseIcon
         v-if="type === 'search'"
         name="search"
@@ -15,7 +15,7 @@
         :color="iconColor"
       />
 
-      <!-- Input Element -->
+      
       <input
         :value="modelValue"
         :placeholder="placeholder"
@@ -32,7 +32,7 @@
         @blur="isFocused = false"
       />
 
-      <!-- Right Icon (Clear X) -->
+      
       <button
         v-if="clearable && modelValue && !disabled"
         class="shrink-0 w-5 h-5 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors"
@@ -44,7 +44,7 @@
       </button>
     </div>
 
-    <!-- Helper Text -->
+    
     <output
       v-if="helperText"
       id="helper-text"
@@ -145,7 +145,6 @@ const containerClasses = computed(() => {
     return `${base} bg-surface-light cursor-not-allowed border-0`
   }
 
-  // Status colors (success/error)
   if (props.status === 'success') {
     return `${base} bg-white border-2 border-primary-700`
   }
@@ -153,17 +152,14 @@ const containerClasses = computed(() => {
     return `${base} bg-white border-2 border-error`
   }
 
-  // Focus state - with focus ring for accessibility
   if (isFocused.value) {
     return `${base} bg-white border-2 border-neutral-900 ring-2 ring-primary-200 ring-opacity-50`
   }
 
-  // Border variant: White background with visible border
   if (props.variant === 'border') {
     return `${base} bg-white border border-border hover:border-neutral-400`
   }
 
-  // Default variant: Light gray background, no border (minimalist)
   return `${base} bg-surface-light border-0 hover:bg-neutral-100`
 })
 

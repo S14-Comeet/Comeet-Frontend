@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col min-h-full h-full bg-background">
     <div class="flex-1 p-4 overflow-y-auto">
-      <!-- 프로필 정보 -->
+      
       <div class="bg-white rounded-lg p-6 shadow-sm mb-4">
         <div class="flex items-center gap-4">
           <div class="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden">
@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <!-- 점주 전용 메뉴 -->
+      
       <div v-if="authStore.isOwner" class="bg-white rounded-lg shadow-sm mb-4">
         <button
           class="w-full flex items-center justify-between p-4 hover:bg-primary-50 transition-colors"
@@ -34,7 +34,7 @@
         </button>
       </div>
 
-      <!-- 메뉴 목록 -->
+      
       <div class="bg-white rounded-lg shadow-sm">
         <button
           class="w-full flex items-center justify-between p-4 border-b border-primary-200 hover:bg-primary-50 transition-colors"
@@ -67,7 +67,7 @@
       </div>
     </div>
 
-    <!-- 로그아웃 확인 모달 -->
+    
     <Teleport to="body">
       <Transition name="fade">
         <div
@@ -112,13 +112,11 @@ import { createLogger } from '@/utils/logger'
 import BaseIcon from '@/components/common/BaseIcon.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 
-
 const logger = createLogger('ProfileView')
 
 const router = useRouter()
 const authStore = useAuthStore()
 
-// 로그아웃 상태 관리
 const showLogoutModal = ref(false)
 const isLoggingOut = ref(false)
 
@@ -172,11 +170,9 @@ const handleLogout = async () => {
   try {
     await authStore.logout()
     showLogoutModal.value = false
-    // 로그인 페이지로 이동
     router.push('/login')
   } catch (error) {
     logger.error('로그아웃 실패', error)
-    // 에러가 발생해도 로그인 페이지로 이동 (로컬 상태는 이미 초기화됨)
     router.push('/login')
   } finally {
     isLoggingOut.value = false

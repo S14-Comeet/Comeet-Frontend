@@ -1,6 +1,6 @@
 <template>
   <div class="cupping-note-form">
-    <!-- Header -->
+    
     <div class="form-header">
       <div class="header-badge">
         <BaseIcon name="coffee" :size="16" />
@@ -9,7 +9,7 @@
       <p class="header-desc">SCA 기준에 따라 상세한 평가를 남겨보세요</p>
     </div>
 
-    <!-- Roast Level -->
+    
     <section class="form-section">
       <h3 class="section-title">로스팅 레벨</h3>
       <div class="roast-levels">
@@ -30,14 +30,14 @@
       </div>
     </section>
 
-    <!-- Score Radar Chart -->
+    
     <section class="form-section">
       <h3 class="section-title">향미 점수</h3>
       <div class="scores-container">
-        <!-- Visual Chart -->
+        
         <div class="radar-chart">
           <svg viewBox="0 0 200 200">
-            <!-- Background Polygon -->
+            
             <polygon
               :points="getPolygonPoints(15)"
               fill="none"
@@ -57,7 +57,7 @@
               stroke-width="1"
             />
 
-            <!-- Score Polygon -->
+            
             <polygon
               :points="getScorePolygonPoints()"
               fill="rgba(132, 97, 72, 0.2)"
@@ -65,7 +65,7 @@
               stroke-width="2"
             />
 
-            <!-- Labels -->
+            
             <text
               v-for="(score, idx) in scoreFields"
               :key="score.key"
@@ -78,14 +78,14 @@
             </text>
           </svg>
 
-          <!-- Total Score -->
+          
           <div class="total-score">
             <span class="total-value">{{ totalScore.toFixed(2) }}</span>
             <span class="total-max">/105</span>
           </div>
         </div>
 
-        <!-- Score Sliders -->
+        
         <div class="score-sliders">
           <div
             v-for="score in scoreFields"
@@ -113,7 +113,7 @@
       </div>
     </section>
 
-    <!-- Detailed Notes -->
+    
     <section class="form-section">
       <h3 class="section-title">상세 노트 <span class="optional">(선택)</span></h3>
 
@@ -214,7 +214,6 @@ const form = reactive({
   overallNotes: props.modelValue.overallNotes || ''
 })
 
-// Emit changes
 watch(form, (newVal) => {
   emit('update:modelValue', { ...newVal })
 }, { deep: true })
@@ -249,7 +248,6 @@ const getScoreColor = (score) => {
   return '#f44336'
 }
 
-// Radar Chart Calculations
 const getPolygonPoints = (maxValue) => {
   const center = 100
   const points = []
@@ -257,7 +255,7 @@ const getPolygonPoints = (maxValue) => {
 
   for (let i = 0; i < count; i++) {
     const angle = (Math.PI * 2 * i) / count - Math.PI / 2
-    const radius = (maxValue / 15) * 70 // 70 is max radius
+    const radius = (maxValue / 15) * 70
     const x = center + radius * Math.cos(angle)
     const y = center + radius * Math.sin(angle)
     points.push(`${x},${y}`)
@@ -500,7 +498,6 @@ const getLabelPosition = (index, offset) => {
   flex-direction: column;
   gap: 0.375rem;
 }
-
 
 .note-label {
   font-size: 0.75rem;

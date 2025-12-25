@@ -1,5 +1,4 @@
-// Placeholder for Visit API client if needed later
-// Currently mocked logic is handled in api/review.js implicitly for visitId defaults.
+
 import api from './axios';
 
 /**
@@ -12,7 +11,7 @@ import api from './axios';
  */
 export const verifyVisit = async (data) => {
   const response = await api.post('/visit/verify', data);
-  return response.data; // BaseResponseVerifiedResDto (returns VerifiedResDto)
+  return response.data;
 };
 
 /**
@@ -21,7 +20,7 @@ export const verifyVisit = async (data) => {
  */
 export const getVisitHistory = async (params) => {
   const response = await api.get('/visit/history', { params });
-  return response.data; // PageResponseVisitPageDto
+  return response.data;
 };
 
 /**
@@ -30,5 +29,5 @@ export const getVisitHistory = async (params) => {
  */
 export const getVisitById = async (visitId) => {
   const response = await api.get(`/visit/${visitId}`);
-  return response.data; // BaseResponseVisitInfoDto
+  return response.data;
 };

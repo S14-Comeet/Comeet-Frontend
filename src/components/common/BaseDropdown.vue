@@ -6,7 +6,7 @@
       isOpen && 'h-auto'
     ]"
   >
-    <!-- Dropdown Button -->
+    
     <button
         type="button"
         :class="[
@@ -22,7 +22,7 @@
         @focus="isFocused = true"
         @blur="isFocused = false"
     >
-      <!-- Label -->
+      
       <span
           :class="[
           'text-base leading-normal',
@@ -32,7 +32,7 @@
         {{ displayValue }}
       </span>
 
-      <!-- Chevron Icon -->
+      
       <span class="overflow-hidden shrink-0 w-10 h-10 flex items-center justify-center" aria-hidden="true">
         <svg
             :class="[
@@ -53,8 +53,7 @@
       </span>
     </button>
 
-
-    <!-- Dropdown List -->
+    
     <transition name="dropdown">
       <ul
           v-if="isOpen"
@@ -147,24 +146,20 @@ const dropdownClasses = computed(() => {
     return `${base} bg-surface-light border-0 cursor-not-allowed`
   }
 
-  // Open state (highest priority)
   if (isOpen.value) {
     return `${base} bg-white border-2 border-neutral-900 cursor-pointer ring-2 ring-primary-200 ring-opacity-50`
   }
 
-  // Focus state (keyboard navigation)
   if (isFocused.value) {
     return `${base} bg-white border-2 border-neutral-900 cursor-pointer ring-2 ring-primary-200 ring-opacity-50`
   }
 
-  // Has value selected
   if (props.modelValue) {
     return props.variant === 'border'
       ? `${base} bg-white border border-border cursor-pointer hover:border-neutral-400`
       : `${base} bg-surface-light border-0 cursor-pointer hover:bg-neutral-100`
   }
 
-  // Default empty state
   return props.variant === 'border'
       ? `${base} bg-white border border-border cursor-pointer hover:border-neutral-400`
       : `${base} bg-surface-light border-0 cursor-pointer hover:bg-neutral-100`
@@ -269,7 +264,6 @@ const handleKeyDown = (event) => {
   }
 }
 
-// Close dropdown when clicking outside
 const handleClickOutside = (event) => {
   if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
     isOpen.value = false

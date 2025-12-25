@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col min-h-full h-full bg-background">
     <div class="flex-1 p-4 overflow-y-auto">
-      <!-- 프로필 이미지 섹션 -->
+      
       <div class="flex flex-col items-center mb-8">
         <div class="relative">
           <div class="w-24 h-24 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden">
@@ -13,7 +13,7 @@
             />
             <BaseIcon v-else name="user-line" :size="48" class="text-primary-600" />
           </div>
-          <!-- 이미지 변경 버튼 -->
+          
           <label
             class="absolute -bottom-1 -right-1 w-9 h-9 bg-white border-2 border-primary rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:bg-primary-50 transition-colors"
             :class="{ 'opacity-50 cursor-not-allowed': isUploadingImage }"
@@ -31,7 +31,7 @@
           </label>
         </div>
         <p class="text-textSecondary text-sm mt-2">{{ authStore.userEmail }}</p>
-        <!-- 이미지 삭제 버튼 -->
+        
         <button
           v-if="profileImageUrl && profileImageUrl !== originalProfileImageUrl"
           class="text-xs text-error mt-1 hover:underline"
@@ -41,9 +41,9 @@
         </button>
       </div>
 
-      <!-- 정보 수정 폼 -->
+      
       <div class="bg-white rounded-lg p-4 shadow-sm mb-4">
-        <!-- 닉네임 -->
+        
         <div class="mb-6">
           <label class="block text-sm font-medium text-textPrimary mb-2">닉네임</label>
           <BaseInput
@@ -62,7 +62,7 @@
           </div>
         </div>
 
-        <!-- 이름 (수정 불가) -->
+        
         <div class="mb-6">
           <label class="block text-sm font-medium text-textPrimary mb-2">이름</label>
           <div class="h-14 px-5 py-4 bg-surface-light rounded-xl flex items-center">
@@ -71,7 +71,7 @@
           <p class="text-xs text-textSecondary mt-1 px-1">소셜 로그인 정보로 수정할 수 없습니다</p>
         </div>
 
-        <!-- 이메일 (수정 불가) -->
+        
         <div>
           <label class="block text-sm font-medium text-textPrimary mb-2">이메일</label>
           <div class="h-14 px-5 py-4 bg-surface-light rounded-xl flex items-center">
@@ -81,11 +81,11 @@
         </div>
       </div>
 
-      <!-- 역할 변경 섹션 -->
+      
       <div class="bg-white rounded-lg p-4 shadow-sm">
         <label class="block text-sm font-medium text-textPrimary mb-3">역할</label>
         <div class="flex flex-col gap-3">
-          <!-- USER 역할 -->
+          
           <button
             type="button"
             :class="[
@@ -118,7 +118,7 @@
                   맛집을 찾고, 저장하고, 리뷰를 남겨요
                 </span>
               </span>
-              <!-- Check Icon -->
+              
               <span
                 v-if="selectedRole === 'USER'"
                 class="w-6 h-6 rounded-full bg-primary flex items-center justify-center"
@@ -130,7 +130,7 @@
             </span>
           </button>
 
-          <!-- MANAGER 역할 -->
+          
           <button
             type="button"
             :class="[
@@ -163,7 +163,7 @@
                   내 가게를 등록하고 관리해요
                 </span>
               </span>
-              <!-- Check Icon -->
+              
               <span
                 v-if="selectedRole === 'MANAGER'"
                 class="w-6 h-6 rounded-full bg-primary flex items-center justify-center"
@@ -178,7 +178,7 @@
       </div>
     </div>
 
-    <!-- 저장 버튼 -->
+    
     <div class="p-4 bg-white border-t border-border">
       <BaseButton
         variant="primary"
@@ -211,7 +211,6 @@ const logger = createLogger('MyProfileEditView')
 const router = useRouter()
 const authStore = useAuthStore()
 
-// 상태 관리
 const nickname = ref('')
 const profileImageUrl = ref('')
 const selectedRole = ref('')
@@ -219,18 +218,15 @@ const originalNickname = ref('')
 const originalProfileImageUrl = ref('')
 const originalRole = ref('')
 
-// 이미지 업로드 상태
 const fileInput = ref(null)
 const isUploadingImage = ref(false)
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024 // 5MB
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024
 
-// 닉네임 검증 상태
 const nicknameValidationState = ref('idle')
 const nicknameHelperMessage = ref('')
 const isSubmitting = ref(false)
 let debounceTimer = null
 
-// 초기값 로드
 onMounted(() => {
   nickname.value = authStore.userNickname || ''
   profileImageUrl.value = authStore.userProfileImage || ''
@@ -238,7 +234,7 @@ onMounted(() => {
   originalNickname.value = nickname.value
   originalProfileImageUrl.value = profileImageUrl.value
   originalRole.value = selectedRole.value
-  nicknameValidationState.value = 'success' // 기존 닉네임은 이미 유효함
+  nicknameValidationState.value = 'success'
 })
 
 /** 변경사항 유무 */
@@ -271,7 +267,7 @@ const nicknameHelperClass = computed(() => {
 
 /** 닉네임 유효성 검사 */
 const validateNickname = async () => {
-  // 원래 닉네임과 같으면 검증 생략
+
   if (nickname.value.trim() === originalNickname.value) {
     nicknameValidationState.value = 'success'
     nicknameHelperMessage.value = ''
@@ -293,7 +289,6 @@ const validateNickname = async () => {
     return
   }
 
-  // 특수문자/숫자 검증 (한글, 영문만 허용)
   if (!VALIDATION.NICKNAME.PATTERN.test(nickname.value)) {
     nicknameValidationState.value = 'error'
     nicknameHelperMessage.value = '한글과 영문만 사용할 수 있습니다'
@@ -301,7 +296,6 @@ const validateNickname = async () => {
     return
   }
 
-  // 디바운싱을 적용하여 API 호출 최적화
   clearTimeout(debounceTimer)
   debounceTimer = setTimeout(async () => {
     try {
@@ -339,13 +333,11 @@ const handleImageSelect = async (event) => {
   const file = event.target.files?.[0]
   if (!file) return
 
-  // 파일 타입 검증
   if (!file.type.startsWith('image/')) {
     showError('이미지 파일만 업로드할 수 있습니다')
     return
   }
 
-  // 파일 크기 검증
   if (file.size > MAX_IMAGE_SIZE) {
     showError('파일 크기가 5MB를 초과합니다')
     return
@@ -362,7 +354,7 @@ const handleImageSelect = async (event) => {
     showError('이미지 업로드에 실패했습니다')
   } finally {
     isUploadingImage.value = false
-    // 파일 입력 초기화 (같은 파일 다시 선택 가능하도록)
+
     if (fileInput.value) {
       fileInput.value.value = ''
     }
@@ -383,7 +375,6 @@ const handleSave = async () => {
   try {
     const promises = []
 
-    // 사용자 정보 변경 (닉네임, 프로필 이미지)
     const userUpdateData = {}
     if (nickname.value.trim() !== originalNickname.value) {
       userUpdateData.nickname = nickname.value.trim()
@@ -401,7 +392,6 @@ const handleSave = async () => {
       )
     }
 
-    // 역할 변경
     if (selectedRole.value !== originalRole.value) {
       promises.push(
         updateUserRole(selectedRole.value)
@@ -413,7 +403,6 @@ const handleSave = async () => {
 
     await Promise.all(promises)
 
-    // 스토어 업데이트
     await authStore.fetchUser()
 
     showSuccess('정보가 수정되었습니다')
@@ -430,7 +419,7 @@ const handleSave = async () => {
       nicknameValidationState.value = 'error'
       nicknameHelperMessage.value = '닉네임 형식이 올바르지 않습니다'
     }
-    // 기타 에러는 axios interceptor에서 toast로 처리됨
+
   } finally {
     isSubmitting.value = false
   }

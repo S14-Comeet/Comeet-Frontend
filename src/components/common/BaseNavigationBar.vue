@@ -3,31 +3,31 @@
     <div class="nav-content">
       <div class="w-full px-4 pb-safe">
         <div class="flex items-center justify-around h-16">
-          <!-- 지도 -->
+          
           <router-link to="/map" class="nav-item" :class="{ 'nav-item-active': isActive('/map') }">
             <component :is="getIcon('map')" class="nav-icon" />
             <span class="nav-label">지도</span>
           </router-link>
 
-          <!-- 추천 -->
+          
           <router-link to="/recommendation" class="nav-item" :class="{ 'nav-item-active': isActive('/recommendation') }">
             <component :is="getIcon('sparkle')" class="nav-icon" />
             <span class="nav-label">추천</span>
           </router-link>
 
-          <!-- 여권 -->
+          
           <router-link to="/passport" class="nav-item" :class="{ 'nav-item-active': isActive('/passport') }">
             <component :is="getIcon('passport')" class="nav-icon" />
             <span class="nav-label">여권</span>
           </router-link>
 
-          <!-- 저장 -->
+          
           <router-link to="/saved" class="nav-item" :class="{ 'nav-item-active': isActive('/saved') }">
             <component :is="getIcon('bookmark')" class="nav-icon" />
             <span class="nav-label">저장</span>
           </router-link>
 
-          <!-- 마이 -->
+          
           <router-link to="/profile" class="nav-item" :class="{ 'nav-item-active': isActive('/profile') }">
             <component :is="getIcon('user')" class="nav-icon" />
             <span class="nav-label">마이</span>
@@ -41,7 +41,6 @@
 <script setup>
 import { useRoute } from 'vue-router'
 
-// SVG 아이콘 임포트
 import MapLineIcon from '@/assets/icons/map-line.svg?component'
 import MapFillIcon from '@/assets/icons/map-fill.svg?component'
 import SparkleLineIcon from '@/assets/icons/sparkle-line.svg?component'
@@ -70,7 +69,7 @@ const getIcon = (type) => {
     sparkle: isActive('/recommendation') ? SparkleFillIcon : SparkleLineIcon,
     passport: isActive('/passport') ? PassportFillIcon : PassportLineIcon,
     bookmark: isActive('/saved') ? BookmarkFillIcon : BookmarkLineIcon,
-    user: UserLineIcon, // user는 fill 버전이 없으므로 항상 line
+    user: UserLineIcon,
   }
   return icons[type]
 }

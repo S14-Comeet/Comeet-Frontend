@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen bg-white p-4 relative">
-    <!-- Back Button -->
     <button
       class="absolute top-4 left-4 w-10 h-10 flex items-center justify-center hover:opacity-70 transition-opacity z-10"
       aria-label="뒤로 가기"
@@ -12,18 +11,14 @@
     </button>
 
     <div class="max-w-[360px] mx-auto pt-16 flex flex-col min-h-[calc(100vh-2rem)]">
-      <!-- 닉네임 입력 영역 (Step 1에서는 전체, Step 2에서는 축소) -->
       <Transition name="nickname-collapse" mode="out-in">
-        <!-- Step 1: 닉네임 입력 (전체 화면) -->
         <div v-if="currentStep === 1" key="step1-input" class="flex-1 flex flex-col">
-          <!-- Title Section -->
           <div class="mb-10">
             <h1 class="text-2xl font-bold leading-relaxed text-neutral-900">
               Comeet에서 사용할<br>닉네임을 등록해 주세요
             </h1>
           </div>
 
-          <!-- Input Section -->
           <div class="mb-auto">
             <BaseInput
               v-model="nickname"
@@ -35,14 +30,12 @@
               @update:model-value="validateNickname"
               @clear="handleClear"
             />
-            <!-- Helper Text + Character Counter (통일된 위치) -->
             <div class="flex justify-between items-center mt-2 px-1">
               <span :class="helperTextClass">{{ helperMessage || '\u00A0' }}</span>
               <span class="text-sm text-textSecondary">{{ nickname.length }}/{{ VALIDATION.NICKNAME.MAX_LENGTH }}</span>
             </div>
           </div>
 
-          <!-- Next Button -->
           <div class="pb-8">
             <BaseButton
               variant="primary"
@@ -56,9 +49,7 @@
           </div>
         </div>
 
-        <!-- Step 2: 역할 선택 -->
         <div v-else key="step2-role" class="flex-1 flex flex-col">
-          <!-- Title Section -->
           <div class="mb-6">
             <h1 class="text-2xl font-bold leading-relaxed text-neutral-900">
               어떤 서비스를<br>이용하시겠어요?
@@ -68,9 +59,7 @@
             </p>
           </div>
 
-          <!-- Role Selection Cards -->
           <div class="flex flex-col gap-3">
-            <!-- USER 역할 -->
             <button
               type="button"
               :class="[
@@ -101,7 +90,6 @@
                     맛집을 찾고, 저장하고, 리뷰를 남겨요
                   </span>
                 </span>
-                <!-- Check Icon -->
                 <span v-if="selectedRole === 'USER'" class="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M20 6L9 17L4 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
@@ -110,7 +98,6 @@
               </span>
             </button>
 
-            <!-- MANAGER 역할 (가맹점주) -->
             <button
               type="button"
               :class="[
@@ -141,7 +128,6 @@
                     내 가게를 등록하고 관리해요
                   </span>
                 </span>
-                <!-- Check Icon -->
                 <span v-if="selectedRole === 'MANAGER'" class="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M20 6L9 17L4 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
@@ -150,7 +136,6 @@
               </span>
             </button>
 
-            <!-- Confirmed Nickname Display (카드 바로 아래에 붙음) -->
             <div class="flex items-center justify-between p-4 bg-surface-light rounded-xl mt-3">
               <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
@@ -171,10 +156,8 @@
             </div>
           </div>
 
-          <!-- Spacer -->
           <div class="flex-1"></div>
 
-          <!-- Submit Button -->
           <div class="pb-8">
             <BaseButton
               variant="primary"
@@ -203,13 +186,11 @@ import { showSuccess } from '@/utils/toast';
 import { createLogger } from '@/utils/logger';
 import BaseInput from '@/components/common/BaseInput.vue';
 import BaseButton from '@/components/common/BaseButton.vue';
-import BaseIcon from '@/components/common/BaseIcon.vue';
 
 const logger = createLogger('NicknameRegistrationView');
 const router = useRouter();
 const authStore = useAuthStore();
 
-// 상태 관리
 const currentStep = ref(1);
 const nickname = ref('');
 const selectedRole = ref('');
@@ -253,7 +234,6 @@ const validateNickname = async () => {
     return;
   }
 
-  // 특수문자/숫자 검증 (한글, 영문만 허용)
   if (!VALIDATION.NICKNAME.PATTERN.test(nickname.value)) {
     validationState.value = 'error';
     helperMessage.value = '한글과 영문만 사용할 수 있습니다';
@@ -261,7 +241,6 @@ const validateNickname = async () => {
     return;
   }
 
-  // 디바운싱을 적용하여 API 호출 최적화
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(async () => {
     try {
@@ -328,13 +307,8 @@ const handleSubmit = async () => {
       role: selectedRole.value
     });
 
-    // 스토어 업데이트
     await authStore.fetchUser();
-
-    // 성공 Toast
     showSuccess(`환영합니다, ${nickname.value.trim()}님!`);
-
-    // 취향 설정 페이지로 이동
     router.push('/preference-onboarding');
   } catch (error) {
 
@@ -349,7 +323,6 @@ const handleSubmit = async () => {
       helperMessage.value = errorMessage || '등록에 실패했습니다. 다시 시도해 주세요.';
     }
 
-    // 에러 발생 시 step 1로 돌아가서 메시지 표시
     currentStep.value = 1;
     validationState.value = 'error';
   } finally {
@@ -359,7 +332,6 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-/* 닉네임 축소 트랜지션 - 자연스러운 슬라이드 다운 효과 */
 .nickname-collapse-enter-active {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }

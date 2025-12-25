@@ -1,6 +1,5 @@
 <template>
   <div class="page-container">
-    <!-- 페이지 헤더 -->
     <div class="bg-white px-4 py-5 border-b border-border flex-shrink-0">
       <h1 class="text-xl font-bold text-textPrimary">
         {{ isEditMode ? '메뉴 수정' : '메뉴 추가' }}
@@ -10,18 +9,14 @@
       </p>
     </div>
 
-    <!-- 로딩 상태 -->
     <div v-if="isLoadingMenu || isLoadingStore" class="flex-1 flex justify-center items-center">
       <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
     </div>
 
-    <!-- 폼 -->
     <form v-else class="form-content" @submit.prevent="handleSubmit">
-      <!-- 기본 정보 -->
       <div class="bg-white rounded-xl p-4 mb-4">
         <h2 class="text-base font-bold text-textPrimary mb-4">기본 정보</h2>
 
-        <!-- 메뉴명 -->
         <div class="mb-4">
           <label class="block text-sm font-medium text-textPrimary mb-2">
             메뉴명 <span class="text-error">*</span>
@@ -34,7 +29,6 @@
           />
         </div>
 
-        <!-- 설명 -->
         <div class="mb-4">
           <label class="block text-sm font-medium text-textPrimary mb-2">설명</label>
           <textarea
@@ -45,7 +39,6 @@
           ></textarea>
         </div>
 
-        <!-- 가격 -->
         <div class="mb-4">
           <label class="block text-sm font-medium text-textPrimary mb-2">
             가격 <span class="text-error">*</span>
@@ -59,7 +52,6 @@
           />
         </div>
 
-        <!-- 카테고리 -->
         <div class="mb-4">
           <label class="block text-sm font-medium text-textPrimary mb-2">
             카테고리 <span class="text-error">*</span>
@@ -84,7 +76,6 @@
         </div>
       </div>
 
-      <!-- 이미지 -->
       <div class="bg-white rounded-xl p-4 mb-4">
         <h2 class="text-base font-bold text-textPrimary mb-4">이미지</h2>
         <label class="block text-sm font-medium text-textPrimary mb-2">메뉴 이미지</label>
@@ -94,7 +85,6 @@
         />
       </div>
 
-      <!-- 원두 연결 -->
       <div class="bg-white rounded-xl p-4 mb-4">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-base font-bold text-textPrimary">원두 연결</h2>
@@ -107,7 +97,6 @@
           </button>
         </div>
 
-        <!-- 연결된 원두 목록 -->
         <div v-if="selectedBeans.length === 0" class="text-center py-6 bg-neutral-50 rounded-lg">
           <p class="text-sm text-textSecondary mb-2">연결된 원두가 없습니다</p>
           <button
@@ -147,7 +136,6 @@
       </div>
     </form>
 
-    <!-- 원두 선택 모달 -->
     <OwnerBeanSelectorEnhanced
       v-if="showBeanSelector"
       :store-info="storeInfo"
@@ -156,7 +144,6 @@
       @select="handleBeanSelect"
     />
 
-    <!-- 하단 버튼 -->
     <div class="bottom-button-area">
       <BaseButton
         variant="primary"
@@ -191,16 +178,14 @@ const logger = createLogger('OwnerMenuForm')
 const route = useRoute()
 const router = useRouter()
 
-// 상태
 const isEditMode = computed(() => !!route.params.menuId)
 const storeId = computed(() => route.params.storeId)
 const isLoadingMenu = ref(false)
 const isLoadingStore = ref(false)
 const isSubmitting = ref(false)
 const showBeanSelector = ref(false)
-const storeInfo = ref(null) // 가게 정보 (roasteryId 포함)
+const storeInfo = ref(null)
 
-// 폼 데이터
 const form = ref({
   name: '',
   description: '',
@@ -209,13 +194,10 @@ const form = ref({
   imageUrl: ''
 })
 
-// 선택된 원두들 (메뉴 생성 후 연결할 원두 목록)
 const selectedBeans = ref([])
 
-// 선택된 원두 ID 목록 (중복 방지용)
 const selectedBeanIds = computed(() => selectedBeans.value.map(b => b.id))
 
-// 에러 상태
 const errors = ref({
   name: '',
   price: '',
@@ -296,11 +278,10 @@ const loadMenuData = async () => {
       imageUrl: menu.imageUrl || ''
     }
 
-    // 기존 연결된 원두 로드
     if (menu.beanBadges && menu.beanBadges.length > 0) {
       selectedBeans.value = menu.beanBadges.map(b => ({
         ...b,
-        isExisting: true // 이미 연결된 원두 표시
+        isExisting: true
       }))
     }
   } catch (err) {
@@ -316,7 +297,6 @@ const loadMenuData = async () => {
  * 원두 선택 핸들러
  */
 const handleBeanSelect = (bean) => {
-  // 중복 체크
   if (selectedBeans.value.some(b => b.id === bean.id)) {
     return
   }
@@ -365,14 +345,12 @@ const handleSubmit = async () => {
       showSuccess('메뉴가 추가되었습니다')
     }
 
-    // 새로 추가된 원두들 연결 처리
     const newBeans = selectedBeans.value.filter(b => !b.isExisting)
 
     for (const bean of newBeans) {
       try {
         let beanId = bean.id
 
-        // 새로 생성할 원두인 경우
         if (bean.isPending) {
           const createdBean = await createBean({
             roasteryId: bean.roasteryId,
@@ -387,7 +365,6 @@ const handleSubmit = async () => {
           logger.debug('원두 생성 완료', createdBean)
         }
 
-        // 메뉴에 원두 연결
         await linkBeanToMenu(menuId, {
           beanId: beanId,
           isBlended: bean.isBlended || false
@@ -395,7 +372,6 @@ const handleSubmit = async () => {
         logger.debug('원두 연결 완료', { menuId, beanId })
       } catch (err) {
         logger.error('원두 연결 실패', err)
-        // 개별 원두 연결 실패해도 계속 진행
       }
     }
 

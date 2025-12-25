@@ -1,8 +1,6 @@
 <template>
   <div class="flex flex-col min-h-full bg-background">
-    <!-- 페이지 헤더 -->
     <header class="relative w-full h-14 bg-white flex items-center justify-center px-5 border-b border-border flex-shrink-0">
-      <!-- 뒤로가기 버튼 -->
       <div class="absolute left-5 flex items-center">
         <button
           class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary-50 transition-colors"
@@ -12,14 +10,11 @@
           <BaseIcon name="chevron-left" :size="24" class="text-neutral-900" />
         </button>
       </div>
-      <!-- 타이틀 -->
       <h1 class="text-lg font-bold text-textPrimary">새 원두 등록</h1>
     </header>
 
-    <!-- 폼 -->
     <form class="form-content" @submit.prevent="handleSubmit">
       <div class="bg-white rounded-xl p-4 space-y-4">
-        <!-- 블렌드 토글 -->
         <div class="flex items-center justify-between py-2 px-1">
           <div>
             <span class="text-sm font-medium text-textPrimary">블렌드 원두</span>
@@ -38,9 +33,7 @@
           </button>
         </div>
 
-        <!-- 싱글 오리진 모드 -->
         <template v-if="!isBlend">
-          <!-- 생산 국가 (필수) -->
           <div>
             <label class="block text-sm font-medium text-textPrimary mb-2">
               생산 국가 <span class="text-error">*</span>
@@ -60,7 +53,6 @@
             <p v-if="errors.country" class="text-xs text-error mt-1">{{ errors.country }}</p>
           </div>
 
-          <!-- 농장명 -->
           <div>
             <label class="block text-sm font-medium text-textPrimary mb-2">농장명</label>
             <BaseInput
@@ -69,7 +61,6 @@
             />
           </div>
 
-          <!-- 품종 -->
           <div>
             <label class="block text-sm font-medium text-textPrimary mb-2">품종</label>
             <select
@@ -93,7 +84,6 @@
             />
           </div>
 
-          <!-- 가공 방식 -->
           <div>
             <label class="block text-sm font-medium text-textPrimary mb-2">가공 방식</label>
             <select
@@ -118,9 +108,7 @@
           </div>
         </template>
 
-        <!-- 블렌드 모드 -->
         <template v-else>
-          <!-- 블렌드 원산지 목록 -->
           <div class="space-y-4">
             <div class="flex items-center justify-between">
               <label class="text-sm font-medium text-textPrimary">
@@ -155,7 +143,6 @@
                 </button>
               </div>
 
-              <!-- 국가 -->
               <div class="mb-3">
                 <label class="block text-xs text-textSecondary mb-1">국가</label>
                 <select
@@ -171,7 +158,6 @@
                 </select>
               </div>
 
-              <!-- 농장 -->
               <div class="mb-3">
                 <label class="block text-xs text-textSecondary mb-1">농장</label>
                 <input
@@ -181,7 +167,6 @@
                 />
               </div>
 
-              <!-- 품종 -->
               <div class="mb-3">
                 <label class="block text-xs text-textSecondary mb-1">품종</label>
                 <select
@@ -205,7 +190,6 @@
                 />
               </div>
 
-              <!-- 가공 방식 -->
               <div>
                 <label class="block text-xs text-textSecondary mb-1">가공 방식</label>
                 <select
@@ -232,7 +216,6 @@
           </div>
         </template>
 
-        <!-- 로스팅 레벨 -->
         <div>
           <label class="block text-sm font-medium text-textPrimary mb-2">로스팅</label>
           <div class="grid grid-cols-3 gap-2">
@@ -253,7 +236,6 @@
           </div>
         </div>
 
-        <!-- 향미 노트 선택 -->
         <div>
           <div class="flex items-center justify-between mb-2">
             <label class="text-sm font-medium text-textPrimary">향미 노트</label>
@@ -266,7 +248,6 @@
             </button>
           </div>
 
-          <!-- 선택된 플레이버 미리보기 -->
           <div v-if="selectedFlavorCodes.length > 0 && !showFlavorSelector" class="flex flex-wrap gap-1.5">
             <span
               v-for="code in selectedFlavorCodes"
@@ -280,7 +261,6 @@
             이 원두의 향미 특성을 선택하세요 (선택사항)
           </p>
 
-          <!-- 플레이버 셀렉터 -->
           <Transition name="slide-down">
             <div v-if="showFlavorSelector" class="mt-3 -mx-4">
               <HierarchicalFlavorSelector
@@ -291,7 +271,6 @@
           </Transition>
         </div>
 
-        <!-- 원두 이름 (자동 생성 + 수정 가능) -->
         <div>
           <label class="block text-sm font-medium text-textPrimary mb-2">
             원두 이름 <span class="text-error">*</span>
@@ -318,7 +297,6 @@
       </div>
     </form>
 
-    <!-- 하단 버튼 -->
     <div class="bottom-button-area">
       <BaseButton
         variant="primary"
@@ -352,7 +330,6 @@ const logger = createLogger('OwnerBeanForm')
 const route = useRoute()
 const router = useRouter()
 
-// 국가 목록을 지역별로 그룹화
 const groupedCountries = computed(() => {
   const regions = {}
   BEAN_COUNTRIES.forEach(country => {
@@ -372,14 +349,11 @@ const groupedCountries = computed(() => {
     }))
 })
 
-// 상태
 const storeId = computed(() => route.params.storeId)
 const storeInfo = ref(null)
 
-// 블렌드 모드
 const isBlend = ref(false)
 
-// 싱글 오리진 폼
 const form = ref({
   country: '',
   farm: '',
@@ -389,7 +363,6 @@ const form = ref({
   name: ''
 })
 
-// 블렌드 원산지 배열
 const createEmptyOrigin = () => ({
   country: '',
   farm: '',
@@ -410,15 +383,12 @@ const errors = ref({
 const isSubmitting = ref(false)
 const isNameManuallyEdited = ref(false)
 
-// 플레이버 선택 상태
 const selectedFlavorCodes = ref([])
 const showFlavorSelector = ref(false)
 
-// 품종 선택 상태 (싱글 오리진)
 const selectedVariety = ref('')
 const isCustomVariety = ref(false)
 
-// 가공 방식 선택 상태 (싱글 오리진)
 const selectedProcessingMethod = ref('')
 const isCustomProcessingMethod = ref(false)
 
@@ -427,14 +397,12 @@ const isCustomProcessingMethod = ref(false)
  */
 const autoGeneratedName = computed(() => {
   if (isBlend.value) {
-    // 블렌드: 국가들을 나열
     const countries = blendOrigins.value
       .map(o => o.country)
       .filter(c => c.trim())
     if (countries.length === 0) return ''
     return `${countries.join(' & ')} 블렌드`
   }
-  // 싱글 오리진
   if (!form.value.country) return ''
   return form.value.farm
     ? `${form.value.country} ${form.value.farm}`
@@ -446,11 +414,9 @@ const autoGeneratedName = computed(() => {
  */
 const isFormValid = computed(() => {
   if (isBlend.value) {
-    // 블렌드: 최소 2개의 국가가 선택되어야 함
     const validOrigins = blendOrigins.value.filter(o => o.country.trim())
     return validOrigins.length >= 2 && form.value.name.trim()
   }
-  // 싱글 오리진
   return form.value.country.trim() && form.value.name.trim()
 })
 
@@ -485,7 +451,6 @@ const resetToAutoName = () => {
 const toggleBlend = () => {
   isBlend.value = !isBlend.value
   isNameManuallyEdited.value = false
-  // 모드 전환시 이름 재생성
   form.value.name = autoGeneratedName.value
 }
 
@@ -610,9 +575,7 @@ const getFlavorDisplayName = (code) => {
  * 폼 제출
  */
 const handleSubmit = async () => {
-  // 유효성 검사
   errors.value = { country: '' }
-
   if (isBlend.value) {
     const validOrigins = blendOrigins.value.filter(o => o.country.trim())
     if (validOrigins.length < 2) {
@@ -636,7 +599,6 @@ const handleSubmit = async () => {
     let beanData
 
     if (isBlend.value) {
-      // 블렌드 모드: 쉼표로 구분된 문자열로 데이터 구성
       const validOrigins = blendOrigins.value.filter(o => o.country.trim())
       const countries = validOrigins.map(o => o.country.trim())
       const farms = validOrigins.map(o => o.farm?.trim() || '')
@@ -646,14 +608,13 @@ const handleSubmit = async () => {
       beanData = {
         roasteryId: storeInfo.value.roasteryId,
         name: form.value.name.trim(),
-        country: countries.join(', '),  // "에티오피아, 콜롬비아"
+        country: countries.join(', '),
         farm: arrayToString(farms),
         variety: arrayToString(varieties),
         processingMethod: arrayToString(processingMethods),
         roastingLevel: form.value.roastingLevel || null
       }
     } else {
-      // 싱글 오리진 모드
       beanData = {
         roasteryId: storeInfo.value.roasteryId,
         name: form.value.name.trim(),
@@ -669,7 +630,6 @@ const handleSubmit = async () => {
     const newBeanId = createdBean?.beanId || createdBean?.id
     logger.info('원두 생성 성공', { isBlend: isBlend.value, beanId: newBeanId })
 
-    // 플레이버 매핑 처리
     if (selectedFlavorCodes.value.length > 0 && newBeanId) {
       try {
         const flavorIds = convertFlavorCodesToIds(selectedFlavorCodes.value)
@@ -679,13 +639,11 @@ const handleSubmit = async () => {
         }
       } catch (flavorErr) {
         logger.warn('플레이버 매핑 실패 (원두는 등록됨)', flavorErr)
-        // 플레이버 매핑 실패는 경고만 표시하고 진행
       }
     }
 
     showSuccess('원두가 등록되었습니다')
 
-    // 원두 탭으로 돌아가기
     router.replace({
       name: 'owner-menus',
       params: { storeId: storeId.value },
@@ -720,7 +678,6 @@ onMounted(() => {
   padding-bottom: max(1rem, env(safe-area-inset-bottom));
 }
 
-/* 블렌드 원산지 카드 */
 .blend-origin-card {
   background-color: var(--color-background);
   border: 1px solid var(--color-border);
@@ -732,7 +689,6 @@ onMounted(() => {
   border-color: var(--color-primary-300);
 }
 
-/* 블렌드 모드 입력 필드 */
 .blend-input {
   width: 100%;
   padding: 0.5rem 0.75rem;
@@ -754,7 +710,6 @@ onMounted(() => {
   box-shadow: 0 0 0 2px var(--color-primary-100);
 }
 
-/* Slide Down Transition */
 .slide-down-enter-active {
   transition: all 0.3s ease-out;
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="passport-card" :class="{ 'unavailable': !passport.isAvailable }" @click="handleClick">
-    <!-- 커버 이미지 영역 -->
+    
     <div class="card-cover">
       <img
 v-if="passport.coverImageUrl" :src="passport.coverImageUrl" :alt="`${passport.month}월 커피 여정`"
@@ -12,14 +12,14 @@ v-if="passport.coverImageUrl" :src="passport.coverImageUrl" :alt="`${passport.mo
         </div>
       </div>
 
-      <!-- 그라데이션 오버레이 -->
+      
       <div class="cover-overlay"></div>
 
-      <!-- 월 라벨 -->
+      
       <div class="month-badge">{{ passport.month }}월</div>
     </div>
 
-    <!-- 카드 컨텐츠 -->
+    
     <div class="card-content">
       <template v-if="passport.isAvailable">
         <div class="stats-row">
@@ -41,7 +41,7 @@ v-if="passport.coverImageUrl" :src="passport.coverImageUrl" :alt="`${passport.mo
           </div>
         </div>
 
-        <!-- 미니 경로 표시 (원산지 순서) -->
+        
         <div v-if="passport.originSequence?.length" class="route-preview">
           <span v-for="(origin, idx) in passport.originSequence.slice(0, 4)" :key="idx" class="route-dot">
             {{ origin }}

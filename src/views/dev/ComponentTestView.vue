@@ -5,7 +5,7 @@
         Common Components Test - Warm Brown Theme
       </h1>
 
-      <!-- Color System Preview -->
+      
       <section class="mb-12 bg-white p-6 rounded-lg shadow">
         <h2 class="text-2xl font-bold text-textPrimary mb-4">Color System</h2>
         <div class="grid grid-cols-5 gap-4">
@@ -19,7 +19,7 @@
         </div>
       </section>
 
-      <!-- BaseChip Component -->
+      
       <section class="mb-12 bg-white p-6 rounded-lg shadow">
         <h2 class="text-2xl font-bold text-textPrimary mb-4">BaseChip Component</h2>
 
@@ -59,7 +59,7 @@
         </div>
       </section>
 
-      <!-- BaseDropdown Component -->
+      
       <section class="mb-12 bg-white p-6 rounded-lg shadow">
         <h2 class="text-2xl font-bold text-textPrimary mb-4">BaseDropdown Component</h2>
 
@@ -96,7 +96,7 @@
         </div>
       </section>
 
-      <!-- BaseIcon Component -->
+      
       <section class="mb-12 bg-white p-6 rounded-lg shadow">
         <h2 class="text-2xl font-bold text-textPrimary mb-4">BaseIcon Component - 모든 아이콘</h2>
 
@@ -229,12 +229,12 @@
         </div>
       </section>
 
-      <!-- BaseHeader Component -->
+      
       <section class="mb-12 bg-white p-6 rounded-lg shadow">
         <h2 class="text-2xl font-bold text-textPrimary mb-4">BaseHeader Component</h2>
 
         <div class="space-y-6">
-          <!-- 로그인 상태 헤더 -->
+          
           <div>
             <h3 class="text-sm font-medium text-textSecondary mb-2">로그인 상태 (알림 있음)</h3>
             <BaseHeader
@@ -255,7 +255,7 @@
             />
           </div>
 
-          <!-- 비로그인 상태 헤더 -->
+          
           <div>
             <h3 class="text-sm font-medium text-textSecondary mb-2">비로그인 상태 (로그인 버튼 표시)</h3>
             <BaseHeader
@@ -266,7 +266,7 @@
             />
           </div>
 
-          <!-- 뒤로가기 버튼 포함 헤더 -->
+          
           <div>
             <h3 class="text-sm font-medium text-textSecondary mb-2">로그인 상태 + 뒤로가기 버튼 (알림 페이지용)</h3>
             <BaseHeader
@@ -285,7 +285,7 @@
         </div>
       </section>
 
-      <!-- BaseInput Component -->
+      
       <section class="mb-12 bg-white p-6 rounded-lg shadow">
         <h2 class="text-2xl font-bold text-textPrimary mb-4">BaseInput Component</h2>
 
@@ -348,7 +348,7 @@
         </div>
       </section>
 
-      <!-- BaseButton Component -->
+      
       <section class="mb-12 bg-white p-6 rounded-lg shadow">
         <h2 class="text-2xl font-bold text-textPrimary mb-4">BaseButton Component</h2>
 
@@ -406,7 +406,7 @@
         </div>
       </section>
 
-      <!-- Color Usage Examples -->
+      
       <section class="mb-12 bg-white p-6 rounded-lg shadow">
         <h2 class="text-2xl font-bold text-textPrimary mb-4">Warm Brown Color Usage</h2>
 
@@ -437,7 +437,7 @@
         </div>
       </section>
 
-      <!-- StarRating Component -->
+      
       <section class="mb-12 bg-white p-6 rounded-lg shadow">
         <h2 class="text-2xl font-bold text-textPrimary mb-4">StarRating Component</h2>
 
@@ -462,7 +462,7 @@
         </div>
       </section>
 
-      <!-- ReviewCard Component -->
+      
       <section class="mb-12 bg-white p-6 rounded-lg shadow">
         <h2 class="text-2xl font-bold text-textPrimary mb-4">ReviewCard Component</h2>
 
@@ -495,7 +495,6 @@ import BaseHeader from '@/components/common/BaseHeader.vue'
 import StarRating from '@/components/common/StarRating.vue'
 import ReviewCard from '@/components/review/ReviewCard.vue'
 
-// Dropdown state
 const dropdownValue1 = ref('')
 const dropdownValue2 = ref('option1')
 const dropdownValue3 = ref('')
@@ -508,7 +507,6 @@ const dropdownOptions = [
   { label: 'Option 5', value: 'option5' }
 ]
 
-// Input states
 const inputValue1 = ref('')
 const inputValue2 = ref('검색어 입력')
 const inputValue3 = ref('Sample text with X')
@@ -517,7 +515,6 @@ const inputValue5 = ref('Disabled input')
 const inputValue6 = ref('Success input')
 const inputValue7 = ref('Error input')
 
-// Header event handlers
 const handleNoticeClick = () => {
   console.log('Notice button clicked')
 }
@@ -526,11 +523,9 @@ const handleLogin = () => {
   console.log('Login button clicked')
 }
 
-// StarRating states
 const starRating1 = ref(3)
 const starRating2 = ref(0)
 
-// Mock review data
 const mockReviews = ref([
   {
     reviewId: 1,

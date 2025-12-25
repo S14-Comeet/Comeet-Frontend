@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col min-h-full h-full bg-background">
-    <!-- 비로그인 사용자 - 로그인 필요 메시지 -->
+    
     <div v-if="!isAuthenticated" class="flex flex-col items-center justify-center py-20 px-4 text-center">
       <BaseIcon name="user-line" :size="64" class="text-textSecondary mb-6" />
       <p class="text-textSecondary text-base mb-6">저장 목록을 확인하려면 로그인해주세요</p>
@@ -12,9 +12,9 @@
       </button>
     </div>
 
-    <!-- 로그인한 사용자 - 정상 컨텐츠 -->
+    
     <template v-else>
-      <!-- 폴더 목록 화면 -->
+      
       <SavedFolderList
         v-if="!selectedFolder"
         :folders="folders"
@@ -26,7 +26,7 @@
         @delete="handleDeleteFolder"
       />
 
-      <!-- 카페 목록 화면 -->
+      
       <SavedCafeList
         v-else
         :folder-name="selectedFolder.name"
@@ -96,7 +96,6 @@ const router = useRouter()
 const savedStore = useSavedStore()
 const authStore = useAuthStore()
 
-// 인증 상태 확인
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 
 const folders = ref([])
@@ -110,14 +109,11 @@ const showDeleteConfirm = ref(false)
 const editingFolder = ref(null)
 const deletingFolder = ref(null)
 
-// 로그인 페이지로 이동
 const goToLogin = () => {
   router.push('/login')
 }
 
-// 폴더 목록 불러오기
 const loadFolders = async () => {
-  // 인증되지 않은 사용자는 폴더 목록을 불러오지 않음
   if (!isAuthenticated.value) {
     return
   }
@@ -133,7 +129,6 @@ const loadFolders = async () => {
   }
 }
 
-// 폴더 선택 핸들러
 const handleSelectFolder = async (folder) => {
   selectedFolder.value = folder
   isLoadingCafes.value = true
@@ -150,29 +145,21 @@ const handleSelectFolder = async (folder) => {
   }
 }
 
-// 뒤로 가기 핸들러
 const handleBack = () => {
   selectedFolder.value = null
   cafes.value = []
 }
 
-// 카페 선택 핸들러
-// TODO: 추후 카페 상세 페이지로 이동하도록 변경 예정 (알림 페이지와 유사한 방식)
 const handleSelectCafe = (cafe) => {
   logger.info('카페 선택', cafe)
   showInfo('카페 상세 페이지는 추후 구현 예정입니다.')
 }
 
-// 지도에서 보기 핸들러
 const handleShowOnMap = () => {
-  // Pinia store에 선택된 폴더 정보 저장
   savedStore.setSelectedFolder(selectedFolder.value, cafes.value)
-
-  // 지도 페이지로 이동
   router.push({ name: 'map' })
 }
 
-// 폴더 추가 핸들러
 const handleAddFolder = async (folderData) => {
   try {
     const newFolder = await createFolder({
@@ -190,13 +177,11 @@ const handleAddFolder = async (folderData) => {
   }
 }
 
-// 폴더 수정 모달 열기
 const handleEditFolder = (folder) => {
   editingFolder.value = folder
   showEditFolderModal.value = true
 }
 
-// 폴더 수정 핸들러
 const handleUpdateFolder = async (folderData) => {
   try {
     const updatedFolder = await updateFolder(editingFolder.value.id, {
@@ -205,7 +190,6 @@ const handleUpdateFolder = async (folderData) => {
       description: folderData.description
     })
 
-    // 로컬 배열에서 해당 폴더 업데이트
     const index = folders.value.findIndex(f => f.id === editingFolder.value.id)
     if (index !== -1) {
       folders.value[index] = updatedFolder
@@ -220,13 +204,11 @@ const handleUpdateFolder = async (folderData) => {
   }
 }
 
-// 폴더 삭제 확인 다이얼로그 열기
 const handleDeleteFolder = (folder) => {
   deletingFolder.value = folder
   showDeleteConfirm.value = true
 }
 
-// 폴더 삭제 확인
 const confirmDelete = async () => {
   try {
     await deleteFolder(deletingFolder.value.id)
@@ -242,14 +224,12 @@ const confirmDelete = async () => {
   }
 }
 
-// 카페 삭제 핸들러
 const handleDeleteCafe = async (cafe) => {
   try {
     await removeStoreFromFolder(selectedFolder.value.id, cafe.storeId)
 
     cafes.value = cafes.value.filter(c => c.storeId !== cafe.storeId)
 
-    // 폴더 목록에서도 카페 개수 업데이트
     const folder = folders.value.find(f => f.id === selectedFolder.value.id)
     if (folder && folder.storeCount > 0) {
       folder.storeCount -= 1

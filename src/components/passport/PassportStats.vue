@@ -1,6 +1,6 @@
 <template>
   <div class="passport-stats">
-    <!-- 메인 통계 카드 -->
+    
     <div class="main-stats-card">
       <div class="stats-grid">
         <div class="stat-item">
@@ -35,9 +35,9 @@
       </div>
     </div>
 
-    <!-- 하이라이트 카드 -->
+    
     <div class="highlight-cards">
-      <!-- 주요 원산지 -->
+      
       <div class="highlight-card">
         <div class="highlight-header">
           <BaseIcon name="star-fill" :size="14" color="var(--color-primary-500)" />
@@ -46,7 +46,7 @@
         <div class="highlight-value">{{ info.topOrigin || '없음' }}</div>
       </div>
 
-      <!-- 주요 로스터리 -->
+      
       <div class="highlight-card">
         <div class="highlight-header">
           <BaseIcon name="bookmark-fill" :size="14" color="var(--color-primary-500)" />
@@ -56,7 +56,7 @@
       </div>
     </div>
 
-    <!-- 원산지 여정 (간결 버전) -->
+    
     <div v-if="info.originSequence?.length" class="journey-card">
       <div class="journey-header">
         <BaseIcon name="mapPin" :size="16" color="var(--color-primary-600)" />

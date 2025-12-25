@@ -1,6 +1,6 @@
 <template>
   <div class="cupping-note-display">
-    <!-- Roast Level -->
+    
     <div v-if="cuppingNote.roastingLevel" class="roast-level-section mb-4">
       <span class="section-label">로스팅 레벨</span>
       <div class="roast-badge" :style="{ backgroundColor: roastLevelInfo.color }">
@@ -9,14 +9,14 @@
       </div>
     </div>
 
-    <!-- Score Radar Chart -->
+    
     <div class="scores-section mb-4">
       <span class="section-label">향미 점수</span>
       <div class="scores-container">
-        <!-- Visual Chart (larger) -->
+        
         <div class="radar-chart">
           <svg viewBox="0 0 200 200">
-            <!-- Background Polygon -->
+            
             <polygon
               :points="getPolygonPoints(15)"
               fill="none"
@@ -36,7 +36,7 @@
               stroke-width="1"
             />
 
-            <!-- Score Polygon -->
+            
             <polygon
               :points="getScorePolygonPoints()"
               fill="rgba(132, 97, 72, 0.2)"
@@ -44,7 +44,7 @@
               stroke-width="2"
             />
 
-            <!-- Labels -->
+            
             <text
               v-for="(score, idx) in scoreFields"
               :key="score.key"
@@ -57,14 +57,14 @@
             </text>
           </svg>
 
-          <!-- Total Score -->
+          
           <div class="total-score">
             <span class="total-value">{{ totalScore.toFixed(2) }}</span>
             <span class="total-max">/105</span>
           </div>
         </div>
 
-        <!-- Score List (compact) -->
+        
         <div class="score-list">
           <div
             v-for="score in scoreFields"
@@ -80,7 +80,7 @@
       </div>
     </div>
 
-    <!-- Detailed Notes -->
+    
     <div v-if="hasDetailedNotes" class="notes-section">
       <span class="section-label">상세 노트</span>
       <div class="notes-list">
@@ -177,7 +177,6 @@ const getScoreColor = (score) => {
   return '#f44336'
 }
 
-// Radar Chart Calculations
 const getPolygonPoints = (maxValue) => {
   const center = 100
   const points = []

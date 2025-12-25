@@ -5,10 +5,10 @@
         class="bg-white rounded-t-2xl shadow-2xl p-4 pb-safe"
         @click.stop
     >
-      <!-- 드래그 핸들 -->
+      
       <div class="w-12 h-1 bg-primary-200 rounded-full mx-auto mb-4"></div>
 
-      <!-- 카페 정보 -->
+      
       <div class="flex items-start gap-3">
         <div class="flex flex-wrap gap-1">
           <span
@@ -33,7 +33,7 @@
         </div>
       </div>
 
-      <!-- 액션 버튼 -->
+      
       <div class="flex gap-2 mt-4">
         <button
             class="flex-1 px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-500 transition-colors"
@@ -56,7 +56,6 @@
 import { computed } from 'vue'
 import { MENU_CATEGORIES } from '@/constants'
 
-// enum 값을 한글 라벨로 변환하는 맵
 const categoryLabelMap = Object.fromEntries(
   MENU_CATEGORIES.map(cat => [cat.value, cat.label])
 )
@@ -67,7 +66,6 @@ const props = defineProps({
 
 defineEmits(['close', 'detail'])
 
-// 카테고리를 한글로 변환
 const displayCategories = computed(() => {
   if (!props.place?.category) return []
   return props.place.category

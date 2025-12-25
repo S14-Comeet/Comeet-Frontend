@@ -84,9 +84,9 @@ const emit = defineEmits(['click'])
 
 const sizeClasses = computed(() => {
   const sizes = {
-    large: 'h-14 px-6 text-base leading-tight', // 56px, 16pt
-    medium: 'h-12 px-5 text-sm leading-tight', // 48px, 14pt
-    small: 'h-10 px-4 text-sm leading-tight'   // 40px, 14pt
+    large: 'h-14 px-6 text-base leading-tight',
+    medium: 'h-12 px-5 text-sm leading-tight',
+    small: 'h-10 px-4 text-sm leading-tight'
   }
   return sizes[props.size] || sizes.large
 })

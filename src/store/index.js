@@ -9,4 +9,3 @@ export const useAppStore = defineStore('app', {
     welcomeMessage: (state) => `환영합니다, ${state.appName} 프론트 구조가 준비되었습니다.`
   }
 });
-
