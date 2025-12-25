@@ -1,4 +1,4 @@
-# Comeet Frontend
+# 커슐랭(Cochelin) Frontend
 
 카페 발견과 커피 경험을 공유하는 소셜 플랫폼의 프론트엔드 애플리케이션입니다.
 
