@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Comeet Frontend is a Vue 3 + Vite mobile-first web application for a cafe discovery and social platform. The app features OAuth authentication, map-based cafe search using Naver Maps, saved cafes organization, and real-time notifications.
+Comeet Frontend is a Vue 3 + Vite mobile-first web application for a cafe discovery and social platform. The app features OAuth authentication, map-based cafe search using Naver Maps, saved cafes organization with bookmark folders, and real-time notifications.
 
 ## Development Commands
 
@@ -41,24 +41,73 @@ npm run lint
 
 ```
 src/
-├── api/            # API clients (axios.js, auth.js, cafe.js, flavor.js, menu.js, review.js, visit.js, owner.js, recommendation.js, passport.js, preference.js, bean.js)
-├── assets/         # Global styles (main.css with Tailwind @theme), icons
-├── components/     # Reusable UI components
-│   ├── common/     # Base components (BaseButton, BaseHeader, BaseChip, StarRating, etc.)
-│   ├── map/        # Map-specific components (MapControls, MapPlaceInfo, MapPlaceDetail, etc.)
-│   ├── saved/      # Saved cafes feature components
-│   ├── review/     # Review feature components
-│   └── owner/      # Owner/manager feature components (OwnerStoreCard, OwnerMenuCard, OwnerBeanSelector, OwnerRoasterySelector, OwnerFlavorSelector, OwnerImageUploader)
-├── composables/    # Vue composables (useGeolocation, useNaverMap, useMapMarkers, useMapPopup, useMapControls)
-├── constants/      # App-wide constants (STORAGE_KEYS, etc.)
-├── router/         # Vue Router configuration with auth guards
-├── store/          # Pinia stores (auth, saved, notification, flavor, recommendation, passport, etc.)
-├── utils/          # Utility functions (storage, logger, toast, geolocation, geo, address)
-├── views/          # Page components (MapView, LoginView, ProfileView, MenuView, ReviewWriteView, RecommendationView, PassportView, PreferenceOnboardingView, etc.)
-│   └── owner/      # Owner pages (OwnerStoreListView, OwnerStoreFormView, OwnerMenuManageView, OwnerMenuFormView, OwnerBeanFormView)
-├── App.vue         # Root component with responsive layout shell
-├── config.js       # App configuration (reads from .env)
-└── main.js         # Application entry point
+├── api/                  # API clients
+│   ├── axios.js          # Axios instance with interceptors
+│   ├── auth.js           # Authentication API
+│   ├── bean.js           # Coffee bean API
+│   ├── bookmark.js       # Bookmark folder/store API
+│   ├── cafe.js           # Cafe search API
+│   ├── flavor.js         # Flavor data API
+│   ├── menu.js           # Menu API
+│   ├── owner.js          # Owner/manager API
+│   ├── passport.js       # Coffee passport API
+│   ├── preference.js     # User preference API
+│   ├── recommendation.js # AI recommendation API
+│   ├── review.js         # Review CRUD API
+│   └── visit.js          # Visit tracking API
+├── assets/               # Global styles (main.css with Tailwind @theme), icons
+├── components/           # Reusable UI components
+│   ├── common/           # Base components
+│   │   ├── BaseButton.vue, BaseChip.vue, BaseDropdown.vue
+│   │   ├── BaseHeader.vue, BaseIcon.vue, BaseInput.vue
+│   │   ├── BaseNavigationBar.vue
+│   │   ├── BeanCard.vue, StoreCard.vue
+│   │   ├── ConfirmDialog.vue, FlavorChip.vue
+│   │   ├── HierarchicalFlavorSelector.vue, PreferenceSlider.vue
+│   │   ├── RatingBadge.vue, StarRating.vue
+│   ├── bean/             # BeanFlavorWheel
+│   ├── map/              # MapControls, MapPlaceInfo, MapPlaceDetail, MarkerPopup, StoreListSheet
+│   ├── menu/             # MenuList
+│   ├── owner/            # OwnerStoreCard, OwnerMenuCard, OwnerBeanCard, OwnerBeanSelector, OwnerBeanSelectorEnhanced, OwnerRoasterySelector, OwnerImageUploader, OwnerMenuLinkModal
+│   ├── passport/         # PassportCard, PassportStats, PassportTimeline, YearSelector, TimelineMapMode, TimelineRecordCard
+│   ├── recommendation/   # LocationModeToggle, MenuRecommendationCard, RecommendationReason, RecommendationSkeleton
+│   ├── review/           # ReviewCard, ReviewButton, FlavorSelector, FlavorWheel, TastingWheel, CuppingNoteForm, CuppingNoteDisplay
+│   └── saved/            # SavedCafeList, SavedFolderList, AddFolderModal, EditFolderModal, BookmarkFolderSelectModal
+├── composables/          # Vue composables
+│   ├── useGeolocation.js # Location access with error handling
+│   ├── useNaverMap.js    # Map initialization
+│   ├── useMapMarkers.js  # Marker rendering with zoom scaling
+│   ├── useMapPopup.js    # Popup positioning
+│   └── useMapControls.js # Zoom controls
+├── constants/            # App-wide constants (index.js)
+├── router/               # Vue Router configuration with auth guards
+├── store/                # Pinia stores
+│   ├── auth.js           # User authentication state
+│   ├── flavor.js         # Flavor data cache
+│   ├── index.js          # App-wide state
+│   ├── passport.js       # Passport data
+│   ├── recommendation.js # Recommendation cache
+│   └── saved.js          # Saved cafes state
+├── utils/                # Utility functions
+│   ├── address.js        # Address parsing/geocoding
+│   ├── date.js           # Date formatting (formatDate, formatRelativeTime, etc.)
+│   ├── geo.js            # Distance calculation, coordinate validation
+│   ├── logger.js         # Structured logging with createLogger()
+│   ├── storage.js        # Safe localStorage wrapper
+│   └── toast.js          # Toast notification helpers
+├── views/                # Page components (organized by feature)
+│   ├── auth/             # LoginView, NicknameRegistrationView, OAuthCallbackView
+│   ├── bean/             # BeanDetailView
+│   ├── dev/              # ComponentTestView
+│   ├── main/             # HomeView, MapView, RecommendationView, SavedView
+│   ├── owner/            # OwnerStoreListView, OwnerStoreFormView, OwnerMenuManageView, OwnerMenuFormView, OwnerBeanFormView
+│   ├── passport/         # PassportView, PassportDetailView
+│   ├── profile/          # ProfileView, MyPreferenceView, MyProfileEditView, PreferenceOnboardingView
+│   ├── review/           # MyReviewsView, ReviewDetailView, ReviewEditView, ReviewWriteView
+│   └── store/            # StoreDetailView, MenuDetailView, MenuView
+├── App.vue               # Root component with responsive layout shell
+├── config.js             # App configuration (reads from .env)
+└── main.js               # Application entry point
 ```
 
 ### Key Architectural Patterns
@@ -89,14 +138,14 @@ src/
 - **Session Restoration**: On app startup (`main.js`), if an access token exists in storage, `authStore.fetchUser()` is called to restore the user session. Failures clear the token and user state.
 
 **Routing**: Routes are in `src/router/index.js`. To add a new page:
-1. Create component in `src/views/`
+1. Create component in `src/views/<feature>/`
 2. Add route definition to `router/index.js`
 3. Update `PUBLIC_PAGES` Set if route should be accessible without authentication
 4. Update `pagesWithoutHeader` or `pagesWithoutNavigation` in `App.vue` if needed
 
 **State Management**:
 - Pinia stores in `src/store/` with automatic localStorage persistence
-- Main stores: `useAuthStore` (auth.js), `useSavedStore` (saved.js), `useNotificationStore` (notification.js), `useFlavorStore` (flavor.js), `useRecommendationStore` (recommendation.js), `usePassportStore` (passport.js), `useAppStore` (index.js)
+- Main stores: `useAuthStore` (auth.js), `useSavedStore` (saved.js), `useFlavorStore` (flavor.js), `useRecommendationStore` (recommendation.js), `usePassportStore` (passport.js), `useAppStore` (index.js)
 - All stores use `persist: { storage: safeStorage }` for safe cross-environment persistence
 
 **API Layer**:
@@ -104,7 +153,7 @@ src/
 - Credentials included (`withCredentials: true`) for cookie-based refresh tokens
 - 30-second request timeout with network error handling (timeout/offline detection)
 - Token refresh queue with max 10 pending requests to prevent memory leaks
-- Domain-specific API clients in `src/api/` (e.g., `auth.js`, `cafe.js`)
+- Domain-specific API clients in `src/api/` (e.g., `auth.js`, `cafe.js`, `bookmark.js`)
 - Error handling: Non-401 errors trigger toast notifications via `showApiError()`
 
 **Toast Notifications**:
@@ -118,14 +167,21 @@ src/
 - Log levels: `error` (always), `warn` (production+), `info` (development), `debug` (VITE_ENABLE_DEBUG=true only)
 - Example: `const logger = createLogger('MapView')` then `logger.info('Map initialized')`
 
+**Date Utilities** (`src/utils/date.js`):
+- `formatDate(dateInput)`: YYYY.MM.DD format
+- `formatDateWithWeekday(dateInput)`: YYYY년 M월 D일 (요일) format
+- `formatDateShort(dateInput)`: MM.DD format
+- `formatRelativeTime(dateInput)`: Relative time (방금 전, 5분 전, 어제, etc.)
+- Supports multiple input formats: ISO string, array `[year, month, day]`, Date object
+
 **Component Pattern**:
 - Vue 3 Composition API with `<script setup>` syntax
 - Base components in `src/components/common/` follow `Base*` naming convention
-- Feature-specific components organized in subdirectories (e.g., `map/`, `saved/`)
+- Feature-specific components organized in subdirectories (e.g., `map/`, `saved/`, `review/`)
 
 **Layout Structure**:
 - `App.vue` provides responsive mobile-first shell (max-width 448px on desktop, centered with shadow)
-- Conditional rendering: `BaseHeader` (hidden for login/nickname/map), `BaseNavigationBar` (hidden for login/nickname)
+- Conditional rendering: `BaseHeader` (hidden for login/nickname/map/review-write/preference-onboarding), `BaseNavigationBar` (hidden for login/nickname/review flows/preference-onboarding)
 - Full-screen pages (e.g., map) use `.full-screen` class to override padding/constraints
 - Navigation bar adds bottom padding to prevent content overlap
 - **KeepAlive**: Main navigation pages (MapView, RecommendationView, PassportView, SavedView, ProfileView) use Vue's KeepAlive to preserve component state when switching between tabs
@@ -163,6 +219,17 @@ src/
 - `formatDistance(meters)`: Human-readable format (e.g., "500m", "1.2km")
 - `isValidCoordinate(lat, lng)`: Validates coordinate ranges
 
+**Bookmark System** (`src/api/bookmark.js`, `src/components/saved/`):
+- Folder-based organization for saved cafes
+- API endpoints:
+  - `GET /bookmarks/folders` - List folders
+  - `POST /bookmarks/folders` - Create folder
+  - `PUT/DELETE /bookmarks/folders/{folderId}` - Update/delete folder
+  - `GET /bookmarks/folders/{folderId}/stores` - Get stores in folder
+  - `POST/DELETE /bookmarks/folders/{folderId}/stores/{storeId}` - Add/remove store
+  - `GET /bookmarks/stores/{storeId}/status` - Check bookmark status
+- Components: `SavedFolderList`, `SavedCafeList`, `AddFolderModal`, `EditFolderModal`, `BookmarkFolderSelectModal`
+
 **Owner/Manager Features** (`src/views/owner/`, `src/api/owner.js`):
 - Role-based access: `authStore.isOwner` checks for `MANAGER` role
 - Entry point: "내 가게 관리" button in ProfileView (visible only to owners)
@@ -178,7 +245,7 @@ src/
   - `POST/DELETE /menus/{menuId}/beans` - Bean linking
   - `GET /beans/roastery/{roasteryId}`, `POST /beans` - Bean management
 
-**AI Recommendation System** (`src/views/RecommendationView.vue`, `src/api/recommendation.js`, `src/store/recommendation.js`):
+**AI Recommendation System** (`src/views/main/RecommendationView.vue`, `src/api/recommendation.js`, `src/store/recommendation.js`):
 - Entry point: Bottom navigation bar "추천" tab
 - Features:
   - Bean recommendations: Top 5 personalized bean suggestions based on user preferences
@@ -191,19 +258,21 @@ src/
   - `GET /recommendations/beans/{beanId}/menus` - Menus using specific bean
 - Store pattern: `useRecommendationStore` with caching and `hasFetched*` flags to prevent redundant API calls
 
-**Coffee Passport** (`src/views/PassportView.vue`, `src/views/PassportDetailView.vue`, `src/api/passport.js`, `src/store/passport.js`):
+**Coffee Passport** (`src/views/passport/`, `src/api/passport.js`, `src/store/passport.js`):
 - Monthly passport system tracking coffee consumption
 - Features:
   - Year/month passport list with availability status
   - Detailed passport view with visit records grouped by date
   - Statistics: roastery and country consumption analytics
+  - Timeline view with map mode showing visit locations
 - API endpoints:
   - `GET /passport?year={year}` - Yearly passport list
   - `GET /passport/{passportId}` - Passport detail with records
   - `GET /passport/statistics/roastery` - Roastery consumption stats
   - `GET /passport/statistics/country` - Country origin stats
+- Components: `PassportCard`, `PassportStats`, `PassportTimeline`, `YearSelector`, `TimelineMapMode`, `TimelineRecordCard`
 
-**User Preferences & Onboarding** (`src/views/PreferenceOnboardingView.vue`, `src/views/MyPreferenceView.vue`, `src/api/preference.js`):
+**User Preferences & Onboarding** (`src/views/profile/PreferenceOnboardingView.vue`, `src/views/profile/MyPreferenceView.vue`, `src/api/preference.js`):
 - Flavor preference collection for personalized recommendations
 - Features:
   - Preference onboarding: Interactive flavor profile setup (acidity, body, sweetness, bitterness)
@@ -214,6 +283,11 @@ src/
   - `GET /preferences` - Get current preferences
   - `PUT /preferences` - Update preferences
   - `DELETE /preferences` - Delete preferences
+
+**Review System** (`src/views/review/`, `src/api/review.js`, `src/components/review/`):
+- Complete review CRUD with cupping notes
+- Views: `ReviewWriteView`, `ReviewDetailView`, `ReviewEditView`, `MyReviewsView`
+- Components: `ReviewCard`, `ReviewButton`, `FlavorSelector`, `FlavorWheel`, `TastingWheel`, `CuppingNoteForm`, `CuppingNoteDisplay`
 
 ## Configuration Notes
 
@@ -258,11 +332,14 @@ import { getItem, setItem, removeItem } from '@/utils/storage'
 - `naver` global: Declared as readonly for Naver Maps API access
 
 **Constants** (`src/constants/index.js`): Contains shared enums and lookup data:
-- `MENU_CATEGORIES`: Menu/store category options (HAND_DRIP, ESPRESSO, etc.)
-- `BEAN_COUNTRIES`: Coffee bean origin countries with coordinates and regions
-- `BEAN_VARIETY_GROUPS`, `BEAN_PROCESSING_METHOD_GROUPS`: Grouped dropdown options
+- `APP_CONSTANTS`: Application metadata
+- `MENU_CATEGORIES`: Menu/store category options (HAND_DRIP, ESPRESSO, AMERICANO, LATTE, etc.)
+- `BEAN_COUNTRIES`: Coffee bean origin countries with coordinates and regions (30+ countries)
+- `BEAN_VARIETY_GROUPS`, `BEAN_VARIETIES`: Coffee variety options (Bourbon, Gesha, Typica, etc.)
+- `BEAN_PROCESSING_METHOD_GROUPS`, `BEAN_PROCESSING_METHODS`: Processing methods (Washed, Natural, Honey, etc.)
 - `ROASTING_LEVELS`: Light/Medium/Dark roasting levels
 - `VALIDATION`: Nickname and other input validation rules
+- `DEFAULTS`: Page size, timeout, debounce delay, file limits
 - `FLAVOR_WHEEL`: Hierarchical coffee flavor taxonomy (9 top-level categories with 3 levels of nesting)
   - Each node has: `id`, `code`, `name`, `colorHex`, `children`
   - Utility functions: `findFlavorInWheel(idOrCode)`, `getFlavorPath(idOrCode)`

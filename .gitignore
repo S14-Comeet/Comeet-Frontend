@@ -360,7 +360,6 @@ docs/
 .idea/
 
 # AI/Tool generated files
-CLAUDE.md
 commits.txt
 .git-commit-message.txt
 nul
