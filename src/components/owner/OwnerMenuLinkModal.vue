@@ -2,10 +2,11 @@
   <Teleport to="body">
     <Transition name="fade">
       <div
+        v-if="true"
         class="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50"
         @click.self="$emit('close')"
       >
-        <div class="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md max-h-[90vh] flex flex-col shadow-xl">
+        <div class="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md max-h-[60vh] flex flex-col shadow-xl mb-16 sm:mb-0">
           <!-- 헤더 -->
           <div class="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
             <div>
@@ -23,7 +24,7 @@
           </div>
 
           <!-- 메뉴 목록 -->
-          <div class="flex-1 overflow-y-auto p-4">
+          <div class="flex-1 overflow-y-auto p-4 min-h-0">
             <!-- 로딩 -->
             <div v-if="isLoading" class="flex justify-center py-8">
               <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
@@ -56,19 +57,6 @@
                     <p class="text-xs text-textSecondary mt-0.5">{{ formatCategory(menu.category) }}</p>
                   </div>
                 </label>
-
-                <!-- 블렌드 토글 (연결된 경우만) -->
-                <div v-if="linkState[menu.id]?.linked" class="mt-2 ml-7">
-                  <label class="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      :checked="linkState[menu.id]?.isBlended"
-                      class="w-4 h-4 text-accent border-border rounded focus:ring-accent"
-                      @change="toggleBlend(menu.id)"
-                    />
-                    <span class="text-sm text-textSecondary">블렌드 원두</span>
-                  </label>
-                </div>
               </div>
             </div>
           </div>
@@ -127,7 +115,7 @@ const menus = ref([])
 const isLoading = ref(true)
 const isSaving = ref(false)
 
-// 연결 상태: { [menuId]: { linked: boolean, isBlended: boolean, original: { linked, isBlended } } }
+// 연결 상태: { [menuId]: { linked: boolean, original: { linked } } }
 const linkState = ref({})
 
 /**
@@ -146,12 +134,10 @@ const loadMenus = async () => {
       // menu.beanBadges에서 현재 원두가 연결되어 있는지 확인
       const linkedBean = menu.beanBadges?.find(b => b.beanId === props.bean.id)
       const linked = !!linkedBean
-      const isBlended = linkedBean?.isBlended || false
 
       state[menu.id] = {
         linked,
-        isBlended,
-        original: { linked, isBlended }
+        original: { linked }
       }
     })
     linkState.value = state
@@ -170,16 +156,6 @@ const loadMenus = async () => {
 const toggleLink = (menuId) => {
   const state = linkState.value[menuId]
   state.linked = !state.linked
-  if (!state.linked) {
-    state.isBlended = false
-  }
-}
-
-/**
- * 블렌드 토글
- */
-const toggleBlend = (menuId) => {
-  linkState.value[menuId].isBlended = !linkState.value[menuId].isBlended
 }
 
 /**
@@ -187,8 +163,7 @@ const toggleBlend = (menuId) => {
  */
 const hasChanges = computed(() => {
   return Object.values(linkState.value).some(state => {
-    return state.linked !== state.original.linked ||
-           (state.linked && state.isBlended !== state.original.isBlended)
+    return state.linked !== state.original.linked
   })
 })
 
@@ -209,23 +184,13 @@ const handleSave = async () => {
         promises.push(
           linkBeanToMenu(menuId, {
             beanId: props.bean.id,
-            isBlended: state.isBlended
+            isBlended: false
           })
         )
       } else if (wasLinked && !isLinked) {
         // 연결 해제
         promises.push(
           unlinkBeanFromMenu(menuId, props.bean.id)
-        )
-      } else if (isLinked && state.isBlended !== state.original.isBlended) {
-        // 블렌드 상태만 변경 (연결 해제 후 재연결)
-        promises.push(
-          unlinkBeanFromMenu(menuId, props.bean.id).then(() =>
-            linkBeanToMenu(menuId, {
-              beanId: props.bean.id,
-              isBlended: state.isBlended
-            })
-          )
         )
       }
     }

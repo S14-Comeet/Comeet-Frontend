@@ -57,11 +57,6 @@
           <span class="text-textPrimary">내 정보 수정</span>
           <span class="text-textSecondary">›</span>
         </button>
-        <!-- TODO: 알림 설정 기능 구현 필요 -->
-        <button class="w-full flex items-center justify-between p-4 border-b border-primary-200 hover:bg-primary-50 transition-colors">
-          <span class="text-textPrimary">알림 설정</span>
-          <span class="text-textSecondary">›</span>
-        </button>
         <button
           class="w-full flex items-center justify-between p-4 text-error hover:bg-error-light hover:bg-opacity-10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="isLoggingOut"

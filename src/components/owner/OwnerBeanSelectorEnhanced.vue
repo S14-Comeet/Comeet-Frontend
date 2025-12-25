@@ -6,7 +6,7 @@
         class="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50"
         @click.self="$emit('close')"
       >
-        <div class="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md max-h-[90vh] flex flex-col shadow-xl">
+        <div class="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md max-h-[60vh] flex flex-col shadow-xl mb-16 sm:mb-0">
           <!-- 헤더 -->
           <div class="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
             <div>
@@ -63,7 +63,6 @@
                   :key="bean.id"
                   :bean="bean"
                   :is-selected="isSelected(bean.id)"
-                  :is-blended="isBlended"
                   @select="handleSelectBean(bean)"
                 />
 
@@ -117,7 +116,6 @@
                     :key="bean.id"
                     :bean="bean"
                     :is-selected="isSelected(bean.id)"
-                    :is-blended="isBlended"
                     :show-roastery="true"
                     @select="handleSelectBean(bean)"
                   />
@@ -137,17 +135,6 @@
             </div>
           </div>
 
-          <!-- 블렌드 옵션 -->
-          <div class="p-4 border-t border-border flex-shrink-0">
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input
-                v-model="isBlended"
-                type="checkbox"
-                class="w-4 h-4 text-primary border-border rounded focus:ring-primary"
-              />
-              <span class="text-sm text-textPrimary">블렌드 원두로 연결</span>
-            </label>
-          </div>
         </div>
       </div>
     </Transition>
@@ -178,7 +165,6 @@ const emit = defineEmits(['close', 'select'])
 
 // 상태
 const activeTab = ref('roastery')
-const isBlended = ref(false)
 
 // 로스터리 원두 상태
 const roasteryBeans = ref([])
@@ -310,7 +296,7 @@ const handleSelectBean = (bean) => {
 
   emit('select', {
     ...bean,
-    isBlended: isBlended.value
+    isBlended: false
   })
 }
 
@@ -330,7 +316,6 @@ const BeanCard = defineComponent({
   props: {
     bean: { type: Object, required: true },
     isSelected: { type: Boolean, default: false },
-    isBlended: { type: Boolean, default: false },
     showRoastery: { type: Boolean, default: false }
   },
   emits: ['select'],
@@ -354,11 +339,13 @@ const BeanCard = defineComponent({
     }, [
       h('div', { class: 'flex items-start justify-between' }, [
         h('div', { class: 'flex-1 min-w-0' }, [
-          h('p', { class: 'font-medium text-textPrimary' }, [
+          // 원두 이름 표시
+          props.bean.name && h('p', { class: 'font-medium text-textPrimary truncate' }, props.bean.name),
+          h('p', { class: 'text-xs text-textSecondary mt-0.5' }, [
             props.bean.country,
-            props.bean.farm && h('span', { class: 'text-textSecondary font-normal' }, ` / ${props.bean.farm}`)
+            props.bean.farm && ` / ${props.bean.farm}`
           ]),
-          h('p', { class: 'text-xs text-textSecondary mt-1' }, [
+          h('p', { class: 'text-xs text-textSecondary mt-0.5' }, [
             props.bean.variety || '-',
             ' · ',
             props.bean.processingMethod || '-',
@@ -371,7 +358,7 @@ const BeanCard = defineComponent({
         ]),
         h('div', {
           class: [
-            'ml-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors',
+            'ml-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors flex-shrink-0',
             props.isSelected
               ? 'bg-neutral-100 text-textSecondary'
               : 'bg-primary text-white hover:bg-primary-600'

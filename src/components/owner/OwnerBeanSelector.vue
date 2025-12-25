@@ -2,12 +2,13 @@
   <Teleport to="body">
     <Transition name="fade">
       <div
+        v-if="true"
         class="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50"
         @click.self="$emit('close')"
       >
-        <div class="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md max-h-[85vh] flex flex-col shadow-xl">
+        <div class="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md max-h-[60vh] flex flex-col shadow-xl mb-16 sm:mb-0">
           <!-- 헤더 -->
-          <div class="flex items-center justify-between p-4 border-b border-border">
+          <div class="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
             <div>
               <h3 class="text-lg font-bold text-textPrimary">원두 연결</h3>
               <p class="text-sm text-textSecondary">{{ menu?.name }}</p>
@@ -21,7 +22,7 @@
           </div>
 
           <!-- 탭 -->
-          <div class="flex border-b border-border">
+          <div class="flex border-b border-border flex-shrink-0">
             <button
               class="flex-1 py-3 text-sm font-medium transition-colors"
               :class="activeTab === 'linked' ? 'text-primary border-b-2 border-primary' : 'text-textSecondary'"
@@ -39,7 +40,7 @@
           </div>
 
           <!-- 탭 내용 -->
-          <div class="flex-1 overflow-y-auto">
+          <div class="flex-1 overflow-y-auto min-h-0">
             <!-- 연결된 원두 탭 -->
             <div v-if="activeTab === 'linked'" class="p-4">
               <div v-if="linkedBeans.length === 0" class="text-center py-8">
@@ -77,7 +78,7 @@
             <!-- 원두 검색 탭 -->
             <div v-else class="flex flex-col h-full">
               <!-- 검색 바 -->
-              <div class="p-4 border-b border-border">
+              <div class="p-4 border-b border-border flex-shrink-0">
                 <div class="relative">
                   <BaseInput
                     v-model="searchKeyword"
@@ -88,11 +89,10 @@
                     <div class="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
                   </div>
                 </div>
-                <p class="text-xs text-textSecondary mt-1">원두 생산 국가로 검색할 수 있습니다</p>
               </div>
 
               <!-- 원두 목록 -->
-              <div class="flex-1 overflow-y-auto p-4">
+              <div class="flex-1 overflow-y-auto p-4 min-h-0">
                 <!-- 로딩 -->
                 <div v-if="isLoading && beans.length === 0" class="flex justify-center py-8">
                   <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
@@ -114,13 +114,16 @@
                   >
                     <div class="flex items-start justify-between">
                       <div class="flex-1 min-w-0">
-                        <p class="font-medium text-textPrimary">
-                          {{ bean.country }}
-                          <span v-if="bean.farm" class="text-textSecondary font-normal">/ {{ bean.farm }}</span>
+                        <!-- 원두 이름 -->
+                        <p v-if="bean.name" class="font-medium text-textPrimary truncate">{{ bean.name }}</p>
+                        <p class="text-xs text-textSecondary mt-0.5">
+                          {{ bean.country }}{{ bean.farm ? ` / ${bean.farm}` : '' }}
                         </p>
-                        <p class="text-xs text-textSecondary mt-1">
+                        <p class="text-xs text-textSecondary mt-0.5">
                           {{ bean.variety || '-' }} · {{ bean.processingMethod || '-' }} · {{ getRoastingLevelLabel(bean.roastingLevel) }}
                         </p>
+                        <!-- 로스터리 -->
+                        <p v-if="bean.roasteryName" class="text-xs text-primary mt-1">{{ bean.roasteryName }}</p>
                         <!-- 플레이버 -->
                         <div v-if="bean.flavors?.length" class="flex flex-wrap gap-1 mt-2">
                           <span
@@ -134,7 +137,7 @@
                         </div>
                       </div>
                       <button
-                        class="ml-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors"
+                        class="ml-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors flex-shrink-0"
                         :class="isLinked(bean.id)
                           ? 'bg-neutral-100 text-textSecondary cursor-not-allowed'
                           : 'bg-primary text-white hover:bg-primary-600'"
@@ -160,23 +163,11 @@
                   </button>
                 </div>
               </div>
-
-              <!-- 블렌드 옵션 -->
-              <div class="p-4 border-t border-border">
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input
-                    v-model="isBlended"
-                    type="checkbox"
-                    class="w-4 h-4 text-primary border-border rounded focus:ring-primary"
-                  />
-                  <span class="text-sm text-textPrimary">블렌드 원두로 연결</span>
-                </label>
-              </div>
             </div>
           </div>
 
           <!-- 하단 버튼 -->
-          <div class="p-4 border-t border-border safe-bottom">
+          <div class="p-4 border-t border-border safe-bottom flex-shrink-0">
             <BaseButton
               variant="secondary"
               size="large"
@@ -193,7 +184,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { getMenuById } from '@/api/menu'
 import { linkBeanToMenu, unlinkBeanFromMenu, getBeans, searchBeans } from '@/api/owner'
 import { createLogger } from '@/utils/logger'
@@ -218,7 +209,6 @@ const activeTab = ref('linked')
 const linkedBeans = ref([])
 const beans = ref([])
 const searchKeyword = ref('')
-const isBlended = ref(false)
 const isLoading = ref(false)
 const isSearching = ref(false)
 const isLinking = ref(null)
@@ -318,7 +308,7 @@ const handleLink = async (bean) => {
   try {
     await linkBeanToMenu(props.menu.id, {
       beanId: bean.id,
-      isBlended: isBlended.value
+      isBlended: false
     })
 
     showSuccess('원두가 연결되었습니다')
