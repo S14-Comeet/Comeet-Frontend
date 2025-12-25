@@ -56,15 +56,39 @@ defineProps({
 const emit = defineEmits(['item-click'])
 
 const formatDay = (dateString) => {
+  if (!dateString) return '-'
+  // YYYY-MM-DD 형식 직접 파싱
+  const parts = String(dateString).split('-')
+  if (parts.length >= 3) {
+    const month = parseInt(parts[1], 10)
+    const day = parseInt(parts[2], 10)
+    if (!isNaN(month) && !isNaN(day)) {
+      return `${month}/${day}`
+    }
+  }
+  // fallback: Date 객체 사용
   const date = new Date(dateString)
-  const month = date.getMonth() + 1
-  const day = date.getDate()
-  return `${month}/${day}`
+  if (isNaN(date.getTime())) return '-'
+  return `${date.getMonth() + 1}/${date.getDate()}`
 }
 
 const formatWeekday = (dateString) => {
-  const date = new Date(dateString)
+  if (!dateString) return ''
   const weekdays = ['일', '월', '화', '수', '목', '금', '토']
+  // YYYY-MM-DD 형식 직접 파싱
+  const parts = String(dateString).split('-')
+  if (parts.length >= 3) {
+    const year = parseInt(parts[0], 10)
+    const month = parseInt(parts[1], 10) - 1
+    const day = parseInt(parts[2], 10)
+    const date = new Date(year, month, day)
+    if (!isNaN(date.getTime())) {
+      return weekdays[date.getDay()]
+    }
+  }
+  // fallback
+  const date = new Date(dateString)
+  if (isNaN(date.getTime())) return ''
   return weekdays[date.getDay()]
 }
 
